@@ -1,25 +1,39 @@
 'use client'
-import { Listbox, ListboxItem } from '@heroui/react';
-import Link from 'next/link';
-import React from 'react';
+import { Listbox, ListboxItem } from "@heroui/react";
+import Link from "next/link"; // Import Link from Next.js
 
-export const links = [
-  { href: "/news-feed", label: "News Feed" },
-  { href: "/about-us", label: "About Us" },
-  { href: "/contact-us", label: "Contact Us" },
+export const items = [
+  { href: "/news-feed", label: "News feed" },
+  { href: "/change-password", label: "Change password" },
+  { href: "/about-us", label: "About us" },
+  { href: "/contact-us", label: "Contact us" },
+
 ];
 
-const SidebarMenu = () => {
+
+export default function SidebarMenu() {
+
   return (
-    
-    <div className=" bg-default-100  ">
-
-      <Listbox aria-label="Actions" onAction={(key) => alert(key)}>
-        {links.map((link) => <ListboxItem key={link.href}> <Link href={link.href}  className=' block w-full'>{link?.label} </Link> </ListboxItem>)}
-       
-      </Listbox>
-      </div>
+    <div className="bg-default-100 dark:bg-default-100">
+        <Listbox
+          isVirtualized
+          className="max-w-xs "
+          label={"Select from 1000 items"}
+          // placeholder="Select..."
+          virtualization={{
+            maxListboxHeight: 400,
+            itemHeight: 40,
+          }}
+        >
+          {items.map((item, index) => (
+            <ListboxItem key={index} value={item.label}
+            as={Link} href={item.href}
+            >
+                {item.label}
+              
+            </ListboxItem>
+          ))}
+        </Listbox>
+    </div>
   );
-};
-
-export default SidebarMenu;
+}
