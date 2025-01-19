@@ -8,6 +8,8 @@ import { Input as HeroUiInput } from "@heroui/react";
 interface CustomInputProps {
   name: string;
   label: string;
+  labelPlacement?: "outside" | "outside-left" | "inside" | undefined;
+  placeholder?: string;
   required?: boolean;
   type?: "text" | "password";
   size?: "sm" | "md" | "lg";
@@ -20,6 +22,8 @@ interface CustomInputProps {
 export default function Input({
   name,
   label,
+  labelPlacement,
+  placeholder,
   required = false,
   type = "text",
   size = "md",
@@ -39,6 +43,8 @@ export default function Input({
       <HeroUiInput
         {...register(name)}
         label={label}
+        labelPlacement={labelPlacement}
+        placeholder={placeholder}
         required={required}
         size={size}
         value={value}

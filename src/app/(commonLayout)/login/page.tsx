@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { toast } from "sonner";
@@ -10,9 +9,8 @@ import { SubmitHandler } from "react-hook-form";
 import Input from "@/components/form/Input";
 import Link from "next/link";
 import { Button, } from "@heroui/react";
-import { useLoginMutation } from "@/redux/auth/authApi";
 import { useUser } from "@/context/UserProvider";
-import { setToken } from "@/service/AuthService";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
 
 export type ILoginUser = {
   email: string;
@@ -23,7 +21,9 @@ const LoginPage = () => {
   const router = useRouter();
   // const dispatch = useAppDispatch();
   const [login] = useLoginMutation();
-  const { setIsLoading: userLoading } = useUser();
+  const { user ,setIsLoading: userLoading } = useUser();
+
+  console.log("login page user", user)
 
 
   const onSubmit: SubmitHandler<ILoginUser> = async (formData) => {
@@ -35,22 +35,13 @@ const LoginPage = () => {
 
       if (res?.success) {
         userLoading(true);
-        // userLoading(false); 
-        // const { token } = res.data;
-        // const user: any = jwtDecode(token);
-        // dispatch(setUser({ user, token }));
-        // console.log('res....DATA',res?.data)
-        const userlogin = setToken(res?.data)
-        console.log({userlogin})
         router.push("/");
         toast.success(res?.message, { id: toastId });
       }
     } catch (error: any) {
       toast.error(error?.data?.message, { id: toastId });
     }
-    //  finally {
-      // userLoading(false); 
-    // }
+    
   };
 
 
@@ -60,23 +51,23 @@ const LoginPage = () => {
       <div className="w-[35%]">
         <Form  
          //! Only for development
-        defaultValues={{
-          email: "zillur@gmail.com",
-          password: "1234",
-        }}
+        // defaultValues={{
+        //   email: "zillur@gmail.com",
+        //   password: "1234",
+        // }}
         resolver={zodResolver(loginValidationSchema)}
         onSubmit={onSubmit}>
-            <div className="py-3">
-              <Input label="Email" name="email" size="sm" />
-            </div>
-            <div className="py-3">
+              <div className=" flex flex-col gap-3">
+        
+              <Input label="Email" labelPlacement="outside" placeholder="Enter your email" name="email"  />
               <Input
                 label="Password"
+                labelPlacement="outside"
+                placeholder="Enter your password"
                 name="password"
-                size="sm"
                 type="password"
               />
-            </div>
+              </div>
             <div className="flex py-2 px-1 justify-between">
               {/* <Checkbox
                     classNames={{
@@ -87,6 +78,7 @@ const LoginPage = () => {
                   </Checkbox> */}
               <Link color="primary"
                 href={"#"}
+                className=" text-sm text-blue-600 hover:text-blue-400 transition-colors duration-200"
                >
                 Forgot password?
               </Link>
@@ -94,7 +86,7 @@ const LoginPage = () => {
 
             <Button
               className="my-3 w-full rounded-md "
-              size="lg"
+              size="md"
               type="submit"
             >
               Login
@@ -103,9 +95,8 @@ const LoginPage = () => {
         <div className="text-center">
           Not have an account ?{" "}
           <Link
-            // onClick={() => handleForgetPassword()}
             href={"/register"}
-            className="text-blue-500 hover:text-blue-700"
+            className="text-blue-600 hover:text-blue-400 transition-colors duration-200"
           >
             Register
           </Link>
