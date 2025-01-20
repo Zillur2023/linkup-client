@@ -10,9 +10,9 @@ import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 import { registerValidationSchema } from "@/schemas";
 import { useCreateUserMutation } from "@/redux/features/user/userApi";
-import Form from "@/components/form/Form";
-import Input from "@/components/form/Input";
 import { Avatar, Badge, Button } from "@heroui/react";
+import LinkUpForm from "@/components/form/LinkUpForm";
+import LinkUpInput from "@/components/form/LinkUpInput";
 
 export type IRegisterUser = {
   name: string;
@@ -76,7 +76,7 @@ const RegisterPage: React.FC = () => {
     <div className=" h-auto flex flex-col items-center justify-center">
     <h3 className="my-2 text-xl font-bold">Register</h3>
     <div className="w-[35%] ">
-      <Form
+      <LinkUpForm
         //! Only for development
         // defaultValues={{
         //   name: "zillur Rahman",
@@ -87,9 +87,9 @@ const RegisterPage: React.FC = () => {
         onSubmit={onSubmit}
       >
        <div className="flex flex-col gap-3">
-       <Input label="Name" labelPlacement="outside" placeholder="Enter your name" name="name" />
-          <Input label="Email" labelPlacement="outside" placeholder="Enter your email" name="email"  />
-          <Input
+       <LinkUpInput label="Name" labelPlacement="outside" placeholder="Enter your name" name="name" />
+          <LinkUpInput label="Email" labelPlacement="outside" placeholder="Enter your email" name="email"  />
+          <LinkUpInput
             label="Password"
             labelPlacement="outside"
             placeholder="Enter your passwords"
@@ -130,7 +130,7 @@ const RegisterPage: React.FC = () => {
         >
           Register
         </Button>
-      </Form>
+      </LinkUpForm>
       <div className="text-center">
         Already have an account ? <Link href={"/login"} className="text-blue-500 hover:text-blue-700">Login</Link>
       </div>

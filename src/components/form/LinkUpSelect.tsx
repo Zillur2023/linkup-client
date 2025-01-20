@@ -1,5 +1,5 @@
 import { IInput } from "@/type";
-import { Select as NextUiSelect, SelectItem } from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
 import { useFormContext } from "react-hook-form";
 
 interface IProps extends IInput {
@@ -11,7 +11,7 @@ interface IProps extends IInput {
   value?: string
 }
 
-export default function Select({
+export default function LinkUpSelect({
   options,
   name,
   label,
@@ -25,7 +25,7 @@ export default function Select({
   } = useFormContext();
 
   return (
-    <NextUiSelect
+    <Select
       {...register(name)}
       className="min-w-full sm:min-w-[225px]"
       isDisabled={disabled}
@@ -36,6 +36,6 @@ export default function Select({
       {options.map((option) => (
         <SelectItem key={option}>{option}</SelectItem>
       ))}
-    </NextUiSelect>
+    </Select>
   );
 }

@@ -4,13 +4,13 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginValidationSchema } from "@/schemas";
-import Form from "@/components/form/Form";
 import { SubmitHandler } from "react-hook-form";
-import Input from "@/components/form/Input";
 import Link from "next/link";
 import { Button, } from "@heroui/react";
 import { useUser } from "@/context/UserProvider";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
+import LinkUpForm from "@/components/form/LinkUpForm";
+import LinkUpInput from "@/components/form/LinkUpInput";
 
 export type ILoginUser = {
   email: string;
@@ -49,7 +49,7 @@ const LoginPage = () => {
     <div className="flex h-[calc(100vh-100px)] flex-col items-center justify-center">
       <h3 className="my-2 text-xl font-bold">Login</h3>
       <div className="w-[35%]">
-        <Form  
+        <LinkUpForm  
          //! Only for development
         // defaultValues={{
         //   email: "zillur@gmail.com",
@@ -59,8 +59,8 @@ const LoginPage = () => {
         onSubmit={onSubmit}>
               <div className=" flex flex-col gap-3">
         
-              <Input label="Email" labelPlacement="outside" placeholder="Enter your email" name="email"  />
-              <Input
+              <LinkUpInput label="Email" labelPlacement="outside" placeholder="Enter your email" name="email"  />
+              <LinkUpInput
                 label="Password"
                 labelPlacement="outside"
                 placeholder="Enter your password"
@@ -91,7 +91,7 @@ const LoginPage = () => {
             >
               Login
             </Button>
-        </Form>
+        </LinkUpForm>
         <div className="text-center">
           Not have an account ?{" "}
           <Link

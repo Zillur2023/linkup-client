@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { EyeSlashFilledIcon } from "./EyeSlashFilledIcon";
 import { EyeFilledIcon } from "./EyeFilledIcon";
-import { Input as HeroUiInput } from "@heroui/react";
+import { Input } from "@heroui/react";
 
-interface CustomInputProps {
+interface InputProps {
   name: string;
   label: string;
   labelPlacement?: "outside" | "outside-left" | "inside" | undefined;
@@ -19,7 +19,7 @@ interface CustomInputProps {
   focusRef?: (el: HTMLInputElement | null) => void;
 }
 
-export default function Input({
+export default function LinkUpInput({
   name,
   label,
   labelPlacement,
@@ -30,7 +30,7 @@ export default function Input({
   value,
   isReadOnly=false,
   focusRef,
-}: CustomInputProps) {
+}: InputProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const { register, formState: { errors } } = useFormContext();
 
@@ -40,7 +40,7 @@ export default function Input({
 
   return (
     <div>
-      <HeroUiInput
+      <Input
         {...register(name)}
         label={label}
         labelPlacement={labelPlacement}

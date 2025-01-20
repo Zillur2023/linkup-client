@@ -13,7 +13,7 @@ interface IProps extends formConfig {
   onSubmit: SubmitHandler<any>;
 }
 
-export default function Form({
+export default function LinkUpForm({
   children,
   onSubmit,
   defaultValues,
