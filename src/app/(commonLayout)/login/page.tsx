@@ -11,6 +11,8 @@ import { useUser } from "@/context/UserProvider";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import LinkUpForm from "@/components/form/LinkUpForm";
 import LinkUpInput from "@/components/form/LinkUpInput";
+import Posts from "@/components/shared/Posts";
+import PostEditor from "@/components/shared/PostEditor";
 
 export type ILoginUser = {
   email: string;
@@ -46,6 +48,8 @@ const LoginPage = () => {
 
 
   return (
+   <>
+      <PostEditor/>
     <div className="flex h-[calc(100vh-100px)] flex-col items-center justify-center">
       <h3 className="my-2 text-xl font-bold">Login</h3>
       <div className="w-[35%]">
@@ -104,6 +108,7 @@ const LoginPage = () => {
       </div>
      
     </div>
+   </>
   );
 };
 

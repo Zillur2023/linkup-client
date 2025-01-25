@@ -13,3 +13,10 @@ export const registerValidationSchema = z.object({
   email: z.string().email("Please enter a valid email address!"),
   password: z.string().min(4, "Must be at least 4 characters."),
 });
+
+export const postEditorValidationSchema = z.object({
+  isPremium: z.boolean().optional(), 
+  content: z.string().optional(),
+  // content: z.any().optional(),
+  image: z.array(z.instanceof(File)).optional(),
+});

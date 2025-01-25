@@ -23,6 +23,7 @@ export default function LinkUpSelect({
     register,
     formState: { errors },
   } = useFormContext();
+  console.log("select value",value)
 
   return (
     <Select

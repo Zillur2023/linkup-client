@@ -67,17 +67,17 @@ export const postApi = baseApi.injectEndpoints({
       providesTags: ["Post"],
     }),
     
-    updateUpvote: builder.mutation({
+    updateLikes: builder.mutation({
       query: (postData) => ({
-        url: `/post/upvotes`,
+        url: `/post/likes`,
         method: "PUT",
         body: postData,
       }),
       invalidatesTags: ["Post","User"],
     }),
-    updateDownvote: builder.mutation({
+    updateDislikes: builder.mutation({
       query: (postData) => ({
-        url: `/post/downvotes`,
+        url: `/post/dislikes`,
         method: "PUT",
         body: postData,
       }),
@@ -111,29 +111,11 @@ export const postApi = baseApi.injectEndpoints({
 export const {
   useCreatePostMutation,
   useGetAllPostQuery,
-  useUpdateUpvoteMutation,
-  useUpdateDownvoteMutation,
+  useUpdateLikesMutation,
+  useUpdateDislikesMutation,
   useUpdatePostMutation,
   useDeletePostMutation,
   useIsAvailableForVeriedQuery
 } = postApi;
 
 
-// getAllPost: builder.query({
-//   query: ({ postId, userId }: { postId?: string; userId?: string }) => {
-//     let url = '/post/all-post'; // Base URL
-//     if (postId) {
-//       // If postId is provided, append it to the URL
-//       url += `/${postId}`;
-//     } else if (userId) {
-//       // If userId is provided, append it to the URL
-//       url += `/userId/${userId}`;
-//     }
-
-//     return {
-//       url,
-//       method: "GET",
-//     };
-//   },
-//   providesTags: ["Post"],
-// }),
