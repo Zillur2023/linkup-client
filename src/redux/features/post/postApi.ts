@@ -15,14 +15,12 @@ export const postApi = baseApi.injectEndpoints({
         postId,
         userId,
         searchTerm, 
-        category,   
         sortBy, 
         isPremium    
       }: {
         postId?: string;
         userId?: string;
         searchTerm?: string; // Optional searchTerm
-        category?: string;   // Optional category
         // sortBy?: "highestUpvotes" | "lowestUpvotes" | "highestDownvotes" | "lowestDownvotes" 
         sortBy?: string; 
         isPremium?: boolean; 
@@ -42,9 +40,6 @@ export const postApi = baseApi.injectEndpoints({
         const params: string[] = [];
         if (searchTerm) {
           params.push(`searchTerm=${encodeURIComponent(searchTerm)}`);
-        }
-        if (category) {
-          params.push(`category=${encodeURIComponent(category)}`); // Append category
         }
         if (sortBy) {
           params.push(`sortBy=${sortBy}`);

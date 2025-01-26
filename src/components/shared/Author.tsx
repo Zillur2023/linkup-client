@@ -1,12 +1,11 @@
 
 import { User } from "@heroui/react";
 import { VerifiedIcon } from "lucide-react";
-import { ReactNode } from "react";
 
 interface IAuthor {
-  name: string | ReactNode;
-  email: string | ReactNode;
-  image: string;
+  name: string ;
+  email: string ;
+  image: string[];
   isVerified: boolean;
 }
 
@@ -31,7 +30,7 @@ export default function Author({ author, className }: AuthorProps) {
         <p className="text-blue-500">{author?.email}</p>
       }
       avatarProps={{
-        src: `${author?.image}`,
+        src: `${author?.image?.[0]}`,
       }}
     />
   );

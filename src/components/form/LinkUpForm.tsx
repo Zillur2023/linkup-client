@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@heroui/react";
 import { ReactNode } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
@@ -35,6 +34,7 @@ export default function LinkUpForm({
   const submitHandler = methods.handleSubmit;
 
   console.log({submitHandler})
+  console.log("Form Errors:", methods.formState.errors);
 
   return (
     <FormProvider {...methods}>

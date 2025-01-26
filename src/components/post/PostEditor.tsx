@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Checkbox } from "@heroui/react";
 import { IPost, IUserData } from "@/type";
 import { useUser } from "@/context/UserProvider";
-import LinkUpModal from "./LinkUpModal";
+import LinkUpModal from "../shared/LinkUpModal";
 import { postEditorValidationSchema } from "@/schemas";
 import LinkUpInputFile from "../form/LinkUpInputFile";
 import LinkUpForm from "../form/LinkUpForm";
@@ -31,6 +31,7 @@ import { Color } from '@tiptap/extension-color'
 import TextStyle from '@tiptap/extension-text-style'
 import ListItem from '@tiptap/extension-list-item'
 import { useEditor } from "@tiptap/react";
+import { toast } from "sonner";
 
 interface PostEditorProps {
   updatePostData?: IPost; 
@@ -49,7 +50,8 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
           }),
           Highlight,
           Color.configure({ types: [TextStyle.name, ListItem.name] }),
-          TextStyle.configure({ types: [ListItem.name] }),
+          // TextStyle.configure({ types: [ListItem.name] }),
+          TextStyle.configure({ }),
           StarterKit.configure({
             bulletList: {
               keepMarks: true,
@@ -66,9 +68,8 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
 
 
   const [createPost] = useCreatePostMutation();
-//   const [updatePost] = useUpdatePostMutation();
+  const [updatePost] = useUpdatePostMutation();
 
-// const { reset } = useFormContext(); // Access the reset method
 
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
@@ -76,32 +77,30 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
   
     const formData = new FormData();
 
-    // const updatedData: any = {
-    //   ...data,
-    //   _id: updatePostData?._id,
-    //   author: userData?.data?._id,
-    //   content: plainText,
-    // };
+    const updatedData: any = {
+      ...data,
+      _id: updatePostData?._id,
+      author: userData?.data?._id,
+      content: data?.content,
+    };
 
 
-    // formData.append("image", imageFiles?.[0]);
+    formData.append("image", data?.image);
 
-    // formData.append("data", JSON.stringify(updatedData));
+    formData.append("data", JSON.stringify(updatedData));
 
-    // const toastId = toast.loading("loading...");
-    // try {
-    //   const res = updatePostData
-    //     ? await updatePost(formData).unwrap()
-    //     : await createPost(formData).unwrap();
+    const toastId = toast.loading("loading...");
+    try {
+      const res = updatePostData
+        ? await updatePost(formData).unwrap()
+        : await createPost(formData).unwrap();
 
-    //   if (res.success) {
-    //     toast.success(res.message, { id: toastId });
-    //     reset();
-    //   }
-    // } catch (error: any) {
-    //   toast.error(error?.data?.message, { id: toastId });
-    // }
-    // createPost(data)
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message, { id: toastId });
+    }
   };
 
   
@@ -110,7 +109,6 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
     <LinkUpModal
       // buttonText="Edit Profile"
       openButtonText={`${updatePostData ? "Update Post" : "Create a new post"}`}
-      actionButtonText={`${updatePostData ? "Update" : "Create"}`}
       title={`${updatePostData ? "Update Post" : "Create a new post"}`}
       variant="bordered"
       ClassName="rounded-md border hover:border-blue-500 py-0 w-full"
@@ -120,11 +118,11 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
               
                 resolver={zodResolver(postEditorValidationSchema)}
                 onSubmit={onSubmit}
-                defaultValues={{
-                  isPremium: false, // Default value for the checkbox
-                  content: "", // Default value for the editor
-                  image: null, // Default value for the file input
-                }}
+                // defaultValues={{
+                //   isPremium: false, // Default value for the checkbox
+                //   content: "", // Default value for the editor
+                //   image: null, // Default value for the file input
+                // }}
                 
               >
    
@@ -157,9 +155,7 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
             Reset
           </Button> */}
           <LinkUpReset editor={editor}/>
-           {/* <Button type="button" size="sm" variant="bordered" onClick={()=> reset({isPremium:false, content:"", image: null})}>
-                Reset
-              </Button> */}
+          
         </div>
        
     

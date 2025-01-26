@@ -13,7 +13,9 @@ interface LinkUpEditorProps {
 
   const LinkUpEditor: React.FC<LinkUpEditorProps> = ({ name, editor }) => {
   
-      const {  control, formState: { errors } } = useFormContext();
+      const {  control, setValue, formState: { errors } } = useFormContext();
+
+      console.log("LinkUpEditor error", errors)
 
 
     if (!editor) {
@@ -28,6 +30,7 @@ interface LinkUpEditorProps {
  
 
   return (
+    <>
     <div className=' border-2 p-1 rounded-md'>
      <div className="control-group">
       <div className="button-group">
@@ -215,14 +218,22 @@ interface LinkUpEditorProps {
         render={({ field }) => (
           <EditorContent
             editor={editor}
-            // onBlur={() => handleChange(field.onChange)}
-            onBlur={() => field.onChange(editor.getHTML())}
+            // onBlur={() => field.onChange(editor.getHTML())}
+            onBlur={() => {
+              const content = editor.getHTML();
+              setValue(name, content); // Final sync when editor loses focus
+            }}
             className="editor-content border-2 p-2 rounded-md"
           />
           
         )}
       />
+      
     </div>
+    {errors[name]?.message && (
+              <p className="text-red-500 text-sm mt-2">{errors[name]?.message as string}</p>
+            )}
+    </>
   )
 }
 

@@ -4,7 +4,7 @@ export interface IUser {
     _id: string;
     name: string;
     email: string;
-    image: string;
+    image: string[];
     followers: string[]; 
     following: string[]; 
     isVerified: boolean;
@@ -21,10 +21,8 @@ export interface IUserData {
 export interface IPost {
   _id: string;
   author: IUser; 
-  title: string;
-  category: string;
   content: string;
-  image?: string; 
+  image?: string[];
   isPremium: boolean; 
   likes: IUser[];
   dislikes: IUser[]; 

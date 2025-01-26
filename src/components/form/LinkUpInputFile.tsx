@@ -1,4 +1,5 @@
 
+import { ImageUp } from 'lucide-react';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -10,6 +11,14 @@ interface LinkUpInputFileProps {
 
 const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
         const {  control, formState: { errors } } = useFormContext();
+
+        console.log("LinkUpInputFile error", errors)
+
+        const openFileDialog = () => {
+          console.log("openFileDialog cliCK")
+          const fileInput = document.getElementById(`file-input-${name}`) as HTMLInputElement;
+          fileInput?.click(); // Programmatically click the hidden file input
+        };
   
 
   return (
@@ -17,6 +26,7 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
     <Controller
     name={name}
     control={control}
+    
     defaultValue={[]}
     render={({ field }) => {
       const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +48,15 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
               {label}
             </label>
           {/* File Input */}
-          <input type="file" multiple onChange={handleFileChange} />
+          <input id={`file-input-${name}`} className=' hidden' type="file" multiple onChange={handleFileChange} />
+           {/* Trigger File Input with Icon */}
+           <button
+              type="button"
+              onClick={openFileDialog}
+              className="p-2 border rounded-md flex items-center justify-center"
+            >
+              <ImageUp />
+            </button>
 
           {/* Display Uploaded Files */}
           <div className="flex gap-4 mt-4 flex-wrap">
@@ -59,6 +77,11 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
                          </div>
                        ))}
           </div>
+
+            {/* Error Message */}
+            {errors[name]?.message && (
+              <p className="text-red-500 text-sm mt-2">{errors[name]?.message as string}</p>
+            )}
         </div>
       );
     }}

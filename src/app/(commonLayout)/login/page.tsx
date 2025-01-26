@@ -11,8 +11,7 @@ import { useUser } from "@/context/UserProvider";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import LinkUpForm from "@/components/form/LinkUpForm";
 import LinkUpInput from "@/components/form/LinkUpInput";
-import Posts from "@/components/shared/Posts";
-import PostEditor from "@/components/shared/PostEditor";
+import PostEditor from "@/components/post/PostEditor";
 
 export type ILoginUser = {
   email: string;

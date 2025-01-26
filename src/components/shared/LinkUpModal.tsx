@@ -11,8 +11,7 @@ import { ReactNode } from "react";
 
 interface IProps {
   openButtonText?: string;
-  actionButtonText?: string;
-  title: string | ReactNode;
+  title: string ;
   children: ReactNode;
   variant?:
     | "light"
@@ -22,24 +21,18 @@ interface IProps {
     | "faded"
     | "shadow"
     | "ghost"
-    | undefined;
   ClassName?: string;
   openButton?:ReactNode
-  onUpdate?: () =>  void; 
-  footerButton?: boolean
 
 }
 
 export default function LinkUpModal({
   openButtonText,
-  actionButtonText="Update",
   title,
   children,
   variant = "light",
   ClassName,
-  onUpdate,
   openButton,
-  footerButton = true
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -60,24 +53,19 @@ export default function LinkUpModal({
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
+              <ModalHeader className="flex flex-col py-2 text-center">{title}</ModalHeader>
               <ModalBody className="overflow-y-auto max-h-auto">{children}</ModalBody>
-             {
-              footerButton &&  <ModalFooter>
+             {/* {
+                <ModalFooter>
               <Button color="danger" size="sm" variant="light" onPress={onClose}>
                 Close
               </Button>
               
               <Button color="primary" size="sm" onPress={() => {
-                  if (onUpdate) {
-                    onUpdate();
-                  }
-                  // onClose();
-                }}>
-                {actionButtonText}
+                 Update
               </Button>
             </ModalFooter>
-             }
+             } */}
             </>
           )}
         </ModalContent>
