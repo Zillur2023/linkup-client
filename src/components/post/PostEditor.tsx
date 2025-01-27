@@ -76,29 +76,41 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
     console.log("POstEditor data", data)
   
     const formData = new FormData();
+    // for (const [key, value] of formData.entries()) {
+    //   console.log(`${key}:`, value);
+    // }
 
-    const updatedData: any = {
-      ...data,
+    
+    const updatedData = {
+        ...data,
       _id: updatePostData?._id,
       author: userData?.data?._id,
       content: data?.content,
     };
 
-
-    formData.append("image", data?.image);
-
-    formData.append("data", JSON.stringify(updatedData));
+    
+    // formData.append("image", data?.image);
+    
+    if (data?.image && Array.isArray(data.image)) {
+      data.image.forEach((file) => {
+        formData.append("image", file); // All files will be appended with the same key
+      });
+    }
+    
+    formData.append("data", JSON.stringify({...data, author: userData?.data?._id,}));
+    console.log("formDatA",[...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {
-      const res = updatePostData
-        ? await updatePost(formData).unwrap()
-        : await createPost(formData).unwrap();
-
+      // const res = updatePostData
+      //   ? await updatePost(formData).unwrap()
+      //   : await createPost(formData).unwrap();
+    const res =  await createPost(formData).unwrap()
       if (res.success) {
         toast.success(res.message, { id: toastId });
       }
     } catch (error: any) {
+      console.log("formErroR", error)
       toast.error(error?.data?.message, { id: toastId });
     }
   };

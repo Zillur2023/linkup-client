@@ -31,6 +31,7 @@ import LinkUpButton from "../shared/LinkUpButton";
 import LinkUpModal from "../shared/LinkUpModal";
 import { generatePDF } from "@/uitls/generatePDF";
 import { useRouter } from "next/navigation";
+import { PostImageGallery } from "./PostImageGallery";
 
 interface PostsProps {
   postId?: string;
@@ -44,7 +45,6 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
     skip: !user?.email,
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [category, setCategory] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
 
   const debounceSearch = useDebounce(searchTerm)
@@ -54,7 +54,6 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
     : {
         // searchTerm,
         searchTerm : debounceSearch,
-        category,
         sortBy,
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
@@ -135,7 +134,7 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
 
   return (
     <>
-      { !postData && <PostSkeleton />  }
+      { postData && <PostSkeleton />  }
         <div className="mt-6 space-y-6 max-w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px] mx-auto">
        
 
@@ -205,17 +204,8 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
             
                 {/* Post Image */}
                 {post?.image && (
-                  <div className=" w-full h-[250px] flex justify-center items-center ">
-                    <Image
-                      shadow="sm"
-                      radius="lg"
-                      width="100%"
-                      height={250}
-                      alt={post?.image?.[0]}
-                      // className=" object-cover "
-                      src={post?.image?.[0]}
-                    />
-                  </div>
+          
+              <PostImageGallery images={post?.image} />
                 )}
 
                 {/* Post Content */}

@@ -12,7 +12,7 @@ interface LinkUpInputFileProps {
 const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
         const {  control, formState: { errors } } = useFormContext();
 
-        console.log("LinkUpInputFile error", errors)
+        // console.log("LinkUpInputFile error", errors)
 
         const openFileDialog = () => {
           console.log("openFileDialog cliCK")

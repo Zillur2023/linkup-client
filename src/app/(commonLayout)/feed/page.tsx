@@ -7,6 +7,7 @@ const FeedPage = () => {
     <h1>FeedPage</h1>
     <Posts/>
     </>
+    
   )
 }
 

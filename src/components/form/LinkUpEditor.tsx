@@ -15,7 +15,7 @@ interface LinkUpEditorProps {
   
       const {  control, setValue, formState: { errors } } = useFormContext();
 
-      console.log("LinkUpEditor error", errors)
+      // console.log("LinkUpEditor error", errors)
 
 
     if (!editor) {

@@ -14,11 +14,11 @@ export const registerValidationSchema = z.object({
   password: z.string().min(4, "Must be at least 4 characters."),
 });
 
-// export const postEditorValidationSchema = z.object({
-//   isPremium: z.boolean().optional(), 
-//   content: z.string().optional(),
-//   image: z.array(z.instanceof(File)).optional(),
-// });
+export const postEditorValidationSchema = z.object({
+  isPremium: z.boolean().optional(), 
+  content: z.string().optional(),
+  image: z.array(z.instanceof(File)).optional(),
+});
 
 // export const postEditorValidationSchema = z.object({
 //   isPremium: z.boolean().optional(),
@@ -43,16 +43,16 @@ export const registerValidationSchema = z.object({
 //     }),
 // });
 
-export const postEditorValidationSchema = z
-  .object({
-    isPremium: z.boolean().optional(),
-    content: z.string().optional(),
-    image: z.array(z.instanceof(File)).optional(),
-  })
-  .refine(
-    (data) => data.content || (data.image && data.image.length > 0), // Ensure content or at least one image is provided
-    {
-      message: "Either content or at least one image is required.",
-      path: ["content"], // You can set this to highlight either "content" or "image"
-    }
-  );
+// export const postEditorValidationSchema = z
+//   .object({
+//     isPremium: z.boolean().optional(),
+//     content: z.string().optional(),
+//     image: z.array(z.instanceof(File)).optional(),
+//   })
+//   .refine(
+//     (data) => data.content || (data.image && data.image.length > 0), // Ensure content or at least one image is provided
+//     {
+//       message: "Either content or at least one image is required.",
+//       path: ["content"], // You can set this to highlight either "content" or "image"
+//     }
+//   );
