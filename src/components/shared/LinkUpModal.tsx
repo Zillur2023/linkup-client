@@ -11,7 +11,7 @@ import { ReactNode } from "react";
 
 interface IProps {
   openButtonText?: string;
-  title: string ;
+  title?: string ;
   children: ReactNode;
   variant?:
     | "light"
@@ -49,11 +49,11 @@ export default function LinkUpModal({
         {openButtonText}
       </Button>}
       
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}  > 
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} > 
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col py-2 text-center">{title}</ModalHeader>
+              { title && <ModalHeader className="flex flex-col py-2 text-center">{title}</ModalHeader> }
               <ModalBody className="overflow-y-auto max-h-auto">{children}</ModalBody>
              {/* {
                 <ModalFooter>

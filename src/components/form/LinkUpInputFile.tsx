@@ -2,6 +2,8 @@
 import { ImageUp } from 'lucide-react';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { PostImageGallery } from '../post/PostImageGallery';
+import { Button } from '@heroui/react';
 
 interface LinkUpInputFileProps {
  
@@ -10,7 +12,7 @@ interface LinkUpInputFileProps {
 }
 
 const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
-        const {  control, formState: { errors } } = useFormContext();
+        const {  control, reset, formState: { errors } } = useFormContext();
 
         // console.log("LinkUpInputFile error", errors)
 
@@ -29,37 +31,47 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
     
     defaultValue={[]}
     render={({ field }) => {
-      const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const handleImageUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newFiles = event.target.files ? Array.from(event.target.files) : [];
         field.onChange([...(field.value || []), ...newFiles]); // Append new files
       };
 
-      const handleRemoveFile = (index: number) => {
+      const handleImageRemove = (index: number) => {
+        console.log("handleFileRemove button clicK", index)
         const updatedFiles = field.value.filter((_: File, i: number) => i !== index);
         field.onChange(updatedFiles); // Remove file by index
       };
 
+      // const previewUrls = field.value?.map((file: File) => URL.createObjectURL(file)) || [];
+
+
       return (
         <div>
-            <label
+          <div className=' mb-3'>
+          <PostImageGallery images={field.value.map((file: File) => URL.createObjectURL(file))}
+           addImage={openFileDialog} reset={reset} 
+           field={field} />
+          </div>
+            {/* <label
               htmlFor={`file-input-${name}`}
               className="block text-sm font-medium text-gray-700 mb-2"
             >
               {label}
-            </label>
+            </label> */}
           {/* File Input */}
-          <input id={`file-input-${name}`} className=' hidden' type="file" multiple onChange={handleFileChange} />
+          <input id={`file-input-${name}`} className=' hidden' type="file" multiple onChange={handleImageUpdate} />
            {/* Trigger File Input with Icon */}
-           <button
-              type="button"
+           <Button
               onClick={openFileDialog}
-              className="p-2 border rounded-md flex items-center justify-center"
+              className=" "
+              startContent={<ImageUp />}
             >
-              <ImageUp />
-            </button>
+              Upload image
+            </Button>
+
 
           {/* Display Uploaded Files */}
-          <div className="flex gap-4 mt-4 flex-wrap">
+          {/* <div className="grid gap-4 mt-4 flex-wrap">
             {field.value?.map((file: File, index: number) => (
                           <div key={index} className="relative">
                             <img
@@ -76,7 +88,8 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
                            </button>
                          </div>
                        ))}
-          </div>
+          </div> */}
+
 
             {/* Error Message */}
             {errors[name]?.message && (

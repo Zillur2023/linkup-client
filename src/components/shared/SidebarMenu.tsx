@@ -3,18 +3,19 @@ import { Listbox, ListboxItem } from "@heroui/react";
 import Link from "next/link"; // Import Link from Next.js
 
 export const items = [
-  { href: "/news-feed", label: "News feed" },
+  { href: "feed", label: "Feed" },
   { href: "/change-password", label: "Change password" },
   { href: "/about-us", label: "About us" },
   { href: "/contact-us", label: "Contact us" },
-
+ 
 ];
 
 
 export default function SidebarMenu() {
+  
 
   return (
-    <div className="bg-default-100 dark:bg-default-100">
+    <div className="bg-default-100 dark:bg-default-100 h-screen max-w-[320px]">
         <Listbox
           isVirtualized
           className="max-w-xs "

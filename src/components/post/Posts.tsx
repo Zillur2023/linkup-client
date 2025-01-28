@@ -32,6 +32,8 @@ import LinkUpModal from "../shared/LinkUpModal";
 import { generatePDF } from "@/uitls/generatePDF";
 import { useRouter } from "next/navigation";
 import { PostImageGallery } from "./PostImageGallery";
+import ActionButton from "../shared/ActionButton";
+import PostEditor from "./PostEditor";
 
 interface PostsProps {
   postId?: string;
@@ -134,8 +136,8 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
 
   return (
     <>
-      { postData && <PostSkeleton />  }
-        <div className="mt-6 space-y-6 max-w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px] mx-auto">
+      { !postData && <PostSkeleton />  }
+        <div className="space-y-4 max-w-[640px]   mx-auto">
        
 
           {postData?.data?.map((post) => (
@@ -165,16 +167,16 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                         : "Follow"}
                     </LinkUpButton>
                   )}
-                  {/* {post?.author?._id === userData?.data?._id && (
-                    // <PostUpdate
-                    //   updatePostData={post}
-                    //   btn={
-                    //     <Pencil className="bg-gray-300 p-1 rounded-md w-full h-full" />
-                    //   }
-                    // />
+                   {post?.author?._id === userData?.data?._id && (
+                    <PostEditor
+                      updatePostData={post}
+                      button={
+                        <Pencil className="bg-gray-300 p-1 rounded-md w-full h-full" />
+                      }
+                    />
                     // <ActionButton/>
                   )}
-                 */}
+                
                   {post?.author?._id === userData?.data?._id && (
                     <LinkUpModal
                       title=""
