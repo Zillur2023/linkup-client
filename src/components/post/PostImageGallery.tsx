@@ -13,7 +13,7 @@ type PostImageGalleryProps = {
   addImage?: () => void;
   reset?: () => void;
   images: string[];
-  field: ControllerField
+  field?: ControllerField
 };
 
 export const PostImageGallery: React.FC<PostImageGalleryProps> = ({ images, addImage, reset, field }) => {

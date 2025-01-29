@@ -14,6 +14,9 @@ export const registerValidationSchema = z.object({
   password: z.string().min(4, "Must be at least 4 characters."),
 });
 
+export const commentValidationSchema = z.object({
+  comment: z.string().min(1,"Must be at least 1 character"),
+});
 export const postEditorValidationSchema = z.object({
   isPremium: z.boolean().optional(), 
   content: z.string().optional(),

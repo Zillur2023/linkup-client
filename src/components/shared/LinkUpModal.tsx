@@ -10,38 +10,47 @@ import {
 import { ReactNode } from "react";
 
 interface IProps {
-  openButtonText?: string;
+  openButtonText?: ReactNode;
+  openButtonIcon?:ReactNode
+  actionButtonText?: string;
   title?: string ;
   children: ReactNode;
-  variant?:
-    | "light"
-    | "solid"
-    | "bordered"
-    | "flat"
-    | "faded"
-    | "shadow"
-    | "ghost"
+  variant?: "light" | "solid" | "bordered" | "flat" | "faded" | "shadow" | "ghost" | undefined;
+  size?: "sm" | "md" | "lg" | "xs" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "full" | undefined;
   ClassName?: string;
-  openButton?:ReactNode
-
+  onUpdate?: () =>  void; 
+  footerButton?: boolean
 }
 
 export default function LinkUpModal({
   openButtonText,
+  openButtonIcon,
+  actionButtonText,
   title,
   children,
   variant = "light",
+  size,
   ClassName,
-  openButton,
+  onUpdate,
+  footerButton = false
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
     <>
    
-      {openButton?  
-          <div onClick={onOpen}>{openButton}</div>
+      {openButtonIcon?  
+          // <div onClick={onOpen}>{openButton}</div>
+          <Button
+          isIconOnly
+          size="sm"
+          variant={variant}
+        onPress={onOpen}
+      >
+        {openButtonIcon}
+      </Button>
          : <Button
+         size="sm"
         className={ClassName}
         variant={variant}
         onPress={onOpen}
@@ -49,23 +58,28 @@ export default function LinkUpModal({
         {openButtonText}
       </Button>}
       
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} > 
-        <ModalContent>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={size} > 
+        <ModalContent >
           {(onClose) => (
             <>
-              { title && <ModalHeader className="flex flex-col py-2 text-center">{title}</ModalHeader> }
-              <ModalBody className="overflow-y-auto max-h-auto">{children}</ModalBody>
-             {/* {
-                <ModalFooter>
-              <Button color="danger" size="sm" variant="light" onPress={onClose}>
+              { title && <ModalHeader className="flex justify-center ">{title}</ModalHeader> }
+              <ModalBody className=" flex items-center justify-center ">{children}</ModalBody>
+           
+              {
+              footerButton &&  <ModalFooter>
+              <Button color="danger" size="sm"  onPress={onClose}>
                 Close
               </Button>
               
-              <Button color="primary" size="sm" onPress={() => {
-                 Update
+              <Button color="primary" size="sm"  onPress={() => {
+                  if (onUpdate) onUpdate();
+                  // onClose();
+                }}>
+                {actionButtonText}
               </Button>
             </ModalFooter>
-             } */}
+             }
+             
             </>
           )}
         </ModalContent>

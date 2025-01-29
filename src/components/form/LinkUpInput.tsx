@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { EyeSlashFilledIcon } from "./EyeSlashFilledIcon";
 import { EyeFilledIcon } from "./EyeFilledIcon";
-import { Input } from "@heroui/react";
+import { Button, Input } from "@heroui/react";
 
 interface InputProps {
   name: string;
@@ -17,6 +17,7 @@ interface InputProps {
   isReadOnly?: boolean;
   // focusRef?: React.Ref<HTMLInputElement>; 
   focusRef?: (el: HTMLInputElement | null) => void;
+  endContent?: ReactNode;
 }
 
 export default function LinkUpInput({
@@ -30,9 +31,13 @@ export default function LinkUpInput({
   value,
   isReadOnly=false,
   focusRef,
+  endContent
 }: InputProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const { register, formState: { errors } } = useFormContext();
+  const { register, watch, getValues, formState: { errors } } = useFormContext();
+
+  console.log(!!watch(name))
+  console.log({getValues})
 
   const inputType = type === "password" && isPasswordVisible ? "text" : type;
   const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
@@ -58,20 +63,20 @@ export default function LinkUpInput({
           if (focusRef) focusRef(e); // Apply focusRef as well
         }}
         endContent={
-          type === "password" && (
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              aria-label="Toggle password visibility"
-              className="focus:outline-none"
-            >
-              {isPasswordVisible ? (
-                <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-              ) : (
-                <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-              )}
-            </button>
-          )
+         endContent ? <Button isDisabled={!watch(name)} type="submit" isIconOnly  className="flex items-end justify-end bg-transparent">{endContent}</Button> :  type === "password" && (
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            aria-label="Toggle password visibility"
+            className="focus:outline-none"
+          >
+            {isPasswordVisible ? (
+              <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+            ) : (
+              <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+            )}
+          </button>
+        )
         }
       />
     </div>

@@ -35,10 +35,10 @@ import { toast } from "sonner";
 
 interface PostEditorProps {
   updatePostData?: IPost; 
-  button?: ReactNode;
+  openButtonIcon?: ReactNode;
 }
 
-const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
+const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, openButtonIcon }) => {
   const { user } = useUser();
   const { data: userData } = useGetUserQuery<IUserData>(user?.email, { skip: !user?.email});
 
@@ -122,9 +122,9 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, button }) => {
       // buttonText="Edit Profile"
       openButtonText={`${updatePostData ? "Update Post" : "Create a new post"}`}
       title={`${updatePostData ? "Update Post" : "Create a new post"}`}
-      variant="bordered"
+      variant="ghost"
       ClassName="rounded-md border hover:border-blue-500 py-0 w-full"
-      openButton={button}
+      openButtonIcon={openButtonIcon}
     >
           <LinkUpForm
               

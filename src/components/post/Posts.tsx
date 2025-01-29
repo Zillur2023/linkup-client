@@ -34,6 +34,7 @@ import { useRouter } from "next/navigation";
 import { PostImageGallery } from "./PostImageGallery";
 import ActionButton from "../shared/ActionButton";
 import PostEditor from "./PostEditor";
+import PostComment from "./PostComment";
 
 interface PostsProps {
   postId?: string;
@@ -170,8 +171,8 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                    {post?.author?._id === userData?.data?._id && (
                     <PostEditor
                       updatePostData={post}
-                      button={
-                        <Pencil className="bg-gray-300 p-1 rounded-md w-full h-full" />
+                      openButtonIcon={
+                        <Pencil />
                       }
                     />
                     // <ActionButton/>
@@ -179,16 +180,17 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                 
                   {post?.author?._id === userData?.data?._id && (
                     <LinkUpModal
-                      title=""
-                      openButton={
-                        <Trash2 className="text-red-500 cursor-pointer bg-gray-300 p-1 rounded-md w-full h-full" />
+                      size={"xs"}
+                      variant="ghost"
+                      footerButton={true}
+                      openButtonIcon={
+                        <Trash2 className=" text-red-400" />
                       }
-                    //   actionButtonText="Delete"
-                    //   onUpdate={() => handleDelete(post?._id)}
+                      actionButtonText="Delete"
+                      onUpdate={() => handleDelete(post?._id)}
                     >
-                      <p className=" text-red-500 font-semibold text-medium">
-                        {" "}
-                        Are your sure to delete{" "}
+                      <p className=" mt-5  text-red-500 font-semibold text-medium flex items-center justify-center ">
+                        Are your sure to delete this post
                       </p>
                     </LinkUpModal>
                   )}
@@ -206,7 +208,6 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
             
                 {/* Post Image */}
                 {post?.image && (
-          
               <PostImageGallery images={post?.image} />
                 )}
 
@@ -287,6 +288,18 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                   onClick={() => generatePDF(postRef)}
                 > <Download size={18}/> </Button>
               </CardFooter>
+              <PostComment
+                postId={post?._id}
+                openButtonText={
+                  <p className=" font-semibold my-3 cursor-pointer hover:underline">
+                    {/* See all comments */}
+                    {/* {comment ? "See all comment" : " "} */}
+                    {post?.comments?.length > 2 && comment ? "See all comment" : " "}
+                  </p>
+                }
+                comment={comment ? true : false}
+                focusRef={(el) => (inputRefs.current[post._id] = el)} 
+              />
             
             </Card>
           ))}

@@ -39,7 +39,7 @@ export interface IComment {
   _id: string;
   postId: IPost; 
   userId: IUser; 
-  commentText: string; 
+  comment: string; 
   // parentCommentId?: Types.ObjectId | null; 
 }
 
