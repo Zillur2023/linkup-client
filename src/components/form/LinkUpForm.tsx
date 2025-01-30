@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { BaseSyntheticEvent, ReactNode } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 interface formConfig {
@@ -10,7 +10,8 @@ interface formConfig {
 
 interface IProps extends formConfig {
   children: ReactNode;
-  onSubmit: SubmitHandler<any>;
+  // onSubmit: SubmitHandler<any>;
+  onSubmit:  (data: any, reset?: () => void) => void;
 }
 
 export default function LinkUpForm({
@@ -30,15 +31,19 @@ export default function LinkUpForm({
   }
 
   const methods = useForm(formConfig);
+  const { handleSubmit, reset } = methods;
 
-  const submitHandler = methods.handleSubmit;
+  // const submitHandler = methods.handleSubmit;
+
+  const submitHandler = handleSubmit((data) => onSubmit(data, reset));
 
   console.log({submitHandler})
   console.log("Form Errors:", methods.formState.errors);
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={submitHandler(onSubmit)}>
+     {/* <form onSubmit={submitHandler(onSubmit)}></form> */}
+      <form onSubmit={submitHandler}>
         {children}
 
       </form>

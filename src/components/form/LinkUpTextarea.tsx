@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState,KeyboardEvent  } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { Button, Textarea } from "@heroui/react";
@@ -14,9 +14,9 @@ interface LinkUpTextareaProps {
   size?: "sm" | "md" | "lg";
   value?: string;
   isReadOnly?: boolean;
-  // focusRef?: React.Ref<HTMLInputElement>; 
-  focusRef?: (el: HTMLInputElement | null) => void;
+  focusRef?: (el: HTMLTextAreaElement | null) => void;
   endContent?: ReactNode;
+  onSubmit?: (data: any, reset?: () => void) => void; // Updated type
 }
 
 export default function LinkUpTextarea({
@@ -30,9 +30,19 @@ export default function LinkUpTextarea({
   value,
   isReadOnly=false,
   focusRef,
-  endContent
+  endContent,
+  onSubmit
 }: LinkUpTextareaProps) {
-  const { register, watch, formState: { errors } } = useFormContext();
+  const { register, watch, reset, formState: { errors } } = useFormContext();
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault(); // Prevent default behavior (e.g., new line)
+      onSubmit?.({ [name]: watch(name) }); // Pass form data to onSubmit
+      // reset()
+    }
+  };
+
 
 
   return (
@@ -61,6 +71,8 @@ export default function LinkUpTextarea({
         // isClearable
         // onClear={() => console.log("textarea cleared")}
         className={` ${!watch(name)? "":"pb-9"} `} 
+        onKeyDown={handleKeyDown} // Add onKeyDown handler
+
         // color="default"
          />
            {endContent && (

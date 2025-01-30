@@ -8,14 +8,14 @@ import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import LinkUpModal from "../shared/LinkUpModal";
 import { IComment } from "@/type";
-import { Avatar, Tooltip } from "@heroui/react";
+import { Avatar, Tooltip, User } from "@heroui/react";
 import ActionButton from "../shared/ActionButton";
 import { useCreateCommentMutation, useDeleteCommentMutation, useGetAllCommentQuery } from "@/redux/features/comment/commentApi";
 import Posts from "./Posts";
 import LinkUpForm from "../form/LinkUpForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { commentValidationSchema } from "@/schemas";
-import { SendHorizontal } from "lucide-react";
+import { SendHorizontal, VerifiedIcon } from "lucide-react";
 import LinkUpTextarea from "../form/LinkUpTextarea";
 
 
@@ -23,7 +23,7 @@ interface PostCommentProps {
   postId: string;
   openButtonText: ReactNode;
   comment?: boolean;
-  focusRef?:(el: HTMLInputElement | null) => void;
+  focusRef?:(el: HTMLTextAreaElement | null) => void;
 }
 
 const PostComment: React.FC<PostCommentProps> = ({ postId, openButtonText, comment, focusRef }) => {
@@ -38,7 +38,9 @@ const PostComment: React.FC<PostCommentProps> = ({ postId, openButtonText, comme
   const { data: allCommentData } = useGetAllCommentQuery(postId);
   
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+//   const onSubmit: SubmitHandler<FieldValues> = async (data, reset) => {
+    const onSubmit = async (data: any, reset?: () => void) => {
+
     if (!userData?.data?._id) {
       router.push("/login");
       return;
@@ -51,6 +53,7 @@ const PostComment: React.FC<PostCommentProps> = ({ postId, openButtonText, comme
     };
     try {
       await createComment(updatedData).unwrap();
+      reset?.();
     } catch (error: any) {
       toast.error(error?.data?.message);
     } finally {
@@ -88,37 +91,31 @@ const PostComment: React.FC<PostCommentProps> = ({ postId, openButtonText, comme
           <Posts postId={postId} comment={false} />
         </div>
       </LinkUpModal>
-      <div className="flex-1 overflow-y-auto px-4">
-        <div className="space-y-4">
+      <div className="flex-1 overflow-y-auto space-y-2 pt-1">
           {commentData?.map((comment: IComment) => (
-            <div key={comment?._id} className="flex items-start space-x-2">
-              <Tooltip content={comment?.userId?.email}>
-                <Avatar src={comment?.userId?.image?.[0]} alt="Commenter" />
-              </Tooltip>
-              <div className=" bg-transparent text-gray-500 p-2 rounded-lg">
-                <div className="flex gap-3 ">
-                  <p>
-                    <strong>{comment?.userId?.name}</strong>
-                  </p>
-                  {/* <Trash2
-                    onClick={() => handleDeleteComment(comment?._id)}
-                    className="text-red-500 cursor-pointer size-4"
-                  /> */}
-                  { comment?.userId?._id == userData?.data?._id && ( <ActionButton onDelete={() => handleDeleteComment(comment?._id)}/> )}
-             
-                </div>
-                {/* {comment?.author?._id == userData?.data?._id &&  <Trash2 onClick={() => handleDeleteComment(comment?._id)} className="text-red-500 cursor-pointer" />} */}
-
-                <p>{comment?.comment}</p>
-              </div>
-            </div>
+            <User key={comment?._id} className=" flex items-center justify-start bg-gray-100"
+            //  name= {comment?.userId?.name}
+            name={
+              <span className="flex items-center  gap-2">
+                <span className={`whitespace-nowrap `}>
+                  {comment?.userId?.name}
+                </span>
+                {comment?.userId?.isVerified && <VerifiedIcon className="w-5 h-5 text-blue-500" />}
+              </span>
+            }
+            description={
+              <p className="">{comment?.comment} {console.log("comment?.comment", comment?.comment)} </p>
+            }
+            avatarProps={{
+              src: `${comment?.userId?.image?.[0]}`,
+            }}
+          />
           ))}
-        </div>
           <LinkUpForm
                resolver={zodResolver(commentValidationSchema)}
                onSubmit={onSubmit}
                      >
-               <LinkUpTextarea name="comment" size="sm" focusRef={focusRef} 
+               <LinkUpTextarea onSubmit={(data) => onSubmit(data)}  name="comment" size="sm" focusRef={focusRef} 
                placeholder="Comment"
                endContent={<SendHorizontal />} />
          

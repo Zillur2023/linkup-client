@@ -39,8 +39,7 @@ export default function LinkUpModal({
   return (
     <>
    
-      {openButtonIcon?  
-          // <div onClick={onOpen}>{openButton}</div>
+    { openButtonIcon ?   (openButtonIcon &&
           <Button
           isIconOnly
           size="sm"
@@ -48,15 +47,25 @@ export default function LinkUpModal({
         onPress={onOpen}
       >
         {openButtonIcon}
-      </Button>
-         : <Button
-         size="sm"
-        className={ClassName}
-        variant={variant}
-        onPress={onOpen}
-      >
-        {openButtonText}
-      </Button>}
+      </Button>) :
+       ( openButtonText &&   <Button
+        size="sm"
+       className={ClassName}
+       variant={variant}
+       onPress={onOpen}
+     >
+       {openButtonText}
+     </Button>) }
+
+{/* <Button
+  size="sm"
+  variant={variant}
+  className={!openButtonIcon ? ClassName : undefined}
+  isIconOnly={!!openButtonIcon}
+  onPress={onOpen}
+>
+  {openButtonIcon || openButtonText}
+</Button> */}
       
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={size} > 
         <ModalContent >

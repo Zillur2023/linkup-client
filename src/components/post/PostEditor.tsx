@@ -72,8 +72,8 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, openButtonIcon 
 
 
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log("POstEditor data", data)
+  // const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+   const onSubmit = async (data:FieldValues) => {
   
     const formData = new FormData();
     // for (const [key, value] of formData.entries()) {

@@ -32,7 +32,8 @@ const RegisterPage: React.FC = () => {
   console.log({imagePreviews})
 
 
-  const onSubmit: SubmitHandler<IRegisterUser> = async (data) => {
+  // const onSubmit: SubmitHandler<IRegisterUser> = async (data) => {
+    const onSubmit = async (data:IRegisterUser) => {
     const formData = new FormData();
     formData.append("data",JSON.stringify(data))
     formData.append("image", imageFiles?.[0])
@@ -77,12 +78,7 @@ const RegisterPage: React.FC = () => {
     <h3 className="my-2 text-xl font-bold">Register</h3>
     <div className="w-[35%] ">
       <LinkUpForm
-        //! Only for development
-        // defaultValues={{
-        //   name: "zillur Rahman",
-        //   email: "zillur@gmail.com",
-        //   password: "1234",
-        // }}
+        
         resolver={zodResolver(registerValidationSchema)}
         onSubmit={onSubmit}
       >

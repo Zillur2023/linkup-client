@@ -27,7 +27,8 @@ const LoginPage = () => {
   console.log("login page user", user)
 
 
-  const onSubmit: SubmitHandler<ILoginUser> = async (formData) => {
+  // const onSubmit: SubmitHandler<ILoginUser> = async (formData) => {
+  const onSubmit = async (formData:ILoginUser) => {
   
     const toastId = toast.loading("Logging in...");
 

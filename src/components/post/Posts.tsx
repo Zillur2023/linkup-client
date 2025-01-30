@@ -69,7 +69,7 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
   const [updateDislike] = useUpdateDislikesMutation();
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
   const [deletePost] = useDeletePostMutation();
-  const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const inputRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const postRef = useRef<HTMLDivElement>(null); // Ref for the div to be converted to PDF
 
 
@@ -137,8 +137,8 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
 
   return (
     <>
-      { !postData && <PostSkeleton />  }
         <div className="space-y-4 max-w-[640px]   mx-auto">
+      { !postData && <PostSkeleton />  }
        
 
           {postData?.data?.map((post) => (
@@ -146,7 +146,7 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
               ref={postRef}
               key={post._id}
               isFooterBlurred
-              className=" w-full p-0 md:p-5 "
+              className=" w-full p-5 "
             >
               {/* Author Info */}
               <CardHeader className=" justify-between ">
@@ -288,14 +288,11 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                   onClick={() => generatePDF(postRef)}
                 > <Download size={18}/> </Button>
               </CardFooter>
+              
               <PostComment
                 postId={post?._id}
                 openButtonText={
-                  <p className=" font-semibold my-3 cursor-pointer hover:underline">
-                    {/* See all comments */}
-                    {/* {comment ? "See all comment" : " "} */}
-                    {post?.comments?.length > 2 && comment ? "See all comment" : " "}
-                  </p>
+                    post?.comments?.length > 2 && comment && "See all comment" 
                 }
                 comment={comment ? true : false}
                 focusRef={(el) => (inputRefs.current[post._id] = el)} 
