@@ -29,7 +29,7 @@ export const VerticalDotsIcon = ({
   </svg>
 );
 interface ActionButtonProps {
-    onEdit?: () => Promise<void>;
+    onEdit?: () => void;
     onDelete?: () => Promise<void>;
 }
 

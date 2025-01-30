@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginValidationSchema } from "@/schemas";
-import { SubmitHandler } from "react-hook-form";
 import Link from "next/link";
 import { Button, } from "@heroui/react";
 import { useUser } from "@/context/UserProvider";
@@ -24,10 +23,6 @@ const LoginPage = () => {
   const [login] = useLoginMutation();
   const { user ,setIsLoading: userLoading } = useUser();
 
-  console.log("login page user", user)
-
-
-  // const onSubmit: SubmitHandler<ILoginUser> = async (formData) => {
   const onSubmit = async (formData:ILoginUser) => {
   
     const toastId = toast.loading("Logging in...");
@@ -54,11 +49,6 @@ const LoginPage = () => {
       <h3 className="my-2 text-xl font-bold">Login</h3>
       <div className="w-[35%]">
         <LinkUpForm  
-         //! Only for development
-        // defaultValues={{
-        //   email: "zillur@gmail.com",
-        //   password: "1234",
-        // }}
         resolver={zodResolver(loginValidationSchema)}
         onSubmit={onSubmit}>
               <div className=" flex flex-col gap-3">

@@ -1,10 +1,8 @@
 
 "use client";
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import {
   FieldValues,
-  SubmitHandler,
-  useFormContext,
 } from "react-hook-form";
 
 import { useGetUserQuery } from "@/redux/features/user/userApi";
@@ -23,7 +21,6 @@ import LinkUpForm from "../form/LinkUpForm";
 import LinkUpEditor from "../form/LinkUpEditor";
 import LinkUpCheckbox from "../form/LinkUpCheckbox";
 import LinkUpReset from "../form/LinkUpReset";
-
 import StarterKit from '@tiptap/starter-kit'
 import Highlight from '@tiptap/extension-highlight'
 import TextAlign from '@tiptap/extension-text-align'
@@ -72,7 +69,6 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, openButtonIcon 
 
 
 
-  // const onSubmit: SubmitHandler<FieldValues> = async (data) => {
    const onSubmit = async (data:FieldValues) => {
   
     const formData = new FormData();

@@ -39,7 +39,7 @@ export default function LinkUpTextarea({
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevent default behavior (e.g., new line)
       onSubmit?.({ [name]: watch(name) }); // Pass form data to onSubmit
-      // reset()
+      reset()
     }
   };
 
