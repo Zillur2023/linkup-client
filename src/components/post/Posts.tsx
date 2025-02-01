@@ -62,19 +62,16 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
       };
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
 
-  console.log({postData})
-
-
   const [updateLike] = useUpdateLikesMutation();
   const [updateDislike] = useUpdateDislikesMutation();
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
   const [deletePost] = useDeletePostMutation();
-  const inputRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
+  const inputRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const postRef = useRef<HTMLDivElement>(null); // Ref for the div to be converted to PDF
 
 
   const handleCommentClick = (postId: string) => {
-    inputRefs?.current[postId]?.focus();
+    inputRef?.current[postId]?.focus();
   };
 
   const handleLike = async (postId: string) => {
@@ -295,7 +292,7 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                     post?.comments?.length > 2 && comment && "See all comment" 
                 }
                 comment={comment ? true : false}
-                focusRef={(el) => (inputRefs.current[post._id] = el)} 
+                focusRef={(el) => (inputRef.current[post._id] = el)} 
               />
             
             </Card>

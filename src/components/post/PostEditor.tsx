@@ -94,7 +94,7 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, openButtonIcon 
     }
     
     formData.append("data", JSON.stringify({...data, author: userData?.data?._id,}));
-    console.log("formDatA",[...formData.entries()]);
+    // console.log("formDatA",[...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {
@@ -106,7 +106,6 @@ const PostEditor: React.FC<PostEditorProps> = ({ updatePostData, openButtonIcon 
         toast.success(res.message, { id: toastId });
       }
     } catch (error: any) {
-      console.log("formErroR", error)
       toast.error(error?.data?.message, { id: toastId });
     }
   };

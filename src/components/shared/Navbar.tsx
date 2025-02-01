@@ -33,7 +33,6 @@ export const AcmeLogo = () => {
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  console.log({isMenuOpen})
   const menuItems = [
     "Profile",
     "Dashboard",

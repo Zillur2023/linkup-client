@@ -19,16 +19,15 @@ type PostImageGalleryProps = {
 export const PostImageGallery: React.FC<PostImageGalleryProps> = ({ images, addImage, reset, field }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const imageGallery = images ? images : field.value?.map((file: File) => URL.createObjectURL(file)) || [];
+  const imageGallery = images ? images : field?.value?.map((file: File) => URL.createObjectURL(file)) || [];
 
   const handleImageRemove = (index: number) => {
-    console.log("handleFileRemove button clicK", index)
-    const updatedFiles = field.value.filter((_: File, i: number) => i !== index);
-    field.onChange(updatedFiles); // Remove file by index
+    const updatedFiles = field?.value.filter((_: File, i: number) => i !== index);
+    field?.onChange(updatedFiles); // Remove file by index
   };
   
   const handleImageClick = (index: number) => {
-    console.log(`Image ${index + 1} clicked`); // Replace this with your modal logic
+    // console.log(`Image ${index + 1} clicked`); // Replace this with your modal logic
   };
 
   if (!imageGallery || imageGallery.length === 0) return null;

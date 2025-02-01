@@ -41,6 +41,8 @@ export interface IComment {
   userId: IUser; 
   comment: string; 
   // parentCommentId?: Types.ObjectId | null; 
+  createdAt: string; // Automatically managed by Mongoose
+  updatedAt: string; // Automatically managed by Mongoose
 }
 
 

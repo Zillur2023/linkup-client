@@ -34,6 +34,7 @@ export default function LinkUpTextarea({
   onSubmit
 }: LinkUpTextareaProps) {
   const { register, watch, reset, formState: { errors } } = useFormContext();
+  // console.log("focusRef", focusRef)
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -46,7 +47,7 @@ export default function LinkUpTextarea({
 
 
   return (
-    <div className="relative w-full bg-default-100 rounded-lg ">
+    <div className="relative w-full rounded-lg bg-default-100 ">
       <Textarea
         {...register(name)}
         label={label}
@@ -70,7 +71,7 @@ export default function LinkUpTextarea({
         // }
         // isClearable
         // onClear={() => console.log("textarea cleared")}
-        className={` ${!watch(name)? "":"pb-9"} `} 
+        className={` ${!watch(name)? "":"pb-9"}  `} 
         onKeyDown={handleKeyDown} // Add onKeyDown handler
 
         // color="default"
