@@ -11,15 +11,34 @@ import { ReactNode } from "react";
 
 interface IProps {
   openButtonText?: ReactNode;
-  openButtonIcon?:ReactNode
+  openButtonIcon?: ReactNode;
   actionButtonText?: string;
-  title?: string ;
+  title?: string;
   children: ReactNode;
-  variant?: "light" | "solid" | "bordered" | "flat" | "faded" | "shadow" | "ghost" | undefined;
-  size?: "sm" | "md" | "lg" | "xs" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "full" | undefined;
+  variant?:
+    | "light"
+    | "solid"
+    | "bordered"
+    | "flat"
+    | "faded"
+    | "shadow"
+    | "ghost"
+    | undefined;
+  size?:
+    | "sm"
+    | "md"
+    | "lg"
+    | "xs"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl"
+    | "full"
+    | undefined;
   ClassName?: string;
-  onUpdate?: () =>  void; 
-  footerButton?: boolean
+  onUpdate?: () => void;
+  footerButton?: boolean;
 }
 
 export default function LinkUpModal({
@@ -32,32 +51,30 @@ export default function LinkUpModal({
   size,
   ClassName,
   onUpdate,
-  footerButton = false
+  footerButton = false,
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
     <>
-   
-    { openButtonIcon ?   (openButtonIcon &&
-          <Button
-          isIconOnly
-          size="sm"
-          variant={variant}
-        onPress={onOpen}
-      >
-        {openButtonIcon}
-      </Button>) :
-       ( openButtonText &&   <Button
-        size="sm"
-       className={ClassName}
-       variant={variant}
-       onPress={onOpen}
-     >
-       {openButtonText}
-     </Button>) }
+      {openButtonIcon
+        ? openButtonIcon && (
+            <Button isIconOnly size="sm" variant={variant} onPress={onOpen}>
+              {openButtonIcon}
+            </Button>
+          )
+        : openButtonText && (
+            <Button
+              size="sm"
+              className={ClassName}
+              variant={variant}
+              onPress={onOpen}
+            >
+              {openButtonText}
+            </Button>
+          )}
 
-{/* <Button
+      {/* <Button
   size="sm"
   variant={variant}
   className={!openButtonIcon ? ClassName : undefined}
@@ -66,29 +83,38 @@ export default function LinkUpModal({
 >
   {openButtonIcon || openButtonText}
 </Button> */}
-      
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={size} > 
-        <ModalContent >
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={size}>
+        <ModalContent>
           {(onClose) => (
             <>
-              { title && <ModalHeader className="flex justify-center ">{title}</ModalHeader> }
-              <ModalBody className=" flex items-center justify-center ">{children}</ModalBody>
-           
-              {
-              footerButton &&  <ModalFooter>
-              <Button color="danger" size="sm"  onPress={onClose}>
-                Close
-              </Button>
-              
-              <Button color="primary" size="sm"  onPress={() => {
-                  if (onUpdate) onUpdate();
-                  // onClose();
-                }}>
-                {actionButtonText}
-              </Button>
-            </ModalFooter>
-             }
-             
+              {title && (
+                <ModalHeader className="flex justify-center ">
+                  {title}
+                </ModalHeader>
+              )}
+              <ModalBody className=" flex items-center justify-center ">
+                {children}
+              </ModalBody>
+
+              {footerButton && (
+                <ModalFooter>
+                  <Button color="danger" size="sm" onPress={onClose}>
+                    Close
+                  </Button>
+
+                  <Button
+                    color="primary"
+                    size="sm"
+                    onPress={() => {
+                      if (onUpdate) onUpdate();
+                      // onClose();
+                    }}
+                  >
+                    {actionButtonText}
+                  </Button>
+                </ModalFooter>
+              )}
             </>
           )}
         </ModalContent>

@@ -1,10 +1,8 @@
-import Posts from '@/components/post/Posts'
-import React from 'react'
+import Posts from "@/components/post/Posts";
+import React from "react";
 
 const NewsFeedPage = () => {
-  return (
-    <Posts/>
-  )
-}
+  return <Posts />;
+};
 
-export default NewsFeedPage
+export default NewsFeedPage;

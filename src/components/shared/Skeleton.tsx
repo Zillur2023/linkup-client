@@ -1,32 +1,32 @@
-import {Card, Skeleton} from "@heroui/react";
+import { Card, Skeleton } from "@heroui/react";
 
-export  function PostSkeleton() {
+export function PostSkeleton() {
   return (
-   <>
-     {   [...new Array(4)].map((_, index) => (
-    <Card key={index} className="w-full space-y-5 p-4" radius="lg">
-      <div className=" w-full flex  items-center gap-3">
-        <Skeleton className="flex rounded-full w-10 h-8" />
-      <div className="w-full flex flex-col gap-2">
-        <Skeleton className="h-2 w-3/5 rounded-lg" />
-        <Skeleton className="h-2 w-4/5 rounded-lg" />
-      </div>
-        <Skeleton className=" h-6 w-10 rounded-lg"/>
-     </div>
-      <div className="space-y-3">
-        <Skeleton className="h-3 w-full rounded-lg bg-default-200"/>
-        <Skeleton className="h-3 w-full rounded-lg bg-default-200"/>
-        <Skeleton className="h-3 w-4/5 rounded-lg bg-default-200"/>
-      </div>
-      <Skeleton className="h-36 rounded-lg bg-default-300"/>
-      <div className=" flex items-center justify-between">
-      <Skeleton className=" h-6 w-10 rounded-lg"/>
-      <Skeleton className=" h-6 w-10 rounded-lg"/>
-      <Skeleton className=" h-6 w-10 rounded-lg"/>
-      <Skeleton className=" h-6 w-10 rounded-lg"/>
-     </div>
-    </Card>
-   ))}
-   </>
+    <>
+      {[...new Array(4)].map((_, index) => (
+        <Card key={index} className="w-full space-y-5 p-4" radius="lg">
+          <div className=" w-full flex  items-center gap-3">
+            <Skeleton className="flex rounded-full w-10 h-8" />
+            <div className="w-full flex flex-col gap-2">
+              <Skeleton className="h-2 w-3/5 rounded-lg" />
+              <Skeleton className="h-2 w-4/5 rounded-lg" />
+            </div>
+            <Skeleton className=" h-6 w-10 rounded-lg" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-3 w-full rounded-lg bg-default-200" />
+            <Skeleton className="h-3 w-full rounded-lg bg-default-200" />
+            <Skeleton className="h-3 w-4/5 rounded-lg bg-default-200" />
+          </div>
+          <Skeleton className="h-36 rounded-lg bg-default-300" />
+          <div className=" flex items-center justify-between">
+            <Skeleton className=" h-6 w-10 rounded-lg" />
+            <Skeleton className=" h-6 w-10 rounded-lg" />
+            <Skeleton className=" h-6 w-10 rounded-lg" />
+            <Skeleton className=" h-6 w-10 rounded-lg" />
+          </div>
+        </Card>
+      ))}
+    </>
   );
 }

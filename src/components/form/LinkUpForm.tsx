@@ -11,7 +11,7 @@ interface formConfig {
 interface IProps extends formConfig {
   children: ReactNode;
   // onSubmit: SubmitHandler<any>;
-  onSubmit:  (data: any, reset?: () => void) => void;
+  onSubmit: (data: any, reset?: () => void) => void;
 }
 
 export default function LinkUpForm({
@@ -42,11 +42,8 @@ export default function LinkUpForm({
 
   return (
     <FormProvider {...methods}>
-     {/* <form onSubmit={submitHandler(onSubmit)}></form> */}
-      <form onSubmit={submitHandler}>
-        {children}
-
-      </form>
+      {/* <form onSubmit={submitHandler(onSubmit)}></form> */}
+      <form onSubmit={submitHandler}>{children}</form>
     </FormProvider>
   );
 }

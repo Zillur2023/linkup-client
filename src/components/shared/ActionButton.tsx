@@ -1,4 +1,10 @@
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/react";
 import { EllipsisVertical } from "lucide-react";
 // import { VerticalDotsIcon } from "../table/VerticalDotsIcon";
 export const VerticalDotsIcon = ({
@@ -29,29 +35,36 @@ export const VerticalDotsIcon = ({
   </svg>
 );
 interface ActionButtonProps {
-    onEdit?: () => void;
-    onDelete?: () => Promise<void>;
+  onEdit?: () => void;
+  onDelete?: () => Promise<void>;
 }
 
-
-const ActionButton: React.FC<ActionButtonProps> = ({onEdit, onDelete}) => {
-
+const ActionButton: React.FC<ActionButtonProps> = ({ onEdit, onDelete }) => {
   return (
     <div className="relative flex justify-end items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  {/* <VerticalDotsIcon className="text-default-300" width={24} height={24} /> */}
-                  <EllipsisVertical />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem onClick={onEdit} key="edit">Edit</DropdownItem>
-                <DropdownItem onClick={onDelete} key="logout" className="text-danger" color="danger">Delete</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-  )
-}
+      <Dropdown>
+        <DropdownTrigger>
+          <Button isIconOnly size="sm" variant="light">
+            {/* <VerticalDotsIcon className="text-default-300" width={24} height={24} /> */}
+            <EllipsisVertical />
+          </Button>
+        </DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem onClick={onEdit} key="edit">
+            Edit
+          </DropdownItem>
+          <DropdownItem
+            onClick={onDelete}
+            key="logout"
+            className="text-danger"
+            color="danger"
+          >
+            Delete
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    </div>
+  );
+};
 
-export default ActionButton
+export default ActionButton;

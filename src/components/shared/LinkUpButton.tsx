@@ -5,10 +5,10 @@ import { ReactNode, useState } from "react";
 
 interface LinkUpButtonProps {
   onClick?: () => Promise<void>; // Async function for handling the button action
-  buttonId: string ; // Unique identifier for each button
+  buttonId: string; // Unique identifier for each button
   children: ReactNode;
   data?: IUser[];
-  ClassName?: string
+  ClassName?: string;
 }
 
 const LinkUpButton: React.FC<LinkUpButtonProps> = ({
@@ -16,7 +16,7 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
   buttonId,
   children,
   data,
-  ClassName
+  ClassName,
 }) => {
   const [loadingStates, setLoadingStates] = useState<{
     [key: string]: boolean;
@@ -48,7 +48,11 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
             size="sm"
             onClick={handleClick}
             disabled={loadingStates[buttonId]}
-            className={ !ClassName ? "flex items-center gap-3 bg-transparent hover:bg-gray-300 " : ClassName }
+            className={
+              !ClassName
+                ? "flex items-center gap-3 bg-transparent hover:bg-gray-300 "
+                : ClassName
+            }
           >
             {loadingStates[buttonId] ? (
               <Spinner size="sm"></Spinner>
@@ -62,8 +66,12 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
           size="sm"
           onClick={handleClick}
           disabled={loadingStates[buttonId]}
-          className={ !ClassName ? "flex items-center gap-3 bg-transparent hover:bg-gray-300 " : ClassName }
-          >
+          className={
+            !ClassName
+              ? "flex items-center gap-3 bg-transparent hover:bg-gray-300 "
+              : ClassName
+          }
+        >
           {loadingStates[buttonId] ? (
             <Spinner size="sm"></Spinner>
           ) : (

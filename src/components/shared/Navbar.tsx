@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React from "react";
 import {
   Navbar as HeroUiNabvar,
@@ -47,9 +47,16 @@ export default function Navbar() {
   ];
 
   return (
-    <HeroUiNabvar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
-      <NavbarContent  justify="start">
-        <NavbarMenuToggle className="sm:hidden" aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
+    <HeroUiNabvar
+      isBordered
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+    >
+      <NavbarContent justify="start">
+        <NavbarMenuToggle
+          className="sm:hidden"
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+        />
         <NavbarBrand>
           <AcmeLogo />
           <p className="font-bold text-inherit">ACME</p>
@@ -57,7 +64,7 @@ export default function Navbar() {
       </NavbarContent>
 
       <NavbarContent as="div" justify="end">
-      <Input
+        <Input
           classNames={{
             base: "max-w-full sm:max-w-[10rem] h-10",
             mainWrapper: "h-full",
@@ -106,7 +113,11 @@ export default function Navbar() {
             <Link
               className="w-full"
               color={
-                index === 2 ? "warning" : index === menuItems.length - 1 ? "danger" : "foreground"
+                index === 2
+                  ? "warning"
+                  : index === menuItems.length - 1
+                  ? "danger"
+                  : "foreground"
               }
               href="#"
               size="lg"
@@ -120,9 +131,13 @@ export default function Navbar() {
   );
 }
 
-
-  export const SearchIcon = ({size = 24, strokeWidth = 1.5, width = 24, height = 24, ...props}) => {
-
+export const SearchIcon = ({
+  size = 24,
+  strokeWidth = 1.5,
+  width = 24,
+  height = 24,
+  ...props
+}) => {
   return (
     <svg
       aria-hidden="true"
@@ -151,4 +166,3 @@ export default function Navbar() {
     </svg>
   );
 };
-

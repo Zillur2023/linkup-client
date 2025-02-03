@@ -7,8 +7,8 @@ interface IProps extends IInput {
   //   uid: string;
   //   name: string;
   // }[];
-  options: string[]
-  value?: string
+  options: string[];
+  value?: string;
 }
 
 export default function LinkUpSelect({
@@ -23,7 +23,7 @@ export default function LinkUpSelect({
     register,
     formState: { errors },
   } = useFormContext();
-  console.log("select value",value)
+  console.log("select value", value);
 
   return (
     <Select

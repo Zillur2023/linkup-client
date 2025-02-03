@@ -1,8 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@heroui/react";
-import { Editor } from '@tiptap/react'
-
+import { Editor } from "@tiptap/react";
 
 interface LinkUpResetProps {
   editor?: Editor | null;

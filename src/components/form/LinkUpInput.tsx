@@ -15,7 +15,7 @@ interface InputProps {
   size?: "sm" | "md" | "lg";
   value?: string;
   isReadOnly?: boolean;
-  // focusRef?: React.Ref<HTMLInputElement>; 
+  // focusRef?: React.Ref<HTMLInputElement>;
   focusRef?: (el: HTMLInputElement | null) => void;
 }
 
@@ -28,15 +28,18 @@ export default function LinkUpInput({
   type = "text",
   size = "md",
   value,
-  isReadOnly=false,
+  isReadOnly = false,
   focusRef,
 }: InputProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const { register, formState: { errors } } = useFormContext();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   const inputType = type === "password" && isPasswordVisible ? "text" : type;
-  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
- 
+  const togglePasswordVisibility = () =>
+    setIsPasswordVisible(!isPasswordVisible);
 
   return (
     <div>

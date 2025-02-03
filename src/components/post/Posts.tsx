@@ -17,12 +17,21 @@ import {
   Trash2,
   Pencil,
   Download,
+  Crown,
 } from "lucide-react";
 import { useUser } from "@/context/UserProvider";
-import { useGetUserQuery, useUpdateFollowUnfollowMutation } from "@/redux/features/user/userApi";
+import {
+  useGetUserQuery,
+  useUpdateFollowUnfollowMutation,
+} from "@/redux/features/user/userApi";
 import { IPostData, IUserData } from "@/type";
 import useDebounce from "@/hooks/debounce.hooks";
-import { useDeletePostMutation, useGetAllPostQuery, useUpdateDislikesMutation, useUpdateLikesMutation } from "@/redux/features/post/postApi";
+import {
+  useDeletePostMutation,
+  useGetAllPostQuery,
+  useUpdateDislikesMutation,
+  useUpdateLikesMutation,
+} from "@/redux/features/post/postApi";
 import { toast } from "sonner";
 import { PostSkeleton } from "../shared/Skeleton";
 import { categoryOptions, sortOptions } from "@/constant";
@@ -41,7 +50,7 @@ interface PostsProps {
   comment?: boolean;
 }
 
-const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
+const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserQuery<IUserData>(user?.email, {
@@ -50,13 +59,13 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
 
-  const debounceSearch = useDebounce(searchTerm)
+  const debounceSearch = useDebounce(searchTerm);
 
   const queryPost = postId
     ? { postId }
     : {
         // searchTerm,
-        searchTerm : debounceSearch,
+        searchTerm: debounceSearch,
         sortBy,
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
@@ -68,7 +77,6 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
   const [deletePost] = useDeletePostMutation();
   const inputRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const postRef = useRef<HTMLDivElement>(null); // Ref for the div to be converted to PDF
-
 
   const handleCommentClick = (postId: string) => {
     inputRef?.current[postId]?.focus();
@@ -134,19 +142,27 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
 
   return (
     <>
-        <div className="space-y-4 max-w-[640px]   mx-auto">
-      { !postData && <PostSkeleton />  }
-       
+      <div className=" max-w-[640px] mx-auto space-y-3">
+        <PostEditor openButtonIcon={<Pencil />} />
+        {!postData && <PostSkeleton />}
 
-          {postData?.data?.map((post) => (
-            <Card
-              ref={postRef}
-              key={post._id}
-              isFooterBlurred
-              className=" w-full p-5 "
-            >
-              {/* Author Info */}
-              <CardHeader className=" justify-between ">
+        {postData?.data?.map((post) => (
+          <Card
+            ref={postRef}
+            key={post._id}
+            isFooterBlurred
+            className=" w-full p-5 "
+          >
+            {/* Author Info */}
+            <CardHeader className=" flex flex-col justify-start items-start relative ">
+              {post?.isPremium && (
+                <div className="absolute top-14 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg">
+                  <Crown size={16} /> {/* Use a crown icon or similar */}
+                  <span className="text-sm font-medium">Premium</span>
+                </div>
+              )}
+
+              <div className=" w-full flex justify-between items-center ">
                 <Author
                   author={post?.author}
                   className="text-lg font-semibold"
@@ -165,24 +181,20 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                         : "Follow"}
                     </LinkUpButton>
                   )}
-                   {post?.author?._id === userData?.data?._id && (
+                  {post?.author?._id === userData?.data?._id && (
                     <PostEditor
                       updatePostData={post}
-                      openButtonIcon={
-                        <Pencil />
-                      }
+                      openButtonIcon={<Pencil />}
                     />
                     // <ActionButton/>
                   )}
-                
+
                   {post?.author?._id === userData?.data?._id && (
                     <LinkUpModal
                       size={"xs"}
                       variant="ghost"
                       footerButton={true}
-                      openButtonIcon={
-                        <Trash2 className=" text-red-400" />
-                      }
+                      openButtonIcon={<Trash2 className=" text-red-400" />}
                       actionButtonText="Delete"
                       onUpdate={() => handleDelete(post?._id)}
                     >
@@ -192,115 +204,110 @@ const Posts: React.FC<PostsProps> = ({ postId , comment = true }) => {
                     </LinkUpModal>
                   )}
                 </div>
-              </CardHeader>
-              <CardBody>
-                {post?.isPremium && (
-                  <div className=" flex justify-end  ">
-                    {" "}
-                    <span className=" border-1  font-normal text-green-500 py-0 px-2 rounded-md">
-                      Premium
-                    </span>{" "}
-                  </div>
-                )}
-            
-                {/* Post Image */}
-                {post?.image && (
-              <PostImageGallery images={post?.image} />
-                )}
+              </div>
+              <div className=" w-full flex justify-end items-center "></div>
+            </CardHeader>
+            <CardBody>
+              <p
+                className="mb-3"
+                dangerouslySetInnerHTML={{
+                  __html: post?.content,
+                }}
+              ></p>
 
-                {/* Post Content */}
-                <p className="my-5">{post.content}</p>
-              </CardBody>
+              {/* Post Image */}
+              {post?.images && <PostImageGallery images={post?.images} />}
 
-              <CardFooter className="justify-between ">
-                {/* Post Interactions */}
-                {/* <Tooltip content={post?.likes?.[index+1]?.name}> */}
-                
+              {/* Post Content */}
+              {/* <p className="my-5">{post.content}</p> */}
+            </CardBody>
 
-                <LinkUpButton
-                  onClick={() => handleLike(post._id)}
-                  buttonId="like"
-                  data={post?.likes}
-                >
-                  <ThumbsUp
-                    size={18}
-                    className={`${
-                      post?.likes?.some(
-                        (item) => item?._id === userData?.data?._id
-                      )
-                        ? "text-blue-600 fill-current"
-                        : "text-gray-600"
-                    }`}
-                  />
+            <CardFooter className="justify-between ">
+              {/* Post Interactions */}
+              {/* <Tooltip content={post?.likes?.[index+1]?.name}> */}
 
-                  <span>{post.likes.length}</span>
-                </LinkUpButton>
+              <LinkUpButton
+                onClick={() => handleLike(post._id)}
+                buttonId="like"
+                data={post?.likes}
+              >
+                <ThumbsUp
+                  size={18}
+                  className={`${
+                    post?.likes?.some(
+                      (item) => item?._id === userData?.data?._id
+                    )
+                      ? "text-blue-600 fill-current"
+                      : "text-gray-600"
+                  }`}
+                />
 
-                <LinkUpButton
-                  onClick={() => handleDislike(post._id)}
-                  buttonId="dislike"
-                  data={post?.dislikes}
-                >
-                  <ThumbsDown
-                    size={18}
-                    className={`${
-                      post?.dislikes?.some(
-                        (item) => item?._id === userData?.data?._id
-                      )
-                        ? "text-blue-600 fill-current"
-                        : "text-gray-600"
-                    }`}
-                  />
-                  <span>{post.dislikes.length}</span>
-                </LinkUpButton>
+                <span>{post.likes.length}</span>
+              </LinkUpButton>
 
-                <div className="">
-                 
-                
-                  <Button
-                    size="sm"
-                    className="flex items-center  bg-transparent hover:bg-gray-300 "
-                    onClick={() => handleCommentClick(post._id)}
-                  >
-                    <MessageCircle size={18} />
-                    <span>{post?.comments?.length}</span>
-                  </Button>
-                </div>
+              <LinkUpButton
+                onClick={() => handleDislike(post._id)}
+                buttonId="dislike"
+                data={post?.dislikes}
+              >
+                <ThumbsDown
+                  size={18}
+                  className={`${
+                    post?.dislikes?.some(
+                      (item) => item?._id === userData?.data?._id
+                    )
+                      ? "text-blue-600 fill-current"
+                      : "text-gray-600"
+                  }`}
+                />
+                <span>{post.dislikes.length}</span>
+              </LinkUpButton>
+
+              <div className="">
                 <Button
                   size="sm"
                   className="flex items-center  bg-transparent hover:bg-gray-300 "
+                  onClick={() => handleCommentClick(post._id)}
                 >
-                  <Share2 size={18} />
-                  {/* <span>{post.comments?.length}</span> */}
+                  <MessageCircle size={18} />
+                  <span>{post?.comments?.length}</span>
                 </Button>
-                {/* <Button
+              </div>
+              <Button
+                size="sm"
+                className="flex items-center  bg-transparent hover:bg-gray-300 "
+              >
+                <Share2 size={18} />
+                {/* <span>{post.comments?.length}</span> */}
+              </Button>
+              {/* <Button
                   size="sm"
                   className="flex items-center  bg-transparent hover:bg-gray-300 "
                 >
                    <Download size={18} onClick={() => generatePDF(post)} className="bg-gray-300 p-1 rounded-md w-full h-full" />
                 </Button> */}
-                 <Button
-                  size="sm"
-                  className="flex items-center  bg-transparent hover:bg-gray-300 "
-                  onClick={() => generatePDF(postRef)}
-                > <Download size={18}/> </Button>
-              </CardFooter>
-              
-              <PostComment
-                postId={post?._id}
-                openButtonText={
-                    post?.comments?.length > 2 && comment && "See all comment" 
-                }
-                comment={comment ? true : false}
-                focusRef={(el) => (inputRef.current[post._id] = el)} 
-              />
-            
-            </Card>
-          ))}
-        </div>
-    
+              <Button
+                size="sm"
+                className="flex items-center  bg-transparent hover:bg-gray-300 "
+                onClick={() => generatePDF(postRef)}
+              >
+                {" "}
+                <Download size={18} />{" "}
+              </Button>
+            </CardFooter>
+
+            <PostComment
+              postId={post?._id}
+              openButtonText={
+                post?.comments?.length > 2 && comment && "See all comment"
+              }
+              comment={comment ? true : false}
+              focusRef={(el) => (inputRef.current[post._id] = el)}
+            />
+          </Card>
+        ))}
+      </div>
     </>
-  
   );
 };
 

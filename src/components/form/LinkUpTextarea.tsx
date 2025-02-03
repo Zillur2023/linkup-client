@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useState,KeyboardEvent  } from "react";
+import { ReactNode, useEffect, useState, KeyboardEvent } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { Button, Textarea } from "@heroui/react";
@@ -28,23 +28,26 @@ export default function LinkUpTextarea({
   type = "text",
   size = "md",
   value,
-  isReadOnly=false,
+  isReadOnly = false,
   focusRef,
   endContent,
-  onSubmit
+  onSubmit,
 }: LinkUpTextareaProps) {
-  const { register, watch, reset, formState: { errors } } = useFormContext();
+  const {
+    register,
+    watch,
+    reset,
+    formState: { errors },
+  } = useFormContext();
   // console.log("focusRef", focusRef)
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevent default behavior (e.g., new line)
       onSubmit?.({ [name]: watch(name) }); // Pass form data to onSubmit
-      reset()
+      reset();
     }
   };
-
-
 
   return (
     <div className="relative w-full rounded-lg bg-default-100 ">
@@ -67,25 +70,25 @@ export default function LinkUpTextarea({
           if (focusRef) focusRef(e); // Apply focusRef as well
         }}
         // endContent={
-        //  endContent && <Button isDisabled={!watch(name)} type="submit" isIconOnly  className="absolute bottom-2 right-2 bg-transparent">{endContent}</Button> 
+        //  endContent && <Button isDisabled={!watch(name)} type="submit" isIconOnly  className="absolute bottom-2 right-2 bg-transparent">{endContent}</Button>
         // }
         // isClearable
         // onClear={() => console.log("textarea cleared")}
-        className={` ${!watch(name)? "":"pb-9"}  `} 
+        className={` ${!watch(name) ? "" : "pb-9"}  `}
         onKeyDown={handleKeyDown} // Add onKeyDown handler
 
         // color="default"
-         />
-           {endContent && (
-    <Button
-      isDisabled={!watch(name)}
-      type="submit"
-      isIconOnly
-      className=" z-20 absolute bottom-0 right-1 bg-transparent "
-      >
-      {endContent}
-    </Button>
-  )}
+      />
+      {endContent && (
+        <Button
+          isDisabled={!watch(name)}
+          type="submit"
+          isIconOnly
+          className=" z-20 absolute bottom-0 right-1 bg-transparent "
+        >
+          {endContent}
+        </Button>
+      )}
     </div>
   );
 }
