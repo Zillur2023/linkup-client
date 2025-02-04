@@ -3,7 +3,7 @@ import { Listbox, ListboxItem } from "@heroui/react";
 import Link from "next/link"; // Import Link from Next.js
 
 export const items = [
-  { href: "feed", label: "Feed" },
+  { href: "/feed", label: "Feed" },
   { href: "/change-password", label: "Change password" },
   { href: "/about-us", label: "About us" },
   { href: "/contact-us", label: "Contact us" },

@@ -8,7 +8,6 @@ import {
   NavbarMenu,
   NavbarContent,
   NavbarItem,
-  Link,
   Button,
   Dropdown,
   DropdownTrigger,
@@ -16,7 +15,12 @@ import {
   DropdownItem,
   Avatar,
   Input,
+  Breadcrumbs,
+  BreadcrumbItem,
+  Tooltip,
 } from "@heroui/react";
+import { Contact, Gamepad2, House, Store } from "lucide-react";
+import Link from "next/link";
 
 export const AcmeLogo = () => {
   return (
@@ -31,8 +35,16 @@ export const AcmeLogo = () => {
   );
 };
 
+export const navbarItems = [
+  { id: "home", href: "/", label: <House /> },
+  { id: "store", href: "#", label: <Store /> },
+  { id: "contact", href: "#", label: <Contact /> },
+  { id: "game", href: "#", label: <Gamepad2 /> },
+];
+
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState(navbarItems[0].id);
   const menuItems = [
     "Profile",
     "Dashboard",
@@ -51,8 +63,10 @@ export default function Navbar() {
       isBordered
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
+      className="    "
+      maxWidth="full"
     >
-      <NavbarContent justify="start">
+      <NavbarContent className="  ">
         <NavbarMenuToggle
           className="sm:hidden"
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -62,8 +76,47 @@ export default function Navbar() {
           <p className="font-bold text-inherit">ACME</p>
         </NavbarBrand>
       </NavbarContent>
+      <NavbarContent className="  hidden sm:flex   w-1/2 " justify="center">
+        <NavbarItem></NavbarItem>
+        <Breadcrumbs
+          classNames={{
+            list: "gap-2 sm:gap-4 md:gap-4 lg:gap-8 xl:gap-10",
+          }}
+          itemClasses={{
+            item: [
+              "px-0 py-0 border-small border-default-400 rounded-small",
+              "data-[current=true]:border-foreground data-[current=true]:bg-foreground data-[current=true]:text-background transition-colors",
+              "data-[disabled=true]:border-default-400 data-[disabled=true]:bg-default-100",
+            ],
+            separator: "hidden",
+          }}
+          size="sm"
+          onAction={(key) => setCurrentPage(key as string)}
+        >
+          {navbarItems.map((item, index) => (
+            <BreadcrumbItem key={item.id} isCurrent={currentPage === item.id}>
+              <Tooltip content={item.id}>
+                <Link
+                  className="  px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-1 "
+                  href={item.href}
+                >
+                  {item?.label}
+                </Link>
+              </Tooltip>
+            </BreadcrumbItem>
+            // <BreadcrumbItem
+            //   as={Link}
+            //   href={item.href}
+            //   key={index}
+            //   isCurrent={currentPage === item.id}
+            // >
+            //   {item.label}
+            // </BreadcrumbItem>
+          ))}
+        </Breadcrumbs>
+      </NavbarContent>
 
-      <NavbarContent as="div" justify="end">
+      <NavbarContent as="div" className="    " justify="end">
         <Input
           classNames={{
             base: "max-w-full sm:max-w-[10rem] h-10",
@@ -120,7 +173,7 @@ export default function Navbar() {
                   : "foreground"
               }
               href="#"
-              size="lg"
+              // size="lg"
             >
               {item}
             </Link>

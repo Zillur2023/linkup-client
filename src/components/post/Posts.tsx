@@ -1,14 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 // import Image from "next/image";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Image,
-} from "@heroui/react";
+import { Button, Card, CardBody, CardFooter, CardHeader } from "@heroui/react";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -34,7 +27,6 @@ import {
 } from "@/redux/features/post/postApi";
 import { toast } from "sonner";
 import { PostSkeleton } from "../shared/Skeleton";
-import { categoryOptions, sortOptions } from "@/constant";
 import Author from "../shared/Author";
 import LinkUpButton from "../shared/LinkUpButton";
 import LinkUpModal from "../shared/LinkUpModal";
