@@ -9,10 +9,6 @@ export default function Home() {
   console.log("!user", !user);
 
   return (
-    // <div className=" ">
-    //   <Navbar />
-    //   <Posts />
-    // </div>
     <>
       <Navbar />
       <div className="h-screen grid md:grid-cols-12  ">

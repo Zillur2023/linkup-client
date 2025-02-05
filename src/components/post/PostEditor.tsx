@@ -2,7 +2,7 @@
 import React, { ReactNode } from "react";
 import { FieldValues } from "react-hook-form";
 
-import { useGetUserQuery } from "@/redux/features/user/userApi";
+import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import {
   useCreatePostMutation,
   useUpdatePostMutation,
@@ -30,16 +30,18 @@ import { toast } from "sonner";
 interface PostEditorProps {
   updatePostData?: IPost;
   openButtonIcon?: ReactNode;
+  openButtonText?: ReactNode;
 }
 
 const PostEditor: React.FC<PostEditorProps> = ({
   updatePostData,
   openButtonIcon,
+  openButtonText,
 }) => {
-  console.log({ updatePostData });
+  // console.log({ updatePostData });
   const { user } = useUser();
-  const { data: userData } = useGetUserQuery<IUserData>(user?.email, {
-    skip: !user?.email,
+  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
+    skip: !user?._id,
   });
 
   const editor = useEditor({
@@ -69,56 +71,66 @@ const PostEditor: React.FC<PostEditorProps> = ({
   const [createPost] = useCreatePostMutation();
   const [updatePost] = useUpdatePostMutation();
 
-  const onSubmit = async (data: FieldValues, reset?: () => void) => {
+  const onSubmit = async (data: any, reset?: () => void) => {
+    console.log("postEdit submit data", data);
+    // console.log("typeof(data.images)", typeof data.images);
     const formData = new FormData();
     // for (const [key, value] of formData.entries()) {
     //   console.log(`${key}:`, value);
     // }
 
-    const updatedData = {
-      ...data,
-      _id: updatePostData?._id,
-      isPremium: updatePostData?.isPremium,
-      author: userData?.data?._id,
-      images: updatePostData?.images,
-      content: updatePostData?.content,
-    };
-
     // formData.append("image", data?.image);
 
     if (data?.images && Array.isArray(data.images)) {
-      data.images.forEach((file) => {
+      data.images.forEach((file: File) => {
         formData.append("images", file); // All files will be appended with the same key
       });
     }
 
-    formData.append(
-      "data",
-      JSON.stringify({ ...data, author: userData?.data?._id })
-    );
-    // console.log("formDatA",[...formData.entries()]);
+    if (updatePostData) {
+      formData.append(
+        "data",
+        JSON.stringify({
+          ...data,
+          _id: updatePostData?._id,
+          // isPremium: updatePostData?.isPremium,
+          author: userData?.data?._id,
+          // images: updatePostData?.images,
+          // content: updatePostData?.content,
+        })
+      );
+    } else {
+      formData.append(
+        "data",
+        JSON.stringify({ ...data, author: userData?.data?._id })
+      );
+    }
+    console.log("formDatA", [...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {
       const res = updatePostData
-        ? await updatePost(updatedData).unwrap()
+        ? await updatePost(formData).unwrap()
         : await createPost(formData).unwrap();
       // const res =  await createPost(formData).unwrap()
+      console.log("postEdit res", res);
       if (res.success) {
         toast.success(res.message, { id: toastId });
+        reset?.();
+        editor?.commands.clearContent();
       }
     } catch (error: any) {
+      console.log({ error });
       toast.error(error?.data?.message, { id: toastId });
     }
   };
 
   return (
     <LinkUpModal
-      // buttonText="Edit Profile"
-      openButtonText={`${updatePostData ? "Update Post" : "Create a new post"}`}
+      openButtonText={openButtonText}
       title={`${updatePostData ? "Update Post" : "Create a new post"}`}
       variant="ghost"
-      ClassName="rounded-md border hover:border-blue-500 py-0 w-full"
+      ClassName="  "
       openButtonIcon={openButtonIcon}
     >
       <LinkUpForm
@@ -126,8 +138,8 @@ const PostEditor: React.FC<PostEditorProps> = ({
         onSubmit={onSubmit}
         defaultValues={{
           isPremium: updatePostData?.isPremium,
-          content: updatePostData?.content || "",
-          images: updatePostData?.images || [], // Ensure an array
+          content: updatePostData?.content,
+          images: updatePostData?.images, // Ensure an array
         }}
       >
         <LinkUpCheckbox name="isPremium" label="Premium Post" />
@@ -137,10 +149,6 @@ const PostEditor: React.FC<PostEditorProps> = ({
 
         <div className="py-3">
           <LinkUpInputFile name="images" label="Upload image" />
-
-          {/* <p   dangerouslySetInnerHTML={{
-        __html: getValues('content') ,
-      }}></p> */}
         </div>
 
         <div className="flex gap-4">

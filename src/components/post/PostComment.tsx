@@ -1,12 +1,15 @@
 "use client";
 
 import { useUser } from "@/context/UserProvider";
-import { useGetUserQuery } from "@/redux/features/user/userApi";
+import {
+  useGetUserByIdQuery,
+  useGetUserQuery,
+} from "@/redux/features/user/userApi";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import LinkUpModal from "../shared/LinkUpModal";
-import { IComment } from "@/type";
+import { IComment, IUserData } from "@/type";
 import {
   useCreateCommentMutation,
   useDeleteCommentMutation,
@@ -42,8 +45,8 @@ const PostComment: React.FC<PostCommentProps> = ({
   const commentRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const router = useRouter();
   const { user } = useUser();
-  const { data: userData } = useGetUserQuery(user?.email, {
-    skip: !user?.email,
+  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
+    skip: !user?._id,
   });
   const [deleteComment] = useDeleteCommentMutation();
   const [createComment] = useCreateCommentMutation();

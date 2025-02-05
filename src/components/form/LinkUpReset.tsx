@@ -12,7 +12,8 @@ const LinkUpReset: React.FC<LinkUpResetProps> = ({ editor }) => {
 
   const handleReset = () => {
     if (editor) {
-      editor.commands.setContent(""); // Reset the editor content
+      // editor.commands.setContent(""); // Reset the editor content
+      editor?.commands.clearContent();
     }
     reset(); // Resets the form to default values
   };

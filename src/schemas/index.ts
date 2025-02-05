@@ -15,12 +15,13 @@ export const registerValidationSchema = z.object({
 });
 
 export const commentValidationSchema = z.object({
-  comment: z.string().min(1,"Must be at least 1 character"),
+  comment: z.string().min(1, "Must be at least 1 character"),
 });
 export const postEditorValidationSchema = z.object({
-  isPremium: z.boolean().optional(), 
+  isPremium: z.boolean().optional(),
   content: z.string().optional(),
-  image: z.array(z.instanceof(File)).optional(),
+  // images: z.array(z.instanceof(File)).optional(),
+  images: z.any(),
 });
 
 // export const postEditorValidationSchema = z.object({

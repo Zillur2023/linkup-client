@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@/context/UserProvider";
 import {
+  useGetUserByIdQuery,
   useGetUserQuery,
   useUpdateFollowUnfollowMutation,
 } from "@/redux/features/user/userApi";
@@ -33,7 +34,6 @@ import LinkUpModal from "../shared/LinkUpModal";
 import { generatePDF } from "@/uitls/generatePDF";
 import { useRouter } from "next/navigation";
 import { PostImageGallery } from "./PostImageGallery";
-import ActionButton from "../shared/ActionButton";
 import PostEditor from "./PostEditor";
 import PostComment from "./PostComment";
 
@@ -45,9 +45,14 @@ interface PostsProps {
 const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   const router = useRouter();
   const { user } = useUser();
-  const { data: userData } = useGetUserQuery<IUserData>(user?.email, {
-    skip: !user?.email,
+  // console.log("USEr", user);
+  // const { data: userData } = useGetUserQuery<IUserData>(user?.email, {
+  //   skip: !user?.email,
+  // });
+  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
+    skip: !user?._id,
   });
+  // console.log("zillurUSERData", userData);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
 
@@ -135,7 +140,11 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   return (
     <>
       <div className=" max-w-[640px] mx-auto space-y-3">
-        <PostEditor openButtonIcon={<Pencil />} />
+        <PostEditor
+          openButtonText={`What's on your main, ${userData?.data?.name}`}
+        />
+        {/* <PostCreate  /> */}
+        {/* <PostEditor openButtonIcon={<LinkUpEditor />} /> */}
         {!postData && <PostSkeleton />}
 
         {postData?.data?.map((post) => (

@@ -25,8 +25,8 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
     getUserById: builder.query({
-      query: () => ({
-        url: "/",
+      query: (id) => ({
+        url: `/user/${id}`,
         method: "GET",
       }),
       providesTags: ["User"],
@@ -37,7 +37,7 @@ const userApi = baseApi.injectEndpoints({
         method: "PUT",
         body: formData,
       }),
-      invalidatesTags: ["User","Post"],
+      invalidatesTags: ["User", "Post"],
     }),
     updateFollowUnfollow: builder.mutation({
       query: (data) => ({
@@ -73,5 +73,5 @@ export const {
   useUpdateProfileMutation,
   useUpdateFollowUnfollowMutation,
   useUpdateVerifiedMutation,
-  useDeleteUserMutation
+  useDeleteUserMutation,
 } = userApi;

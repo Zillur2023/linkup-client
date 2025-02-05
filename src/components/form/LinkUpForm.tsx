@@ -35,7 +35,9 @@ export default function LinkUpForm({
 
   // const submitHandler = methods.handleSubmit;
 
-  const submitHandler = handleSubmit((data) => onSubmit(data, reset));
+  const submitHandler = handleSubmit((data) => {
+    onSubmit(data, reset);
+  });
 
   // console.log({submitHandler})
   console.log("Form Errors:", methods.formState.errors);

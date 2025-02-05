@@ -7,6 +7,7 @@ import {
   useDisclosure,
   ModalFooter,
 } from "@heroui/modal";
+import { ThumbsUp } from "lucide-react";
 import { ReactNode } from "react";
 
 interface IProps {
@@ -57,7 +58,7 @@ export default function LinkUpModal({
 
   return (
     <>
-      {openButtonIcon
+      {/* {openButtonIcon
         ? openButtonIcon && (
             <Button isIconOnly size="sm" variant={variant} onPress={onOpen}>
               {openButtonIcon}
@@ -72,17 +73,22 @@ export default function LinkUpModal({
             >
               {openButtonText}
             </Button>
-          )}
+            // <div onClick={onOpen}>{openButtonText}</div>
+          )} */}
 
-      {/* <Button
-  size="sm"
-  variant={variant}
-  className={!openButtonIcon ? ClassName : undefined}
-  isIconOnly={!!openButtonIcon}
-  onPress={onOpen}
->
-  {openButtonIcon || openButtonText}
-</Button> */}
+      <Button
+        size={openButtonText ? "lg" : "sm"}
+        radius={openButtonText ? "full" : undefined}
+        variant={variant}
+        fullWidth
+        className={
+          openButtonText ? "flex items-center justify-start" : undefined
+        }
+        isIconOnly={!!openButtonIcon}
+        onPress={onOpen}
+      >
+        {openButtonIcon || openButtonText}
+      </Button>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={size}>
         <ModalContent>
