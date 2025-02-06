@@ -1,7 +1,15 @@
 "use client";
 import { useRef, useState } from "react";
 // import Image from "next/image";
-import { Button, Card, CardBody, CardFooter, CardHeader } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  User,
+} from "@heroui/react";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -140,11 +148,18 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   return (
     <>
       <div className=" max-w-[640px] mx-auto space-y-3">
-        <PostEditor
-          openButtonText={`What's on your main, ${userData?.data?.name}`}
-        />
-        {/* <PostCreate  /> */}
-        {/* <PostEditor openButtonIcon={<LinkUpEditor />} /> */}
+        {user && (
+          <div className=" flex items-center justify-center gap-2 my-3">
+            <Avatar
+              isBordered
+              radius="full"
+              src={userData?.data?.images?.[0]}
+            />
+            <PostEditor
+              openButtonText={`What's on your main, ${userData?.data?.name}`}
+            />
+          </div>
+        )}
         {!postData && <PostSkeleton />}
 
         {postData?.data?.map((post) => (
