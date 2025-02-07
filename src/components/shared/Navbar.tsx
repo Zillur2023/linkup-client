@@ -28,7 +28,7 @@ import { IUserData } from "@/type";
 export const navbarItems = [
   { id: "home", href: "/", label: <House /> },
   { id: "friends", href: "#", label: <Users /> },
-  { id: "store", href: "#", label: <Store /> },
+  { id: "Marketplace", href: "/marketplace", label: <Store /> },
   { id: "group", href: "#", label: <Group /> },
 ];
 
@@ -59,7 +59,7 @@ export default function Navbar() {
     "Help & Feedback",
     "Log Out",
   ];
-
+  console.log("Image URL:", userData?.data?.images?.[0]);
   return (
     <HeroUiNabvar
       isBordered
@@ -134,15 +134,15 @@ export default function Navbar() {
       </NavbarContent>
 
       <NavbarContent as="div" className="    " justify="end">
-        {user ? (
+        {userData?.data ? (
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
               <Avatar
                 isBordered
                 as="button"
                 className="transition-transform"
-                color="secondary"
-                name="Jason Hughes"
+                // color="secondary"
+                name={userData?.data?.name}
                 size="sm"
                 src={userData?.data?.images?.[0]}
               />

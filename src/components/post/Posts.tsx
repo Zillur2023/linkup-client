@@ -148,8 +148,8 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   return (
     <>
       <div className=" max-w-[640px] mx-auto space-y-3">
-        {user && (
-          <div className=" flex items-center justify-center gap-2 my-3">
+        {userData?.data && (
+          <div className=" flex items-center justify-center gap-2 my-3 px-1">
             <Avatar
               isBordered
               radius="full"

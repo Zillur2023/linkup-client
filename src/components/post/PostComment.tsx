@@ -24,6 +24,7 @@ import { SendHorizontal, VerifiedIcon, X } from "lucide-react";
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import ActionButton from "../shared/ActionButton";
 import { formatTime } from "@/uitls/formatTime";
+import { Avatar } from "@heroui/react";
 
 interface PostCommentProps {
   postId: string;
@@ -154,10 +155,10 @@ const PostComment: React.FC<PostCommentProps> = ({
                   {/* Comment Header */}
                   <div className="flex items-center gap-2 mb-2">
                     {/* User Avatar */}
-                    <img
-                      src={comment?.userId?.image?.[0]}
-                      alt={comment?.userId?.name}
-                      className="w-10 h-10 rounded-full"
+                    <Avatar
+                      size="sm"
+                      radius="full"
+                      src={userData?.data?.images?.[0]}
                     />
                     {/* User Name and Verification Badge */}
                     <div className="flex items-center gap-2">

@@ -4,7 +4,7 @@ import { VerifiedIcon } from "lucide-react";
 interface IAuthor {
   name: string;
   email: string;
-  image: string[];
+  images: string[];
   isVerified: boolean;
 }
 
@@ -28,7 +28,7 @@ export default function Author({ author, className }: AuthorProps) {
       }
       description={<p className="text-blue-500">{author?.email}</p>}
       avatarProps={{
-        src: `${author?.image?.[0]}`,
+        src: `${author?.images?.[0]}`,
       }}
     />
   );

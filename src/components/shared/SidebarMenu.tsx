@@ -15,7 +15,7 @@ type SidebarItem = {
 
 export const sidebarItems: SidebarItem[] = [
   { href: "#", label: "Friends", icon: <Users /> },
-  { href: "#", label: "Store", icon: <Store /> },
+  { href: "#", label: "Marketplace", icon: <Store /> },
   { href: "#", label: "Group", icon: <Group /> },
 ];
 
