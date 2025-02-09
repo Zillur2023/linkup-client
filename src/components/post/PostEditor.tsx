@@ -38,7 +38,6 @@ const PostEditor: React.FC<PostEditorProps> = ({
   openButtonIcon,
   openButtonText,
 }) => {
-  // console.log({ updatePostData });
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
@@ -72,12 +71,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
   const [updatePost] = useUpdatePostMutation();
 
   const onSubmit = async (data: any, reset?: () => void) => {
-    console.log("postEdit submit data", data);
-    // console.log("typeof(data.images)", typeof data.images);
     const formData = new FormData();
-    // for (const [key, value] of formData.entries()) {
-    //   console.log(`${key}:`, value);
-    // }
 
     // formData.append("image", data?.image);
 
@@ -105,7 +99,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
         JSON.stringify({ ...data, author: userData?.data?._id })
       );
     }
-    console.log("formDatA", [...formData.entries()]);
+    // console.log("formDatA", [...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {
@@ -113,7 +107,6 @@ const PostEditor: React.FC<PostEditorProps> = ({
         ? await updatePost(formData).unwrap()
         : await createPost(formData).unwrap();
       // const res =  await createPost(formData).unwrap()
-      console.log("postEdit res", res);
       if (res.success) {
         toast.success(res.message, { id: toastId });
         reset?.();

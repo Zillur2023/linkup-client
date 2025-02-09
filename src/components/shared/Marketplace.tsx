@@ -1,3 +1,4 @@
+"use client";
 import { Card, CardBody, CardFooter, Image } from "@heroui/react";
 
 const Marketplace = () => {
@@ -45,7 +46,7 @@ const Marketplace = () => {
   ];
 
   return (
-    <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
+    <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 p-4">
       {list.map((item, index) => (
         /* eslint-disable no-console */
         <Card

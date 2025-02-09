@@ -25,11 +25,11 @@ import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
 
-export const navbarItems = [
-  { id: "home", href: "/", label: <House /> },
-  { id: "friends", href: "#", label: <Users /> },
-  { id: "Marketplace", href: "/marketplace", label: <Store /> },
-  { id: "group", href: "#", label: <Group /> },
+export const menuItems = [
+  { href: "/", label: "home", icon: <House /> },
+  { href: "#", label: "friends", icon: <Users /> },
+  { href: "/marketplace", label: "Marketplace", icon: <Store /> },
+  { href: "#", label: "group", icon: <Group /> },
 ];
 
 export default function Navbar() {
@@ -44,22 +44,25 @@ export default function Navbar() {
   //     data, // Keep original data structure
   //   }),
   // });
-  // console.log({images})
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [currentPage, setCurrentPage] = React.useState(navbarItems[0].id);
-  const menuItems = [
-    "Profile",
-    "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
-    "Log Out",
-  ];
-  console.log("Image URL:", userData?.data?.images?.[0]);
+  const [currentPage, setCurrentPage] = React.useState(menuItems[0].label);
+  // const menuItems = [
+  //   "Profile",
+  //   "Dashboard",
+  //   "Activity",
+  //   "Analytics",
+  //   "System",
+  //   "Deployments",
+  //   "My Settings",
+  //   "Team Settings",
+  //   "Help & Feedback",
+  //   "Log Out",
+  // ];
+  // export const menuItems = [
+  //   { href: "#", label: "Friends", icon: <Users /> },
+  //   { href: "#", label: "Marketplace", icon: <Store /> },
+  //   { href: "#", label: "Group", icon: <Group /> },
+  // ];
   return (
     <HeroUiNabvar
       isBordered
@@ -93,48 +96,53 @@ export default function Navbar() {
           />
         </div>
       </NavbarContent>
-      <NavbarContent className="  hidden sm:flex   w-1/2 " justify="center">
-        <NavbarItem></NavbarItem>
-        <Breadcrumbs
-          classNames={{
-            list: "gap-2 sm:gap-4 md:gap-4 lg:gap-8 xl:gap-10",
-          }}
-          itemClasses={{
-            item: [
-              "px-0 py-0 border-small border-default-400 rounded-small",
-              "data-[current=true]:border-foreground data-[current=true]:bg-foreground data-[current=true]:text-background transition-colors",
-              "data-[disabled=true]:border-default-400 data-[disabled=true]:bg-default-100",
-            ],
-            separator: "hidden",
-          }}
-          size="sm"
-          onAction={(key) => setCurrentPage(key as string)}
-        >
-          {navbarItems.map((item, index) => (
-            <BreadcrumbItem key={item.id} isCurrent={currentPage === item.id}>
-              <Tooltip content={item.id}>
-                <Link
-                  className="  px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-1 "
-                  href={item.href}
-                >
-                  {item?.label}
-                </Link>
-              </Tooltip>
-            </BreadcrumbItem>
-            // <BreadcrumbItem
-            //   as={Link}
-            //   href={item.href}
-            //   key={index}
-            //   isCurrent={currentPage === item.id}
-            // >
-            //   {item.label}
-            // </BreadcrumbItem>
-          ))}
-        </Breadcrumbs>
-      </NavbarContent>
+      {user && (
+        <NavbarContent className="  hidden sm:flex   w-1/2 " justify="center">
+          <NavbarItem></NavbarItem>
+          <Breadcrumbs
+            classNames={{
+              list: "gap-2 sm:gap-4 md:gap-4 lg:gap-8 xl:gap-10",
+            }}
+            itemClasses={{
+              item: [
+                "px-0 py-0 border-small border-default-400 rounded-small",
+                "data-[current=true]:border-foreground data-[current=true]:bg-foreground data-[current=true]:text-background transition-colors",
+                "data-[disabled=true]:border-default-400 data-[disabled=true]:bg-default-100",
+              ],
+              separator: "hidden",
+            }}
+            size="sm"
+            onAction={(key) => setCurrentPage(key as string)}
+          >
+            {menuItems.map((item) => (
+              <BreadcrumbItem
+                key={item.label}
+                isCurrent={currentPage === item.label}
+              >
+                <Tooltip content={item.label}>
+                  <Link
+                    className="  px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-1 "
+                    href={item.href}
+                  >
+                    {item?.icon}
+                  </Link>
+                </Tooltip>
+              </BreadcrumbItem>
+              // <BreadcrumbItem
+              //   as={Link}
+              //   href={item.href}
+              //   key={index}
+              //   isCurrent={currentPage === item.id}
+              // >
+              //   {item.label}
+              // </BreadcrumbItem>
+            ))}
+          </Breadcrumbs>
+        </NavbarContent>
+      )}
 
       <NavbarContent as="div" className="    " justify="end">
-        {userData?.data ? (
+        {userData ? (
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
               <Avatar
@@ -168,7 +176,7 @@ export default function Navbar() {
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
             <Link
-              className="w-full"
+              className="w-full flex gap-1"
               color={
                 index === 2
                   ? "warning"
@@ -179,7 +187,7 @@ export default function Navbar() {
               href="#"
               // size="lg"
             >
-              {item}
+              {item.icon} {item.label}
             </Link>
           </NavbarMenuItem>
         ))}

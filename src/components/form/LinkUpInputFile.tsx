@@ -17,7 +17,6 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
   } = useFormContext();
 
   const openFileDialog = () => {
-    console.log("openFileDialog cliCK");
     const fileInput = document.getElementById(
       `file-input-${name}`
     ) as HTMLInputElement;

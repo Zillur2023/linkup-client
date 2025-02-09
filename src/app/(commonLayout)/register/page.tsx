@@ -30,7 +30,6 @@ const RegisterPage: React.FC = () => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     formData.append("images", data?.images?.[0]);
-    console.log("resgister data", data);
 
     const toastId = toast.loading("loading..");
 

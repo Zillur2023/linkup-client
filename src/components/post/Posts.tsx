@@ -53,14 +53,13 @@ interface PostsProps {
 const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   const router = useRouter();
   const { user } = useUser();
-  // console.log("USEr", user);
   // const { data: userData } = useGetUserQuery<IUserData>(user?.email, {
   //   skip: !user?.email,
   // });
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
-  // console.log("zillurUSERData", userData);
+  console.log("POstUSerData", userData);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
 
@@ -75,6 +74,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
+  console.log({ postData });
 
   const [updateLike] = useUpdateLikesMutation();
   const [updateDislike] = useUpdateDislikesMutation();
@@ -148,7 +148,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   return (
     <>
       <div className=" max-w-[640px] mx-auto space-y-3">
-        {userData?.data && (
+        {userData && (
           <div className=" flex items-center justify-center gap-2 my-3 px-1">
             <Avatar
               isBordered

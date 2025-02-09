@@ -16,8 +16,6 @@ const LinkUpEditor: React.FC<LinkUpEditorProps> = ({ name, editor }) => {
     formState: { errors },
   } = useFormContext();
 
-  // console.log("LinkUpEditor error", errors)
-
   if (!editor) {
     return null;
   }

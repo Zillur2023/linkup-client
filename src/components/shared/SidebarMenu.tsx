@@ -3,17 +3,10 @@ import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
 import { Avatar, Listbox, ListboxItem } from "@heroui/react";
-import { Group, Store, Users } from "lucide-react";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { Group, Store, Users } from "lucide-react";
 
-type SidebarItem = {
-  href: string;
-  label: string;
-  icon: ReactNode;
-};
-
-export const sidebarItems: SidebarItem[] = [
+export const sidebarItems = [
   { href: "#", label: "Friends", icon: <Users /> },
   { href: "#", label: "Marketplace", icon: <Store /> },
   { href: "#", label: "Group", icon: <Group /> },
@@ -36,11 +29,11 @@ export default function SidebarMenu() {
         }}
       >
         <>
-          {user && (
+          {userData && (
             <ListboxItem
               value={userData?.data?.name}
               as={Link}
-              href="#"
+              href={`${userData?.data?.name}`}
               startContent={
                 <Avatar
                   radius="full"
