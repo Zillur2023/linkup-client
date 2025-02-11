@@ -38,7 +38,7 @@ export default function SidebarMenu() {
                 <Avatar
                   radius="full"
                   size="sm"
-                  src={userData?.data?.images?.[0]}
+                  src={userData?.data?.profileImage}
                 />
               }
             >

@@ -71,9 +71,10 @@ const PostEditor: React.FC<PostEditorProps> = ({
   const [updatePost] = useUpdatePostMutation();
 
   const onSubmit = async (data: any, reset?: () => void) => {
+    console.log("post data", data);
     const formData = new FormData();
 
-    // formData.append("image", data?.image);
+    // formData.append("image", data?.images);
 
     if (data?.images && Array.isArray(data.images)) {
       data.images.forEach((file: File) => {
@@ -99,7 +100,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
         JSON.stringify({ ...data, author: userData?.data?._id })
       );
     }
-    // console.log("formDatA", [...formData.entries()]);
+    console.log("formDatA post", [...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {
@@ -123,7 +124,6 @@ const PostEditor: React.FC<PostEditorProps> = ({
       openButtonText={openButtonText}
       title={`${updatePostData ? "Update Post" : "Create a new post"}`}
       variant="ghost"
-      ClassName="  "
       openButtonIcon={openButtonIcon}
     >
       <LinkUpForm

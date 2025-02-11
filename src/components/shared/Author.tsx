@@ -28,7 +28,7 @@ export default function Author({ author, className }: AuthorProps) {
       }
       description={<p className="text-blue-500">{author?.email}</p>}
       avatarProps={{
-        src: `${author?.images?.[0]}`,
+        src: `${author?.profileImage}`,
       }}
     />
   );

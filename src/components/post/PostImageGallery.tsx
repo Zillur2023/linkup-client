@@ -31,11 +31,23 @@ export const PostImageGallery: React.FC<PostImageGalleryProps> = ({
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const imageGallery = images
-    ? images
-    : field?.value?.map((file) =>
-        typeof file === "string" ? file : URL.createObjectURL(file)
-      ) || [];
+  // const imageGallery = images
+  //   ? images
+  //   : field?.value?.map((file) =>
+  //       typeof file === "string" ? file : URL.createObjectURL(file)
+  //     ) || [];
+
+  const imageGallery = field?.value
+    ? Array.isArray(field.value)
+      ? field.value.map((file) =>
+          typeof file === "string" ? file : URL.createObjectURL(file)
+        )
+      : [
+          typeof field.value === "string"
+            ? field.value
+            : URL.createObjectURL(field.value),
+        ]
+    : [];
 
   const handleImageRemove = (index: number) => {
     const updatedFiles = field?.value.filter((_, i: number) => i !== index);
@@ -53,7 +65,7 @@ export const PostImageGallery: React.FC<PostImageGalleryProps> = ({
 
   return (
     <div className={`grid gap-4 ${addImage || reset ? "relative" : ""}`}>
-      {addImage && (
+      {field?.name === "images" && addImage && (
         <Button
           onClick={addImage}
           className=" z-10 top-2 left-2 absolute "
@@ -64,7 +76,7 @@ export const PostImageGallery: React.FC<PostImageGalleryProps> = ({
           Add images
         </Button>
       )}
-      {reset && (
+      {field?.name === "images" && reset && (
         // <Button onClick={() => reset}  isIconOnly radius="full" className="  z-10 top-2 right-2 absolute  "  size="sm">
         <Button
           onClick={() => field?.onChange([])}

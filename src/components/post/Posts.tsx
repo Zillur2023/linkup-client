@@ -153,7 +153,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
             <Avatar
               isBordered
               radius="full"
-              src={userData?.data?.images?.[0]}
+              src={userData?.data?.profileImage}
             />
             <PostEditor
               openButtonText={`What's on your main, ${userData?.data?.name}`}
@@ -232,7 +232,9 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
               ></p>
 
               {/* Post Image */}
-              {post?.images && <PostImageGallery images={post?.images} />}
+              {post?.profileImages && (
+                <PostImageGallery images={post?.profileImages} />
+              )}
 
               {/* Post Content */}
               {/* <p className="my-5">{post.content}</p> */}

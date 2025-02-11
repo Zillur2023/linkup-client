@@ -4,7 +4,8 @@ export interface IUser {
   _id: string;
   name: string;
   email: string;
-  images: string[];
+  profileImage?: string;
+  coverImage?: string;
   followers: string[];
   following: string[];
   isVerified: boolean;

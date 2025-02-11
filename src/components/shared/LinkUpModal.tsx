@@ -16,6 +16,7 @@ interface IProps {
   actionButtonText?: string;
   title?: string;
   children: ReactNode;
+  radius?: "sm" | "md" | "lg" | "full" | "none" | undefined;
   variant?:
     | "light"
     | "solid"
@@ -25,7 +26,7 @@ interface IProps {
     | "shadow"
     | "ghost"
     | undefined;
-  size?:
+  modalSize?:
     | "sm"
     | "md"
     | "lg"
@@ -37,8 +38,10 @@ interface IProps {
     | "5xl"
     | "full"
     | undefined;
-  ClassName?: string;
+  buttonSize?: "sm" | "md" | "lg" | undefined;
+  className?: string;
   onUpdate?: () => void;
+  startContent?: ReactNode;
   footerButton?: boolean;
 }
 
@@ -48,10 +51,13 @@ export default function LinkUpModal({
   actionButtonText,
   title,
   children,
+  radius,
   variant = "light",
-  size,
-  ClassName,
+  modalSize,
+  buttonSize = "sm",
+  className,
   onUpdate,
+  startContent,
   footerButton = false,
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -77,20 +83,23 @@ export default function LinkUpModal({
           )} */}
 
       <Button
-        size={openButtonText ? "lg" : "sm"}
-        radius={openButtonText ? "full" : undefined}
+        size={buttonSize}
+        radius={radius}
         variant={variant}
         fullWidth
         className={
-          openButtonText ? "flex items-center justify-start" : undefined
+          // openButtonText ? "flex items-center justify-start" : undefined
+          // textButtonClassName ? textButtonClassName : iconButtonClassName
+          className
         }
         isIconOnly={!!openButtonIcon}
+        startContent={startContent}
         onPress={onOpen}
       >
         {openButtonIcon || openButtonText}
       </Button>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={size}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={modalSize}>
         <ModalContent>
           {(onClose) => (
             <>

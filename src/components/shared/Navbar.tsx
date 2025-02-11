@@ -40,7 +40,7 @@ export default function Navbar() {
   // const { images } = useGetUserByIdQuery<IUserData>(user?._id, {
   //   skip: !user?._id,
   //   selectFromResult: ({ data }) => ({
-  //     image: data?.data?.images ?? null,  // Extract image, provide a default value
+  //     image: data?.data?.profileImages ?? null,  // Extract image, provide a default value
   //     data, // Keep original data structure
   //   }),
   // });
@@ -152,7 +152,7 @@ export default function Navbar() {
                 // color="secondary"
                 name={userData?.data?.name}
                 size="sm"
-                src={userData?.data?.images?.[0]}
+                src={userData?.data?.profileImage}
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" variant="flat">

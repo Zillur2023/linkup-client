@@ -17,7 +17,7 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
-    getUser: builder.query({
+    getUserByEmail: builder.query({
       query: (email) => ({
         url: `/user/${email}`,
         method: "GET",
@@ -31,9 +31,9 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
-    updateProfile: builder.mutation({
+    updateUser: builder.mutation({
       query: (formData) => ({
-        url: `/user/update-profile`,
+        url: `/user/update`,
         method: "PUT",
         body: formData,
       }),
@@ -68,9 +68,9 @@ const userApi = baseApi.injectEndpoints({
 export const {
   useCreateUserMutation,
   useGetAllUserQuery,
-  useGetUserQuery,
+  useGetUserByEmailQuery,
   useGetUserByIdQuery,
-  useUpdateProfileMutation,
+  useUpdateUserMutation,
   useUpdateFollowUnfollowMutation,
   useUpdateVerifiedMutation,
   useDeleteUserMutation,

@@ -13,6 +13,7 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
   const {
     control,
     reset,
+    watch,
     formState: { errors },
   } = useFormContext();
 
@@ -22,6 +23,9 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
     ) as HTMLInputElement;
     fileInput?.click(); // Programmatically click the hidden file input
   };
+
+  // console.log("watch(image)", watch(name));
+  // console.log({ name });
 
   return (
     <Controller
@@ -35,8 +39,22 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
           const newFiles = event.target.files
             ? Array.from(event.target.files)
             : [];
-          field.onChange([...(field.value || []), ...newFiles]); // Append new files
+
+          // console.log("newFiles[0]", newFiles[0]);
+          // field.onChange([...(field.value || []), ...newFiles]);
+          if (name === "images") {
+            // Multiple file upload (append files)
+            field.onChange([...(field.value || []), ...newFiles]);
+          } else {
+            // Single file upload (replace file)
+            field.onChange(newFiles.length > 0 ? newFiles[0] : null);
+          }
         };
+        // console.log("zillurField", field?.value);
+        // console.log(
+        //   "field?.name !== images && field?.value?.length > 1",
+        //   field?.name !== "images" && (field?.value?.length ?? 0) > 1
+        // );
 
         return (
           <div>
@@ -66,6 +84,9 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
             />
             {/* Trigger File Input with Icon */}
             <Button
+              isDisabled={
+                field?.name !== "images" && (field?.value?.length ?? 0) > 0
+              }
               onClick={openFileDialog}
               className=" "
               startContent={<ImageUp />}

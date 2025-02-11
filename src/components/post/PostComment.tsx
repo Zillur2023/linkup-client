@@ -158,7 +158,7 @@ const PostComment: React.FC<PostCommentProps> = ({
                     <Avatar
                       size="sm"
                       radius="full"
-                      src={userData?.data?.images?.[0]}
+                      src={userData?.data?.profileImage}
                     />
                     {/* User Name and Verification Badge */}
                     <div className="flex items-center gap-2">
