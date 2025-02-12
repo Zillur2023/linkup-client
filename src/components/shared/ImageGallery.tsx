@@ -16,14 +16,14 @@ type ControllerField = {
   ref: React.Ref<HTMLInputElement>;
 };
 
-type PostImageGalleryProps = {
+type ImageGalleryProps = {
   addImage?: () => void;
   reset?: () => void;
   images?: string[];
   field?: ControllerField;
 };
 
-export const PostImageGallery: React.FC<PostImageGalleryProps> = ({
+export const ImageGallery: React.FC<ImageGalleryProps> = ({
   images,
   addImage,
   reset,
@@ -89,11 +89,11 @@ export const PostImageGallery: React.FC<PostImageGalleryProps> = ({
         </Button>
       )}
       {imageGallery.length === 1 && (
-        <div className="  bg-green-300">
+        <div className=" flex items-center justify-center ">
           <Image
             radius="none"
             alt="Post"
-            className="z-0 w-[500px] h-full object-cover bg-gray-500"
+            className="z-0 w-32 h-auto object-cover "
             src={imageGallery[0]}
             onClick={() => handleImageClick(0)}
           />

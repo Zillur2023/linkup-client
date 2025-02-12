@@ -13,7 +13,7 @@ const FriendsList = ({
           <div key={i} className="flex flex-col items-center">
             <Avatar
               radius="lg"
-              src={friend?.profileImage} // Default Image
+              src={friend?.image} // Default Image
               className=" w-28 h-28 "
             />
             <p className="text-sm font-semibold text-default-500">

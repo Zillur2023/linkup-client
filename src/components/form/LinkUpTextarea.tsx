@@ -49,7 +49,11 @@ export default function LinkUpTextarea({
   };
 
   return (
-    <div className="relative w-full rounded-lg bg-default-100 ">
+    <div
+      className={`${
+        endContent ? "relative" : ""
+      } w-full rounded-lg bg-default-100  `}
+    >
       <Textarea
         {...register(name)}
         label={label}
@@ -73,7 +77,7 @@ export default function LinkUpTextarea({
         // }
         // isClearable
         // onClear={() => console.log("textarea cleared")}
-        className={` ${!watch(name) ? "" : "pb-9"}  `}
+        className={`${watch(name) && endContent ? "pb-9" : ""}`}
         onKeyDown={handleKeyDown} // Add onKeyDown handler
 
         // color="default"

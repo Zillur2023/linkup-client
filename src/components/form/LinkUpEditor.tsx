@@ -1,5 +1,5 @@
-import "./LinkUpEditorStyles.scss";
-import "./LinkUpEditorStyles.css";
+import "./EditorStyles.scss";
+import "./EditorStyles.css";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Button } from "@heroui/react";

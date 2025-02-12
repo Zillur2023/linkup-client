@@ -1,15 +1,9 @@
+import { IUser } from "@/type";
 import { User } from "@heroui/react";
 import { VerifiedIcon } from "lucide-react";
 
-interface IAuthor {
-  name: string;
-  email: string;
-  images: string[];
-  isVerified: boolean;
-}
-
 interface AuthorProps {
-  author: IAuthor;
+  author: IUser;
   className?: string; // Optional class for the author's name
 }
 

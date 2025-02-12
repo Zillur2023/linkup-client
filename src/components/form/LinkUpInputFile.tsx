@@ -1,8 +1,8 @@
 import { ImageUp } from "lucide-react";
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { PostImageGallery } from "../post/PostImageGallery";
 import { Button } from "@heroui/react";
+import { ImageGallery } from "../shared/ImageGallery";
 
 interface LinkUpInputFileProps {
   name: string;
@@ -62,7 +62,7 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
               {/* <PostImageGallery images={field.value.map((file: File) => URL.createObjectURL(file))}
            addImage={openFileDialog} reset={reset} 
            field={field} /> */}
-              <PostImageGallery
+              <ImageGallery
                 addImage={openFileDialog}
                 reset={reset}
                 field={field}
@@ -84,9 +84,9 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
             />
             {/* Trigger File Input with Icon */}
             <Button
-              isDisabled={
-                field?.name !== "images" && (field?.value?.length ?? 0) > 0
-              }
+              // isDisabled={
+              //   field?.name !== "images" && (field?.value?.length ?? 0) > 0
+              // }
               onClick={openFileDialog}
               className=" "
               startContent={<ImageUp />}

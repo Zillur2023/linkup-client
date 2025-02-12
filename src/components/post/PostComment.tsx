@@ -132,8 +132,8 @@ const PostComment: React.FC<PostCommentProps> = ({
   return (
     <div>
       <LinkUpModal
-        size="3xl"
-        ClassName="flex justify-start hover:underline"
+        modalSize="3xl"
+        className="flex justify-start hover:underline"
         openButtonText={openButtonText}
       >
         <div className="mb-4">

@@ -1,12 +1,13 @@
-import { IUser, IUserData } from "@/type";
+import { IUser } from "@/type";
 import { Avatar, Button, Card, AvatarGroup } from "@heroui/react";
-import { Camera, Edit, UserPlus } from "lucide-react";
+import { Camera } from "lucide-react";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpInputFile from "../form/LinkUpInputFile";
 import LinkUpReset from "../form/LinkUpReset";
 import LinkUpModal from "../shared/LinkUpModal";
 import { toast } from "sonner";
 import { useUpdateUserMutation } from "@/redux/features/user/userApi";
+import EditProfile from "./EditProfile";
 
 interface ProfileHeaderProps {
   user: IUser;
@@ -17,13 +18,14 @@ interface ProfileHeaderProps {
 export const ProfileHeader = ({ user, friends }: ProfileHeaderProps) => {
   const [updateUser] = useUpdateUserMutation();
 
-  const editCoverImage = async (data: any, reset?: () => void) => {
+  const handleEditImage = async (data: any, reset?: () => void) => {
     const formData = new FormData();
-    formData.append(
-      "data",
-      JSON.stringify({ _id: user?._id, coverImage: data?.coverImage })
-    );
-    formData.append("coverImage", data?.coverImage);
+    formData.append("data", JSON.stringify({ _id: user?._id }));
+    if (data?.coverImage) {
+      formData.append("coverImage", data?.coverImage);
+    } else if (data?.profileImage) {
+      formData.append("profileImage", data?.profileImage);
+    }
 
     console.log("formDatA editCOver", [...formData.entries()]);
 
@@ -34,27 +36,7 @@ export const ProfileHeader = ({ user, friends }: ProfileHeaderProps) => {
 
       if (res?.success) {
         toast.success(res?.message, { id: toastId });
-      }
-    } catch (error: any) {
-      toast.error(error?.data?.message, { id: toastId });
-    }
-  };
-  const editProfileImage = async (data: any, reset?: () => void) => {
-    console.log("editProfile data", data);
-    const formData = new FormData();
-    formData.append(
-      "data",
-      JSON.stringify({ _id: user?._id, profileImage: data?.profileImage })
-    );
-    formData.append("profileImage", data?.profileImage);
-
-    const toastId = toast.loading("loading..");
-
-    try {
-      const res = await updateUser(formData).unwrap();
-
-      if (res?.success) {
-        toast.success(res?.message, { id: toastId });
+        reset?.();
       }
     } catch (error: any) {
       toast.error(error?.data?.message, { id: toastId });
@@ -74,15 +56,19 @@ export const ProfileHeader = ({ user, friends }: ProfileHeaderProps) => {
         <div className="absolute bottom-2 right-2 ">
           <LinkUpModal
             buttonSize="md"
-            openButtonText={"Add cover image"}
+            openButtonText={`${
+              user?.coverImage ? "Update cover image" : "Add cover image"
+            }`}
             startContent={<Camera />}
-            title={`Add cover image`}
+            title={`${
+              user?.coverImage ? "Update cover image" : "Add cover image"
+            }`}
             variant="solid"
             className="bg-gray-800 dark:bg-none text-white"
           >
             <LinkUpForm
               // resolver={zodResolver(postEditorValidationSchema)}
-              onSubmit={editCoverImage}
+              onSubmit={handleEditImage}
             >
               <div className="py-3">
                 <LinkUpInputFile name="coverImage" label="Add cover image" />
@@ -126,7 +112,7 @@ export const ProfileHeader = ({ user, friends }: ProfileHeaderProps) => {
               >
                 <LinkUpForm
                   // resolver={zodResolver(postEditorValidationSchema)}
-                  onSubmit={editProfileImage}
+                  onSubmit={handleEditImage}
                 >
                   <div className="py-3">
                     <LinkUpInputFile
@@ -163,9 +149,12 @@ export const ProfileHeader = ({ user, friends }: ProfileHeaderProps) => {
                   <Avatar key={i} src={friend?.image} />
                 ))}
               </AvatarGroup>
-              <Button className="" startContent={<Edit />}>
+              {/* <Button className="" startContent={<Edit />}>
                 Edit Profile
-              </Button>
+              </Button> */}
+              <div>
+                <EditProfile {...user} />
+              </div>
             </div>
           </div>
         </div>

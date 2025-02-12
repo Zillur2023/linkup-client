@@ -1,6 +1,5 @@
 "use client";
 import { useRef, useState } from "react";
-// import Image from "next/image";
 import {
   Avatar,
   Button,
@@ -8,7 +7,6 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  User,
 } from "@heroui/react";
 import {
   ThumbsUp,
@@ -23,7 +21,6 @@ import {
 import { useUser } from "@/context/UserProvider";
 import {
   useGetUserByIdQuery,
-  useGetUserQuery,
   useUpdateFollowUnfollowMutation,
 } from "@/redux/features/user/userApi";
 import { IPostData, IUserData } from "@/type";
@@ -41,7 +38,7 @@ import LinkUpButton from "../shared/LinkUpButton";
 import LinkUpModal from "../shared/LinkUpModal";
 import { generatePDF } from "@/uitls/generatePDF";
 import { useRouter } from "next/navigation";
-import { PostImageGallery } from "./PostImageGallery";
+import { ImageGallery } from "../shared/ImageGallery";
 import PostEditor from "./PostEditor";
 import PostComment from "./PostComment";
 
@@ -53,9 +50,6 @@ interface PostsProps {
 const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   const router = useRouter();
   const { user } = useUser();
-  // const { data: userData } = useGetUserQuery<IUserData>(user?.email, {
-  //   skip: !user?.email,
-  // });
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
@@ -207,7 +201,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
 
                   {post?.author?._id === userData?.data?._id && (
                     <LinkUpModal
-                      size={"xs"}
+                      modalSize={"xs"}
                       variant="ghost"
                       footerButton={true}
                       openButtonIcon={<Trash2 className=" text-red-400" />}
@@ -232,9 +226,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
               ></p>
 
               {/* Post Image */}
-              {post?.profileImages && (
-                <PostImageGallery images={post?.profileImages} />
-              )}
+              {post?.images && <ImageGallery images={post?.images} />}
 
               {/* Post Content */}
               {/* <p className="my-5">{post.content}</p> */}

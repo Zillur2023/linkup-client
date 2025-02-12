@@ -7,6 +7,7 @@ import { Button } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import FriendsList from "./FriendsList";
 import { ProfileHeader } from "./ProfileHeader";
+import Posts from "../post/Posts";
 
 const Profile = () => {
   const pathname = usePathname();
@@ -39,18 +40,20 @@ const Profile = () => {
   ];
 
   return (
-    <div className=" flex  justify-center">
-      <div className=" w-[30%] bg-default-100 dark:bg-default-100 h-screen p-1 ">
-        <Button className=" my-4" fullWidth>
-          Update profile
-        </Button>
-        <FriendsList friends={friends} />
-      </div>
-      <div className=" w-[70%] h-full">
-        {userData?.data && pathname === `/${userData.data.name}` && (
-          //   <ProfileHeader {...userData.data}  />
-          <ProfileHeader user={userData?.data} friends={friends} />
-        )}
+    <div>
+      {userData?.data && pathname === `/${userData.data.name}` && (
+        <ProfileHeader user={userData?.data} friends={friends} />
+      )}
+      <div className=" flex  justify-center">
+        <div className=" w-[30%] bg-default-100 dark:bg-default-100 h-screen p-1 ">
+          <Button className=" my-4" fullWidth>
+            Update profile
+          </Button>
+          <FriendsList friends={friends} />
+        </div>
+        <div className=" w-[70%] h-full">
+          <Posts />
+        </div>
       </div>
     </div>
   );
