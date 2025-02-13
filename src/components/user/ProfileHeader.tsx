@@ -1,5 +1,13 @@
 import { IUser } from "@/type";
-import { Avatar, Button, Card, AvatarGroup } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  Card,
+  AvatarGroup,
+  Tabs,
+  Tab,
+  Divider,
+} from "@heroui/react";
 import { Camera } from "lucide-react";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpInputFile from "../form/LinkUpInputFile";
@@ -8,14 +16,16 @@ import LinkUpModal from "../shared/LinkUpModal";
 import { toast } from "sonner";
 import { useUpdateUserMutation } from "@/redux/features/user/userApi";
 import EditProfile from "./EditProfile";
+import { usePathname } from "next/navigation";
+import { friends } from "./Friends";
 
 interface ProfileHeaderProps {
   user: IUser;
-  friends: { name: string; image: string }[];
 }
 
 // export const ProfileHeader = (user: IUser) => {
-export const ProfileHeader = ({ user, friends }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
+  const pathname = usePathname();
   const [updateUser] = useUpdateUserMutation();
 
   const handleEditImage = async (data: any, reset?: () => void) => {
@@ -159,6 +169,27 @@ export const ProfileHeader = ({ user, friends }: ProfileHeaderProps) => {
           </div>
         </div>
       </div>
+      <Divider />
+      <Tabs
+        aria-label="Tabs"
+        selectedKey={pathname}
+        fullWidth
+        classNames={{
+          tabList: " w-full relative rounded-none p-0 flex justify-start  ",
+          cursor: "w-full bg-blue-500",
+          tab: "max-w-fit px-3 h-12 hover:bg-default-200 rounded-md ",
+          tabContent: "group-data-[selected=true]:text-blue-500",
+        }}
+        color="primary"
+        variant="underlined"
+      >
+        <Tab key={`/${user?.name}`} title={"posts"} href={`/${user?.name}`} />
+        <Tab
+          key={`/${user?.name}/friends`}
+          title={"friends"}
+          href={`/${user?.name}/friends`}
+        />
+      </Tabs>
     </Card>
   );
 };

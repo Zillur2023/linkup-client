@@ -40,63 +40,60 @@ const LoginPage = () => {
   };
 
   return (
-    <>
-      <PostEditor />
-      <div className="flex h-[calc(100vh-100px)] flex-col items-center justify-center">
-        <h3 className="my-2 text-xl font-bold">Login</h3>
-        <div className="w-[35%]">
-          <LinkUpForm
-            resolver={zodResolver(loginValidationSchema)}
-            onSubmit={onSubmit}
-          >
-            <div className=" flex flex-col gap-3">
-              <LinkUpInput
-                label="Email"
-                labelPlacement="outside"
-                placeholder="Enter your email"
-                name="email"
-              />
-              <LinkUpInput
-                label="Password"
-                labelPlacement="outside"
-                placeholder="Enter your password"
-                name="password"
-                type="password"
-              />
-            </div>
-            <div className="flex py-2 px-1 justify-between">
-              {/* <Checkbox
+    <div className="flex h-[calc(100vh-100px)] flex-col items-center justify-center">
+      <h3 className="my-2 text-xl font-bold">Login</h3>
+      <div className="w-[35%]">
+        <LinkUpForm
+          resolver={zodResolver(loginValidationSchema)}
+          onSubmit={onSubmit}
+        >
+          <div className=" flex flex-col gap-3">
+            <LinkUpInput
+              label="Email"
+              labelPlacement="outside"
+              placeholder="Enter your email"
+              name="email"
+            />
+            <LinkUpInput
+              label="Password"
+              labelPlacement="outside"
+              placeholder="Enter your password"
+              name="password"
+              type="password"
+            />
+          </div>
+          <div className="flex py-2 px-1 justify-between">
+            {/* <Checkbox
                     classNames={{
                       label: "text-small",
                     }}
                   >
                     Remember me
                   </Checkbox> */}
-              <Link
-                color="primary"
-                href={"#"}
-                className=" text-sm text-blue-600 hover:text-blue-400 transition-colors duration-200"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <Button className="my-3 w-full rounded-md " size="md" type="submit">
-              Login
-            </Button>
-          </LinkUpForm>
-          <div className="text-center">
-            Not have an account ?{" "}
             <Link
-              href={"/register"}
-              className="text-blue-600 hover:text-blue-400 transition-colors duration-200"
+              color="primary"
+              href={"#"}
+              className=" text-sm text-blue-600 hover:text-blue-400 transition-colors duration-200"
             >
-              Register
+              Forgot password?
             </Link>
           </div>
+
+          <Button className="my-3 w-full rounded-md " size="md" type="submit">
+            Login
+          </Button>
+        </LinkUpForm>
+        <div className="text-center">
+          Not have an account ?{" "}
+          <Link
+            href={"/register"}
+            className="text-blue-600 hover:text-blue-400 transition-colors duration-200"
+          >
+            Register
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -2,62 +2,61 @@
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
-import { Avatar, Listbox, ListboxItem } from "@heroui/react";
+import { Avatar, Listbox, ListboxItem, Tab, Tabs } from "@heroui/react";
 import Link from "next/link";
 import { Group, Store, Users } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export const sidebarItems = [
-  { href: "#", label: "Friends", icon: <Users /> },
-  { href: "#", label: "Marketplace", icon: <Store /> },
-  { href: "#", label: "Group", icon: <Group /> },
+  { href: "#user", label: "Friends", icon: <Users /> },
+  { href: "/marketplace", label: "Marketplace", icon: <Store /> },
+  { href: "#group", label: "Group", icon: <Group /> },
 ];
 
 export default function SidebarMenu() {
+  const pathname = usePathname();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
 
   return (
-    <div className="bg-default-100 dark:bg-default-100 h-screen max-w-[320px] p-4">
-      <Listbox
-        isVirtualized
-        label="Select from 1000 items"
-        virtualization={{
-          maxListboxHeight: 400,
-          itemHeight: 40,
-        }}
-      >
-        <>
-          {userData && (
-            <ListboxItem
-              value={userData?.data?.name}
-              as={Link}
-              href={`${userData?.data?.name}`}
-              startContent={
-                <Avatar
-                  radius="full"
-                  size="sm"
-                  src={userData?.data?.profileImage}
-                />
-              }
-            >
-              {userData?.data?.name}
-            </ListboxItem>
-          )}
-          {sidebarItems?.map((item) => (
-            <ListboxItem
-              key={item.label}
-              value={item.label}
-              as={Link}
-              href={item.href}
-              startContent={item.icon}
-            >
-              {item.label}
-            </ListboxItem>
-          ))}
-        </>
-      </Listbox>
-    </div>
+    <Tabs
+      aria-label="Options"
+      selectedKey={pathname}
+      fullWidth
+      placement="start"
+      className=" h-screen bg-default-100 "
+    >
+      <Tab
+        key={`/${userData?.data?.name}`}
+        href={`/${userData?.data?.name}`}
+        title={
+          <div className="flex items-center space-x-2 ">
+            <Avatar
+              radius="full"
+              size="sm"
+              src={userData?.data?.profileImage}
+            />
+            <span>{userData?.data?.name}</span>
+          </div>
+        }
+        className="  flex justify-start hover:bg-default-200"
+      />
+
+      {sidebarItems?.map((item) => (
+        <Tab
+          key={item.href}
+          href={item.href}
+          title={
+            <div className="flex items-start space-x-2">
+              {item.icon}
+              <span> {item.label} </span>
+            </div>
+          }
+          className="  flex justify-start hover:bg-default-200"
+        />
+      ))}
+    </Tabs>
   );
 }

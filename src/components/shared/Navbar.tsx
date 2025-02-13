@@ -18,21 +18,27 @@ import {
   Breadcrumbs,
   BreadcrumbItem,
   Tooltip,
+  Tab,
+  Tabs,
+  Link,
 } from "@heroui/react";
 import { House, Store, Users, Link as LogoLink, Group } from "lucide-react";
-import Link from "next/link";
+// import Link from "next/link";
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
+import { usePathname } from "next/navigation";
 
 export const menuItems = [
   { href: "/", label: "home", icon: <House /> },
-  { href: "#", label: "friends", icon: <Users /> },
+  { href: "#friends", label: "friends", icon: <Users /> },
   { href: "/marketplace", label: "Marketplace", icon: <Store /> },
-  { href: "#", label: "group", icon: <Group /> },
+  { href: "#group", label: "group", icon: <Group /> },
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  console.log({ pathname });
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
@@ -99,45 +105,25 @@ export default function Navbar() {
       {user && (
         <NavbarContent className="  hidden sm:flex   w-1/2 " justify="center">
           <NavbarItem></NavbarItem>
-          <Breadcrumbs
+
+          <Tabs
+            aria-label="Options"
+            selectedKey={pathname}
+            fullWidth
             classNames={{
-              list: "gap-2 sm:gap-4 md:gap-4 lg:gap-8 xl:gap-10",
+              tabList:
+                " w-full relative rounded-none p-0 flex justify-evenly  ",
+              cursor: "w-full bg-blue-500",
+              tab: "max-w-fit px-3 h-12 hover:bg-default-200 rounded-md ",
+              tabContent: "group-data-[selected=true]:text-blue-500",
             }}
-            itemClasses={{
-              item: [
-                "px-0 py-0 border-small border-default-400 rounded-small",
-                "data-[current=true]:border-foreground data-[current=true]:bg-foreground data-[current=true]:text-background transition-colors",
-                "data-[disabled=true]:border-default-400 data-[disabled=true]:bg-default-100",
-              ],
-              separator: "hidden",
-            }}
-            size="sm"
-            onAction={(key) => setCurrentPage(key as string)}
+            color="primary"
+            variant="underlined"
           >
             {menuItems.map((item) => (
-              <BreadcrumbItem
-                key={item.label}
-                isCurrent={currentPage === item.label}
-              >
-                <Tooltip content={item.label}>
-                  <Link
-                    className="  px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-1 "
-                    href={item.href}
-                  >
-                    {item?.icon}
-                  </Link>
-                </Tooltip>
-              </BreadcrumbItem>
-              // <BreadcrumbItem
-              //   as={Link}
-              //   href={item.href}
-              //   key={index}
-              //   isCurrent={currentPage === item.id}
-              // >
-              //   {item.label}
-              // </BreadcrumbItem>
+              <Tab key={item.href} title={item.icon} href={item.href} />
             ))}
-          </Breadcrumbs>
+          </Tabs>
         </NavbarContent>
       )}
 
