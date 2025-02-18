@@ -2,13 +2,13 @@
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
-import { Avatar, Listbox, ListboxItem, Tab, Tabs } from "@heroui/react";
+import { Avatar, Tab, Tabs } from "@heroui/react";
 import Link from "next/link";
 import { Group, Store, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export const sidebarItems = [
-  { href: "#user", label: "Friends", icon: <Users /> },
+  { href: "/friends", label: "Friends", icon: <Users /> },
   { href: "/marketplace", label: "Marketplace", icon: <Store /> },
   { href: "#group", label: "Group", icon: <Group /> },
 ];

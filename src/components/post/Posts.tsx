@@ -53,7 +53,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
-  console.log("POstUSerData", userData);
+  // console.log("POstUSerData", userData);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
 
@@ -68,7 +68,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
-  console.log({ postData });
+  // console.log({ postData });
 
   const [updateLike] = useUpdateLikesMutation();
   const [updateDislike] = useUpdateDislikesMutation();

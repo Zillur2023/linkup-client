@@ -1,21 +1,19 @@
 import Posts from "@/components/post/Posts";
-import Navbar from "@/components/shared/Navbar";
 import SidebarMenu from "@/components/shared/SidebarMenu";
 
 export default function Home() {
   return (
-    <div>
-      <Navbar />
-      <div className=" flex ">
-        <div className={`hidden md:block  md:w-[20%]`}>
-          <SidebarMenu />
-        </div>
+    <div className=" flex ">
+      <div className="hidden lg:block  lg:w-[20%] fixed h-screen overflow-y-auto ">
+        <SidebarMenu />
+      </div>
 
-        <div className={`hidden md:block  md:w-[60%]`}>
-          <Posts />
-        </div>
+      <div className=" lg:block  lg:w-[60%] lg:ml-[20%] mx-auto md:w-[80%]  ">
+        <Posts />
+      </div>
 
-        <div className={`hidden md:block  md:w-[20%]`}>Part 3</div>
+      <div className="hidden lg:block  lg:w-[20%]  fixed right-0  overflow-y-auto h-screen ">
+        Part 3
       </div>
     </div>
   );

@@ -31,14 +31,13 @@ import { usePathname } from "next/navigation";
 
 export const menuItems = [
   { href: "/", label: "home", icon: <House /> },
-  { href: "#friends", label: "friends", icon: <Users /> },
+  { href: "/friends", label: "friends", icon: <Users /> },
   { href: "/marketplace", label: "Marketplace", icon: <Store /> },
   { href: "#group", label: "group", icon: <Group /> },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
-  console.log({ pathname });
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
@@ -160,17 +159,23 @@ export default function Navbar() {
 
       <NavbarMenu>
         {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
+          <NavbarMenuItem
+            isActive={pathname === item.href}
+            key={`${item}-${index}`}
+            className={`${
+              pathname === item.href ? "bg-default-200" : ""
+            }  hover:bg-default-200 rounded-md `}
+          >
             <Link
               className="w-full flex gap-1"
-              color={
-                index === 2
-                  ? "warning"
-                  : index === menuItems.length - 1
-                  ? "danger"
-                  : "foreground"
-              }
-              href="#"
+              // color={
+              //   index === 2
+              //     ? "warning"
+              //     : index === menuItems.length - 1
+              //     ? "danger"
+              //     : "foreground"
+              // }
+              href={item?.href}
               // size="lg"
             >
               {item.icon} {item.label}

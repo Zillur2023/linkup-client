@@ -3,11 +3,12 @@
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
-import { Button, Tab, Tabs } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { ProfileHeader } from "./ProfileHeader";
 import Posts from "../post/Posts";
 import Friends from "./Friends";
+import Navbar from "../shared/Navbar";
+import NotAvailablePage from "../shared/NotAvailablePage";
 
 const Profile = () => {
   const pathname = usePathname();
@@ -18,29 +19,26 @@ const Profile = () => {
 
   // Dynamically render components based on the section
   const renderSection = () => {
-    switch (pathname) {
-      case `/${userData?.data?.name}`:
-        return (
-          <div className=" flex  bg-green-200 w-[70%]  mx-auto ">
-            <div className=" w-[30%]  bg-default-100 dark:bg-default-100 h-screen p-1 ">
-              <Button className=" my-4" fullWidth>
-                Update profile
-              </Button>
-              <Friends />
-            </div>
-            <div className="w-[70%]  h-full ">
-              <Posts />
-            </div>
+    const profileName = userData?.data?.name;
+
+    // Check if the pathname matches the profile or friends route
+    if (pathname === `/${profileName}`) {
+      return (
+        <div className="w-[60%] mx-auto">
+          <div className="w-full h-full">
+            <Posts />
           </div>
-        );
-      case `/${userData?.data?.name}/friends`:
-        return (
-          <div className=" w-[70%] mx-auto  ">
-            <Friends />
-          </div>
-        );
-      default:
-        return <p>Section not found</p>;
+        </div>
+      );
+    } else if (pathname === `/${profileName}/friends`) {
+      return (
+        <div className="w-[70%] mx-auto">
+          <Friends />
+        </div>
+      );
+    } else {
+      // Show an error message if the route doesn't match
+      return <NotAvailablePage />;
     }
   };
 
@@ -53,34 +51,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-// const Profile = () => {
-//   const pathname = usePathname();
-//   console.log("profile pathname", pathname);
-//   const { user } = useUser();
-//   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
-//     skip: !user?._id,
-//   });
-
-//   return (
-//     <div>
-//       {/* {userData?.data && pathname === `/${userData.data.name}` && ( */}
-//       <ProfileHeader user={userData?.data} />
-//       {/* )} */}
-
-//       <div className=" flex  justify-center">
-//         <div className=" w-[30%] bg-default-100 dark:bg-default-100 h-screen p-1 ">
-//           <Button className=" my-4" fullWidth>
-//             Update profile
-//           </Button>
-//           <Friends />
-//         </div>
-//         <div className=" w-[70%] h-full">
-//           <Posts />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Profile;

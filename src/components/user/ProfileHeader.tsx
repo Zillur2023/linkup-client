@@ -56,12 +56,14 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
   return (
     <Card className="" radius="none">
       <div className="relative">
-        <Avatar
-          src={user?.coverImage}
-          alt="Cover"
-          className=" w-full h-72"
-          radius="none"
-        />
+        {user && (
+          <Avatar
+            src={user?.coverImage}
+            alt="Cover"
+            className=" w-full h-72"
+            radius="none"
+          />
+        )}
 
         <div className="absolute bottom-2 right-2 ">
           <LinkUpModal
@@ -103,10 +105,12 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
       <div className=" px-4">
         <div className=" -mt-5 flex   ">
           <div className="relative">
-            <Avatar
-              src={user?.profileImage}
-              className=" relative  w-28 h-28 "
-            />
+            {user && (
+              <Avatar
+                src={user?.profileImage}
+                className=" relative  w-28 h-28 "
+              />
+            )}
 
             <div className="absolute bottom-5 right-0 ">
               <LinkUpModal

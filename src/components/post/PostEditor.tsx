@@ -125,6 +125,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
       title={`${updatePostData ? "Update Post" : "Create a new post"}`}
       variant="ghost"
       openButtonIcon={openButtonIcon}
+      className=" flex justify-start"
     >
       <LinkUpForm
         resolver={zodResolver(postEditorValidationSchema)}
