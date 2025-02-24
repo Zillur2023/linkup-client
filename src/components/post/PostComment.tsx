@@ -1,10 +1,7 @@
 "use client";
 
 import { useUser } from "@/context/UserProvider";
-import {
-  useGetUserByIdQuery,
-  useGetUserQuery,
-} from "@/redux/features/user/userApi";
+import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

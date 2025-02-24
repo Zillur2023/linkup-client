@@ -8,7 +8,7 @@ export default function Home() {
         <SidebarMenu />
       </div>
 
-      <div className=" lg:block  lg:w-[60%] lg:ml-[20%] mx-auto md:w-[80%]  ">
+      <div className=" lg:block  lg:w-[40%] lg:ml-[30%] mx-auto md:w-[80%] p-3  ">
         <Posts />
       </div>
 

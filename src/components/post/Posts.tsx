@@ -141,16 +141,18 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
 
   return (
     <>
-      <div className=" max-w-[640px] mx-auto space-y-3">
+      <div className="  mx-auto space-y-3">
         {userData && (
           <div className=" flex items-center justify-center gap-2 my-3 px-1">
             <Avatar
-              isBordered
               radius="full"
               src={userData?.data?.profileImage}
+              // size="md"
             />
             <PostEditor
-              openButtonText={`What's on your main, ${userData?.data?.name}`}
+              openButtonText={`What's on your mind, ${userData?.data?.name}`}
+              size="md"
+              radius="full"
             />
           </div>
         )}

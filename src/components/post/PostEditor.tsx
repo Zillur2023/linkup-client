@@ -31,12 +31,16 @@ interface PostEditorProps {
   updatePostData?: IPost;
   openButtonIcon?: ReactNode;
   openButtonText?: ReactNode;
+  size?: "sm" | "md" | "lg" | undefined;
+  radius?: "sm" | "md" | "lg" | "full" | "none" | undefined;
 }
 
 const PostEditor: React.FC<PostEditorProps> = ({
   updatePostData,
   openButtonIcon,
   openButtonText,
+  size,
+  radius,
 }) => {
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -122,6 +126,8 @@ const PostEditor: React.FC<PostEditorProps> = ({
   return (
     <LinkUpModal
       openButtonText={openButtonText}
+      buttonSize={size}
+      radius={radius}
       title={`${updatePostData ? "Update Post" : "Create a new post"}`}
       variant="ghost"
       openButtonIcon={openButtonIcon}

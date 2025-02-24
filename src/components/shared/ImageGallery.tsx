@@ -31,23 +31,23 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  // const imageGallery = images
-  //   ? images
-  //   : field?.value?.map((file) =>
-  //       typeof file === "string" ? file : URL.createObjectURL(file)
-  //     ) || [];
+  const imageGallery = images
+    ? images
+    : field?.value?.map((file) =>
+        typeof file === "string" ? file : URL.createObjectURL(file)
+      ) || [];
 
-  const imageGallery = field?.value
-    ? Array.isArray(field.value)
-      ? field.value.map((file) =>
-          typeof file === "string" ? file : URL.createObjectURL(file)
-        )
-      : [
-          typeof field.value === "string"
-            ? field.value
-            : URL.createObjectURL(field.value),
-        ]
-    : [];
+  // const imageGallery = field?.value
+  //   ? Array.isArray(field.value)
+  //     ? field.value.map((file) =>
+  //         typeof file === "string" ? file : URL.createObjectURL(file)
+  //       )
+  //     : [
+  //         typeof field.value === "string"
+  //           ? field.value
+  //           : URL.createObjectURL(field.value),
+  //       ]
+  //   : [];
 
   const handleImageRemove = (index: number) => {
     const updatedFiles = field?.value.filter((_, i: number) => i !== index);
@@ -93,7 +93,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           <Image
             radius="none"
             alt="Post"
-            className="z-0 w-32 h-auto object-cover "
+            className="z-0 w-[400px] h-auto object-cover "
             src={imageGallery[0]}
             onClick={() => handleImageClick(0)}
           />
@@ -107,7 +107,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               key={idx}
               radius="none"
               alt={`Post ${idx + 1}`}
-              className="z-0 w-full h-full object-cover "
+              className="z-0 w-[400] h-full object-cover "
               src={img}
               onClick={() => handleImageClick(idx)}
             />

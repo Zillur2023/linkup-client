@@ -26,28 +26,32 @@ export default function SidebarMenu() {
       selectedKey={pathname}
       fullWidth
       placement="start"
-      className=" h-screen bg-default-100 "
+      className=" h-screen bg-default-100 py-3 "
     >
-      <Tab
-        key={`/${userData?.data?.name}`}
-        href={`/${userData?.data?.name}`}
-        title={
-          <div className="flex items-center space-x-2 ">
-            <Avatar
-              radius="full"
-              size="sm"
-              src={userData?.data?.profileImage}
-            />
-            <span>{userData?.data?.name}</span>
-          </div>
-        }
-        className="  flex justify-start hover:bg-default-200"
-      />
+      {userData?.data && (
+        <Tab
+          key={`/${userData?.data?.name}`}
+          href={`/${userData?.data?.name}`}
+          as={Link}
+          title={
+            <div className="flex items-center space-x-2 ">
+              <Avatar
+                radius="full"
+                size="sm"
+                src={userData?.data?.profileImage}
+              />
+              <span>{userData?.data?.name}</span>
+            </div>
+          }
+          className="  flex justify-start hover:bg-default-200"
+        />
+      )}
 
       {sidebarItems?.map((item) => (
         <Tab
           key={item.href}
           href={item.href}
+          as={Link}
           title={
             <div className="flex items-start space-x-2">
               {item.icon}

@@ -20,7 +20,6 @@ import {
   Tooltip,
   Tab,
   Tabs,
-  Link,
 } from "@heroui/react";
 import { House, Store, Users, Link as LogoLink, Group } from "lucide-react";
 // import Link from "next/link";
@@ -28,6 +27,7 @@ import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export const menuItems = [
   { href: "/", label: "home", icon: <House /> },
@@ -73,12 +73,30 @@ export default function Navbar() {
       isBordered
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      className="    "
+      className=" py-0"
+      // classNames={{
+      //   item: [
+      //     "flex ",
+      //     "relative",
+      //     "h-full",
+      //     "justify-between",
+      //     // "items-center",
+      //     "hover:bg-default-200 rounded",
+      //     "data-[active=true]:after:content-['']",
+      //     "data-[active=true]:after:absolute",
+      //     "data-[active=true]:after:bottom-0",
+      //     "data-[active=true]:after:left-0",
+      //     "data-[active=true]:after:right-0",
+      //     "data-[active=true]:after:h-[2px]",
+      //     "data-[active=true]:after:rounded-[2px]",
+      //     "data-[active=true]:after:bg-primary",
+      //   ],
+      // }}
       maxWidth="full"
     >
       <NavbarContent className="   ">
         <NavbarMenuToggle
-          className="sm:hidden"
+          className="md:hidden "
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         />
         <div className=" flex items-center justify-center gap-2">
@@ -102,8 +120,12 @@ export default function Navbar() {
         </div>
       </NavbarContent>
       {user && (
-        <NavbarContent className="  hidden sm:flex   w-1/2 " justify="center">
-          <NavbarItem></NavbarItem>
+        <NavbarContent className=" hidden sm:flex   w-1/2 " justify="center">
+          {/* <NavbarItem>
+            <Link color="foreground" href="#">
+              Features
+            </Link>
+          </NavbarItem> */}
 
           <Tabs
             aria-label="Options"
@@ -111,16 +133,21 @@ export default function Navbar() {
             fullWidth
             classNames={{
               tabList:
-                " w-full relative rounded-none p-0 flex justify-evenly  ",
-              cursor: "w-full bg-blue-500",
-              tab: "max-w-fit px-3 h-12 hover:bg-default-200 rounded-md ",
+                "  h-full relative rounded-none  flex justify-evenly    ",
+              cursor: " bg-blue-500",
+              tab: "max-w-fit  h-full hover:bg-default-200 rounded-md p-4 ",
               tabContent: "group-data-[selected=true]:text-blue-500",
             }}
             color="primary"
             variant="underlined"
           >
             {menuItems.map((item) => (
-              <Tab key={item.href} title={item.icon} href={item.href} />
+              <Tab
+                key={item.href}
+                title={item.icon}
+                href={item.href}
+                as={Link}
+              />
             ))}
           </Tabs>
         </NavbarContent>

@@ -1,7 +1,6 @@
 import Profile from "@/components/user/Profile";
 
-const page = ({ params }: { params: Promise<{ user: string }> }) => {
-  console.log({ params });
+const page = () => {
   return (
     <>
       <Profile />

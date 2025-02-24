@@ -1,4 +1,13 @@
-import { Avatar } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  Card,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/react";
+import { Ellipsis } from "lucide-react";
 
 export const friends = [
   {
@@ -25,23 +34,45 @@ export const friends = [
 
 const Friends = () => {
   return (
-    <div className="">
-      <h3 className="text-lg font-semibold mb-2">Friends</h3>
-      <div className="grid grid-cols-2 gap-2 ">
-        {friends?.map((friend, i) => (
-          <div key={i} className="flex flex-col items-center">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ">
+      {friends?.map((friend, i) => (
+        <Card
+          key={i}
+          className=" p-3 flex flex-row items-center justify-between "
+        >
+          <div className=" flex items-center gap-4">
             <Avatar
               radius="lg"
               src={friend?.image} // Default Image
-              className=" w-28 h-28 "
+              className=" w-24 h-24 "
             />
-            <p className="text-sm font-semibold text-default-500">
-              {friend.name}
-            </p>{" "}
-            {/* Default Name */}
+            <div className="   ">
+              <p className="text-lg font-semibold text-default-500 ">
+                {friend.name}
+              </p>
+              <p className="text-sm font-semibold text-default-500 hover:underline ">
+                12 mutual friends
+              </p>
+            </div>
           </div>
-        ))}
-      </div>
+          <Dropdown>
+            <DropdownTrigger>
+              <Button isIconOnly size="sm" variant="light">
+                {/* <VerticalDotsIcon className="text-default-300" width={24} height={24} /> */}
+                <Ellipsis />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu>
+              <DropdownItem key="Favorites">Favorites</DropdownItem>
+              <DropdownItem key="Edit Friend list">
+                Edit Friend list
+              </DropdownItem>
+              <DropdownItem key="Unfollow">Unfollow</DropdownItem>
+              <DropdownItem key="Unfriend">Unfriend</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </Card>
+      ))}
     </div>
   );
 };

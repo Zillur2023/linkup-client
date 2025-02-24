@@ -64,7 +64,7 @@ export default function LinkUpModal({
 
   return (
     <>
-      {/* {openButtonIcon
+      {openButtonIcon
         ? openButtonIcon && (
             <Button isIconOnly size="sm" variant={variant} onPress={onOpen}>
               {openButtonIcon}
@@ -72,32 +72,34 @@ export default function LinkUpModal({
           )
         : openButtonText && (
             <Button
-              size="sm"
-              className={ClassName}
+              size={buttonSize}
+              radius={radius}
               variant={variant}
+              fullWidth
+              className={className}
               onPress={onOpen}
             >
               {openButtonText}
             </Button>
             // <div onClick={onOpen}>{openButtonText}</div>
-          )} */}
+          )}
 
-      <Button
-        size={buttonSize}
-        radius={radius}
-        variant={variant}
-        fullWidth
-        className={
-          // openButtonText ? "flex items-center justify-start" : undefined
-          // textButtonClassName ? textButtonClassName : iconButtonClassName
-          className
-        }
-        isIconOnly={!!openButtonIcon}
-        startContent={startContent}
-        onPress={onOpen}
-      >
-        {openButtonIcon || openButtonText}
-      </Button>
+      {/* <Button
+          size={buttonSize}
+          radius={radius}
+          variant={variant}
+          fullWidth
+          className={
+            // openButtonText ? "flex items-center justify-start" : undefined
+            // textButtonClassName ? textButtonClassName : iconButtonClassName
+            className
+          }
+          isIconOnly={!!openButtonIcon}
+          startContent={startContent}
+          onPress={onOpen}
+        >
+          {openButtonIcon || openButtonText}
+        </Button> */}
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={modalSize}>
         <ModalContent>

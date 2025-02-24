@@ -82,7 +82,7 @@ const MarketplacePage = () => {
       </div>
 
       {/* <div className={`hidden md:block  md:w-[80%]`}> */}
-      <div className=" lg:block   lg:ml-[20%] mx-auto md:w-[80%] ">
+      <div className=" lg:block   lg:ml-[20%] mx-auto w-full md:w-[80%] ">
         <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 p-4">
           {list.map((item, index) => (
             /* eslint-disable no-console */

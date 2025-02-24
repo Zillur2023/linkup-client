@@ -7,6 +7,8 @@ import {
   Tabs,
   Tab,
   Divider,
+  Image,
+  Skeleton,
 } from "@heroui/react";
 import { Camera } from "lucide-react";
 import LinkUpForm from "../form/LinkUpForm";
@@ -18,6 +20,7 @@ import { useUpdateUserMutation } from "@/redux/features/user/userApi";
 import EditProfile from "./EditProfile";
 import { usePathname } from "next/navigation";
 import { friends } from "./Friends";
+import Link from "next/link";
 
 interface ProfileHeaderProps {
   user: IUser;
@@ -58,6 +61,7 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
       <div className="relative">
         {user && (
           <Avatar
+            // <Image
             src={user?.coverImage}
             alt="Cover"
             className=" w-full h-72"
@@ -107,8 +111,10 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
           <div className="relative">
             {user && (
               <Avatar
+                // <Image
                 src={user?.profileImage}
                 className=" relative  w-28 h-28 "
+                radius="full"
               />
             )}
 
@@ -158,11 +164,29 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
             <p className=" text-start text-xl font-semibold "> {user?.name} </p>
             <p className=" text-start"> {friends?.length} friends </p>
             <div className=" flex items-center justify-between ">
-              <AvatarGroup max={8} total={friends?.length}>
-                {friends?.map((friend, i) => (
-                  <Avatar key={i} src={friend?.image} />
-                ))}
-              </AvatarGroup>
+              <Link href={`/${user.name}/friends`}>
+                <AvatarGroup
+                  max={8}
+                  className=" hover:cursor-pointer"
+                  total={friends?.length}
+                  renderCount={(count) => (
+                    // <Link href={`/${user.name}/friends`}>
+                    <p className="text-small text-foreground font-medium ms-2 hover:underline hover:cursor-pointer">
+                      +{count} others
+                    </p>
+                    // </Link>
+                    // <Skeleton className="w-8 h-8 rounded-full" />
+                  )}
+                >
+                  {friends?.map((friend, i) => (
+                    <Avatar
+                      key={i}
+                      src={friend?.image}
+                      onClick={() => console.log({ i })}
+                    />
+                  ))}
+                </AvatarGroup>
+              </Link>
               {/* <Button className="" startContent={<Edit />}>
                 Edit Profile
               </Button> */}
@@ -177,21 +201,27 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
       <Tabs
         aria-label="Tabs"
         selectedKey={pathname}
-        fullWidth
+        // fullWidth
         classNames={{
-          tabList: " w-full relative rounded-none p-0 flex justify-start  ",
+          tabList: " w-full relative rounded-none flex justify-start  ",
           cursor: "w-full bg-blue-500",
-          tab: "max-w-fit px-3 h-12 hover:bg-default-200 rounded-md ",
+          tab: "max-w-fit  hover:bg-default-200 rounded-md p-5 ",
           tabContent: "group-data-[selected=true]:text-blue-500",
         }}
         color="primary"
         variant="underlined"
       >
-        <Tab key={`/${user?.name}`} title={"posts"} href={`/${user?.name}`} />
+        <Tab
+          key={`/${user?.name}`}
+          title={"posts"}
+          href={`/${user?.name}`}
+          as={Link}
+        />
         <Tab
           key={`/${user?.name}/friends`}
           title={"friends"}
           href={`/${user?.name}/friends`}
+          as={Link}
         />
       </Tabs>
     </Card>
