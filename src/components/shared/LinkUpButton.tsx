@@ -8,7 +8,8 @@ interface LinkUpButtonProps {
   buttonId: string; // Unique identifier for each button
   children: ReactNode;
   data?: IUser[];
-  ClassName?: string;
+  className?: string;
+  startContent?: ReactNode;
 }
 
 const LinkUpButton: React.FC<LinkUpButtonProps> = ({
@@ -16,7 +17,8 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
   buttonId,
   children,
   data,
-  ClassName,
+  className,
+  startContent,
 }) => {
   const [loadingStates, setLoadingStates] = useState<{
     [key: string]: boolean;
@@ -49,10 +51,11 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
             onClick={handleClick}
             disabled={loadingStates[buttonId]}
             className={
-              !ClassName
+              !className
                 ? "flex items-center gap-3 bg-transparent hover:bg-gray-300 "
-                : ClassName
+                : className
             }
+            startContent={loadingStates[buttonId] ? "" : startContent}
           >
             {loadingStates[buttonId] ? (
               <Spinner size="sm"></Spinner>
@@ -66,11 +69,9 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
           size="sm"
           onClick={handleClick}
           disabled={loadingStates[buttonId]}
-          className={
-            !ClassName
-              ? "flex items-center gap-3 bg-transparent hover:bg-gray-300 "
-              : ClassName
-          }
+          variant="light"
+          className={className}
+          startContent={loadingStates[buttonId] ? "" : startContent}
         >
           {loadingStates[buttonId] ? (
             <Spinner size="sm"></Spinner>

@@ -141,20 +141,22 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
 
   return (
     <>
-      <div className="  mx-auto space-y-3">
+      <div className=" space-y-5 my-5 ">
         {userData && (
-          <div className=" flex items-center justify-center gap-2 my-3 px-1">
-            <Avatar
-              radius="full"
-              src={userData?.data?.profileImage}
-              // size="md"
-            />
-            <PostEditor
-              openButtonText={`What's on your mind, ${userData?.data?.name}`}
-              size="md"
-              radius="full"
-            />
-          </div>
+          <Card className=" p-4">
+            <div className=" flex items-center justify-center gap-2  ">
+              <Avatar
+                radius="full"
+                src={userData?.data?.profileImage}
+                // size="md"
+              />
+              <PostEditor
+                openButtonText={`What's on your mind, ${userData?.data?.name}`}
+                size="md"
+                radius="full"
+              />
+            </div>
+          </Card>
         )}
         {!postData && <PostSkeleton />}
 
@@ -186,7 +188,6 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
                         handleUpdateFollowUnfollow(post?.author?._id)
                       }
                       buttonId="followOrUnfollow"
-                      ClassName=" "
                     >
                       {userData?.data?.following?.includes(post?.author?._id)
                         ? "Unfollow"
@@ -242,18 +243,18 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
                 onClick={() => handleLike(post._id)}
                 buttonId="like"
                 data={post?.likes}
+                startContent={
+                  <ThumbsUp
+                    className={`${
+                      post?.likes?.some(
+                        (item) => item?._id === userData?.data?._id
+                      )
+                        ? "text-blue-600 fill-current"
+                        : "text-gray-600"
+                    }`}
+                  />
+                }
               >
-                <ThumbsUp
-                  size={18}
-                  className={`${
-                    post?.likes?.some(
-                      (item) => item?._id === userData?.data?._id
-                    )
-                      ? "text-blue-600 fill-current"
-                      : "text-gray-600"
-                  }`}
-                />
-
                 <span>{post.likes.length}</span>
               </LinkUpButton>
 
@@ -261,35 +262,32 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
                 onClick={() => handleDislike(post._id)}
                 buttonId="dislike"
                 data={post?.dislikes}
+                startContent={
+                  <ThumbsDown
+                    className={`${
+                      post?.dislikes?.some(
+                        (item) => item?._id === userData?.data?._id
+                      )
+                        ? "text-blue-600 fill-current"
+                        : "text-gray-600"
+                    }`}
+                  />
+                }
               >
-                <ThumbsDown
-                  size={18}
-                  className={`${
-                    post?.dislikes?.some(
-                      (item) => item?._id === userData?.data?._id
-                    )
-                      ? "text-blue-600 fill-current"
-                      : "text-gray-600"
-                  }`}
-                />
                 <span>{post.dislikes.length}</span>
               </LinkUpButton>
 
               <div className="">
                 <Button
                   size="sm"
-                  className="flex items-center  bg-transparent hover:bg-gray-300 "
+                  variant="light"
                   onClick={() => handleCommentClick(post._id)}
+                  startContent={<MessageCircle />}
                 >
-                  <MessageCircle size={18} />
                   <span>{post?.comments?.length}</span>
                 </Button>
               </div>
-              <Button
-                size="sm"
-                className="flex items-center  bg-transparent hover:bg-gray-300 "
-              >
-                <Share2 size={18} />
+              <Button size="sm" variant="light" startContent={<Share2 />}>
                 {/* <span>{post.comments?.length}</span> */}
               </Button>
               {/* <Button
@@ -300,12 +298,10 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
                 </Button> */}
               <Button
                 size="sm"
-                className="flex items-center  bg-transparent hover:bg-gray-300 "
+                variant="light"
                 onClick={() => generatePDF(postRef)}
-              >
-                {" "}
-                <Download size={18} />{" "}
-              </Button>
+                startContent={<Download />}
+              />
             </CardFooter>
 
             <PostComment

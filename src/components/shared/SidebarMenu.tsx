@@ -26,7 +26,8 @@ export default function SidebarMenu() {
       selectedKey={pathname}
       fullWidth
       placement="start"
-      className=" h-screen bg-default-100 py-3 "
+      className=" py-5  "
+      variant="light"
     >
       {userData?.data && (
         <Tab
