@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { ProfileHeader } from "./ProfileHeader";
 import Friends from "./Friends";
 import NotAvailablePage from "../shared/NotAvailablePage";
-
 import User from "./User";
 
 const Profile = () => {
@@ -17,10 +16,13 @@ const Profile = () => {
     skip: !user?._id,
   });
 
-  const profileName = userData?.data?.name;
-  const accessRoute = [`/${profileName}`, `/${profileName}/friends`];
+  const userName = userData?.data?.name;
+  const profileRoute = [
+    { href: `/${userName}`, label: "posts" },
+    { href: `/${userName}/friends`, label: "friends" },
+  ];
 
-  const isPathValid = accessRoute.includes(pathname);
+  const isPathValid = profileRoute.some((route) => route.href === pathname);
 
   if (!isPathValid) {
     return <NotAvailablePage />;
@@ -29,9 +31,9 @@ const Profile = () => {
   // Render the appropriate section based on the pathname
   const renderSection = () => {
     switch (pathname) {
-      case `/${profileName}`:
-        return <User />;
-      case `/${profileName}/friends`:
+      case `/${userName}`:
+        return <User {...userData?.data} />;
+      case `/${userName}/friends`:
         return <Friends />;
       default:
         return null;
@@ -40,7 +42,7 @@ const Profile = () => {
 
   return (
     <div>
-      <ProfileHeader user={userData?.data} />
+      <ProfileHeader user={userData?.data} profileRoute={profileRoute} />
       <div className=" px-5">{renderSection()}</div>
     </div>
   );

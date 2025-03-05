@@ -1,20 +1,14 @@
 import React from "react";
 import { friends } from "./Friends";
-import { Avatar, Button, Card, Link } from "@heroui/react";
+import { Avatar, Button, Card } from "@heroui/react";
 import Posts from "../post/Posts";
-import { useUser } from "@/context/UserProvider";
-import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
-import { IUser, IUserData } from "@/type";
+import { IUser } from "@/type";
+import Link from "next/link";
 
-const User = () => {
-  const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
-    skip: !user?._id,
-  });
-
+const User = (user: IUser) => {
   return (
-    <div className=" flex w-full md:w-[70%] mx-auto gap-2 ">
-      <div className=" my-5 hidden lg:block  lg:w-[40%] sticky top-[65px] h-[calc(100vh-65px)]  overflow-y-auto">
+    <div className=" flex justify-center w-full md:w-[70%] mx-auto gap-2 my-5">
+      <div className=" w-full  space-y-5 hidden lg:block  lg:w-[40%] sticky top-[65px] h-min  ">
         {/* <LinkUpModal openButtonText={"Edit bio"}>
         <LinkUpForm
           // resolver={zodResolver(commentValidationSchema)}
@@ -25,11 +19,11 @@ const User = () => {
           <LinkUpTextarea name={"bio"} label="" />
         </LinkUpForm>
       </LinkUpModal> */}
-        <FriendsGrid {...userData?.data} />
+        <FriendsGrid {...user} />
       </div>
-      <div className=" w-full  lg:w-[60%] mx-auto  ">
-        <div className=" lg:hidden my-5">
-          <FriendsGrid {...userData?.data} />
+      <div className=" w-full  lg:w-[60%] mx-auto   ">
+        <div className=" lg:hidden  mb-5 ">
+          <FriendsGrid {...user} />
         </div>
         <Posts />
       </div>
@@ -39,23 +33,22 @@ const User = () => {
 
 const FriendsGrid = (user: IUser) => {
   return (
-    <Card className=" p-4 space-y-1">
+    <Card shadow="lg" className="p-3">
       <div className=" flex justify-between items-center">
         <Link
-          underline="hover"
-          color="foreground"
-          className=" text-xl font-semibold"
+          className=" hover:underline text-xl font-semibold"
+          href={`/${user?.name}/friends`}
         >
           Friends
         </Link>
         <Button
           variant="light"
-          color="primary"
+          // color="primary"
           // size="sm"
           as={Link}
           href={`/${user?.name}/friends`}
+          className=" text-blue-500"
         >
-          {" "}
           See all friens
         </Button>
       </div>
@@ -64,7 +57,7 @@ const FriendsGrid = (user: IUser) => {
         {friends?.map((friend, i) => (
           <Card key={i}>
             <Avatar radius="lg" className=" w-full h-24 " src={friend.image} />
-            <p className=" text-center"> {friend.name} </p>
+            <p className=" text-center px-1"> {friend.name} </p>
           </Card>
         ))}
       </div>

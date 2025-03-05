@@ -7,8 +7,7 @@ import {
   Tabs,
   Tab,
   Divider,
-  Image,
-  Skeleton,
+  Tooltip,
 } from "@heroui/react";
 import { Camera } from "lucide-react";
 import LinkUpForm from "../form/LinkUpForm";
@@ -24,10 +23,12 @@ import Link from "next/link";
 
 interface ProfileHeaderProps {
   user: IUser;
+  profileRoute: { href: string; label: string }[];
 }
 
-// export const ProfileHeader = (user: IUser) => {
-export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
+  console.log({ profileRoute });
+  // export const ProfileHeader = (user: IUser) => {
   const pathname = usePathname();
   const [updateUser] = useUpdateUserMutation();
 
@@ -62,7 +63,6 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
         <div className="relative">
           {user && (
             <Avatar
-              // <Image
               src={user?.coverImage}
               alt="Cover"
               className=" w-full h-72"
@@ -73,9 +73,11 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
           <div className="absolute bottom-2 right-2 ">
             <LinkUpModal
               buttonSize="md"
-              openButtonText={`${
-                user?.coverImage ? "Update cover image" : "Add cover image"
-              }`}
+              openButtonText={
+                <span className="hidden lg:block">
+                  {user?.coverImage ? "Update cover image" : "Add cover image"}
+                </span>
+              }
               startContent={<Camera />}
               title={`${
                 user?.coverImage ? "Update cover image" : "Add cover image"
@@ -108,11 +110,10 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
         </div>
 
         <div className=" px-5">
-          <div className=" -mt-5 flex   ">
-            <div className="relative">
+          <div className=" -mt-5 flex flex-col lg:flex-row mx-auto   ">
+            <div className="relative mx-auto  ">
               {user && (
                 <Avatar
-                  // <Image
                   src={user?.profileImage}
                   className=" relative  w-28 h-28 "
                   radius="full"
@@ -162,24 +163,22 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
               </div>
             </div>
             <div className=" mt-5  w-full px-2 pb-3 ">
-              <p className=" text-start text-xl font-semibold ">
-                {" "}
-                {user?.name}{" "}
+              <p className=" text-center lg:text-start text-xl font-semibold ">
+                {user?.name}
               </p>
-              <p className=" text-start"> {friends?.length} friends </p>
-              <div className=" flex items-center justify-between ">
-                <Link href={`/${user.name}/friends`}>
+              <p className=" text-center lg:text-start">
+                {friends?.length} friends
+              </p>
+              <div className=" flex flex-col lg:flex-row items-center justify-between ">
+                <Link href={`/${user?.name}/friends`}>
                   <AvatarGroup
                     max={8}
                     className=" hover:cursor-pointer"
                     total={friends?.length}
                     renderCount={(count) => (
-                      // <Link href={`/${user.name}/friends`}>
                       <p className="text-small text-foreground font-medium ms-2 hover:underline hover:cursor-pointer">
                         +{count} others
                       </p>
-                      // </Link>
-                      // <Skeleton className="w-8 h-8 rounded-full" />
                     )}
                   >
                     {friends?.map((friend, i) => (
@@ -194,7 +193,7 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
                 {/* <Button className="" startContent={<Edit />}>
                 Edit Profile
               </Button> */}
-                <div>
+                <div className=" my-2">
                   <EditProfile {...user} />
                 </div>
               </div>
@@ -205,27 +204,28 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
             aria-label="Tabs"
             selectedKey={pathname}
             // fullWidth
-            classNames={{
-              tabList: " w-full relative rounded-none flex justify-start  ",
-              cursor: "w-full bg-blue-500",
-              tab: "max-w-fit  hover:bg-default-200 rounded-md p-5 ",
-              tabContent: "group-data-[selected=true]:text-blue-500",
-            }}
+
             color="primary"
             variant="underlined"
           >
-            <Tab
-              key={`/${user?.name}`}
-              title={"posts"}
-              href={`/${user?.name}`}
-              as={Link}
-            />
-            <Tab
-              key={`/${user?.name}/friends`}
-              title={"friends"}
-              href={`/${user?.name}/friends`}
-              as={Link}
-            />
+            {profileRoute.map((item) => (
+              <Tab
+                key={item.href}
+                className=" max-w-fit h-full"
+                title={
+                  <Button
+                    className={`${
+                      pathname === item.href ? "text-blue-500" : ""
+                    }  `}
+                    href={item.href}
+                    as={Link}
+                    variant="light"
+                  >
+                    {item.label}
+                  </Button>
+                }
+              />
+            ))}
           </Tabs>
         </div>
       </div>

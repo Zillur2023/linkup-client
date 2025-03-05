@@ -58,7 +58,6 @@ const Friends = () => {
           <Dropdown>
             <DropdownTrigger>
               <Button isIconOnly size="sm" variant="light">
-                {/* <VerticalDotsIcon className="text-default-300" width={24} height={24} /> */}
                 <Ellipsis />
               </Button>
             </DropdownTrigger>

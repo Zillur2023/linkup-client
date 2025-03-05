@@ -3,7 +3,7 @@ import SidebarMenu from "@/components/shared/SidebarMenu";
 
 export default function Home() {
   return (
-    <div className=" flex gap-2  ">
+    <div className=" flex justify-center gap-2 my-5">
       <div className="hidden lg:block  lg:w-[20%] sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto   ">
         <SidebarMenu />
       </div>

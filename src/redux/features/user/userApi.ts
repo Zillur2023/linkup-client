@@ -10,11 +10,32 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    // getAllUser: builder.query({
+    //   query: () => ({
+    //     url: `/user/all-user`,
+    //     method: "GET",
+    //   }),
+    //   providesTags: ["User"],
+    // }),
     getAllUser: builder.query({
-      query: () => ({
-        url: `/user/all-user`,
-        method: "GET",
-      }),
+      query: ({ searchTerm }: { searchTerm?: string }) => {
+        let url = `/user/all-user`; // Base URL
+        // Append searchTerm and sortBy as query parameters
+        const query: string[] = [];
+        if (searchTerm) {
+          query.push(`searchTerm=${encodeURIComponent(searchTerm)}`);
+        }
+
+        // If there are any query parameters, append them to the URL
+        if (query.length) {
+          url += `?${query.join("&")}`;
+        }
+
+        return {
+          url,
+          method: "GET",
+        };
+      },
       providesTags: ["User"],
     }),
     getUserByEmail: builder.query({
@@ -25,7 +46,7 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
     getUserById: builder.query({
-      query: (id:any) => ({
+      query: (id: any) => ({
         url: `/user/${id}`,
         method: "GET",
       }),

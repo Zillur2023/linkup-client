@@ -76,14 +76,14 @@ const MarketplacePage = () => {
     },
   ];
   return (
-    <div className=" flex ">
+    <div className=" flex  justify-center gap-2 my-5  ">
       <div className="hidden lg:block  lg:w-[20%] sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto ">
         <SidebarMenu />
       </div>
 
       {/* <div className={`hidden md:block  md:w-[80%]`}> */}
       <div className=" lg:block    mx-auto w-full md:w-[80%] ">
-        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 p-4">
+        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 ">
           {list.map((item, index) => (
             /* eslint-disable no-console */
             <Card

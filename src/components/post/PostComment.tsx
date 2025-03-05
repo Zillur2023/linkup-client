@@ -1,12 +1,10 @@
 "use client";
 
-import { useUser } from "@/context/UserProvider";
-import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import LinkUpModal from "../shared/LinkUpModal";
-import { IComment, IUserData } from "@/type";
+import { IComment, IUser } from "@/type";
 import {
   useCreateCommentMutation,
   useDeleteCommentMutation,
@@ -24,6 +22,7 @@ import { formatTime } from "@/uitls/formatTime";
 import { Avatar } from "@heroui/react";
 
 interface PostCommentProps {
+  user: IUser;
   postId: string;
   openButtonText: ReactNode;
   comment?: boolean;
@@ -31,6 +30,7 @@ interface PostCommentProps {
 }
 
 const PostComment: React.FC<PostCommentProps> = ({
+  user,
   postId,
   openButtonText,
   comment,
@@ -42,10 +42,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   }>({}); // State to manage expanded comments
   const commentRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const router = useRouter();
-  const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
-    skip: !user?._id,
-  });
+
   const [deleteComment] = useDeleteCommentMutation();
   const [createComment] = useCreateCommentMutation();
   const [updateComment] = useUpdateCommentMutation();
@@ -53,7 +50,7 @@ const PostComment: React.FC<PostCommentProps> = ({
 
   // Handle creating a new comment
   const handleCreateComment = async (data: any, reset?: () => void) => {
-    if (!userData?.data?._id) {
+    if (!user?._id) {
       router.push("/login");
       return;
     }
@@ -61,7 +58,7 @@ const PostComment: React.FC<PostCommentProps> = ({
     try {
       const newComment = {
         ...data,
-        userId: userData?.data?._id,
+        userId: user?._id,
         postId,
       };
       await createComment(newComment).unwrap();
@@ -73,7 +70,7 @@ const PostComment: React.FC<PostCommentProps> = ({
 
   // Handle updating an existing comment
   const handleUpdateComment = async (data: any, reset?: () => void) => {
-    if (!editingComment || !userData?.data?._id) {
+    if (!editingComment || !user?._id) {
       return;
     }
 
@@ -82,7 +79,7 @@ const PostComment: React.FC<PostCommentProps> = ({
         ...data,
         _id: editingComment._id,
         postId: postId,
-        userId: userData?.data?._id,
+        userId: user?._id,
       };
       await updateComment(updatedComment).unwrap();
       setEditingComment(null); // Reset editing state
@@ -126,17 +123,38 @@ const PostComment: React.FC<PostCommentProps> = ({
     ? allCommentData?.data?.slice(0, 2)
     : allCommentData?.data;
 
+  const commentTextarea = (
+    <LinkUpForm
+      resolver={zodResolver(commentValidationSchema)}
+      onSubmit={handleCreateComment}
+    >
+      <LinkUpTextarea
+        name="comment"
+        size="sm"
+        focusRef={focusRef}
+        placeholder="Add a comment"
+        endContent={<SendHorizontal />}
+        onSubmit={handleCreateComment}
+      />
+    </LinkUpForm>
+  );
+
   return (
     <div>
       <LinkUpModal
-        modalSize="3xl"
+        modalSize="xl"
         className="flex justify-start hover:underline"
         openButtonText={openButtonText}
+        fullWidth={false}
+        title={`${user?.name}'s post`}
+        footer={commentTextarea}
+        scrollBehavior="inside"
       >
-        <div className="mb-4">
+        <div className="  w-full">
           <Posts postId={postId} comment={false} />
         </div>
       </LinkUpModal>
+
       <div className="flex-1 overflow-y-auto space-y-2 pt-1">
         {commentData?.map((comment: IComment) => {
           const maxWords = 20; // Maximum words to show initially
@@ -152,11 +170,13 @@ const PostComment: React.FC<PostCommentProps> = ({
                   {/* Comment Header */}
                   <div className="flex items-center gap-2 mb-2">
                     {/* User Avatar */}
-                    <Avatar
-                      size="sm"
-                      radius="full"
-                      src={userData?.data?.profileImage}
-                    />
+                    {user && (
+                      <Avatar
+                        size="sm"
+                        radius="full"
+                        src={user?.profileImage}
+                      />
+                    )}
                     {/* User Name and Verification Badge */}
                     <div className="flex items-center gap-2">
                       <span className="font-semibold whitespace-nowrap">
@@ -167,7 +187,7 @@ const PostComment: React.FC<PostCommentProps> = ({
                       )}
                     </div>
                     {/* Edit/Delete Actions (for the comment owner) */}
-                    {comment?.userId?._id === userData?.data?._id && (
+                    {comment?.userId?._id === user?._id && (
                       <div className="ml-auto">
                         <ActionButton
                           onEdit={() => handleEditComment(comment)}
@@ -245,19 +265,8 @@ const PostComment: React.FC<PostCommentProps> = ({
         })}
 
         {/* Form for adding new comments */}
-        <LinkUpForm
-          resolver={zodResolver(commentValidationSchema)}
-          onSubmit={handleCreateComment}
-        >
-          <LinkUpTextarea
-            name="comment"
-            size="sm"
-            focusRef={focusRef}
-            placeholder="Add a comment"
-            endContent={<SendHorizontal />}
-            onSubmit={handleCreateComment}
-          />
-        </LinkUpForm>
+        {comment && commentTextarea}
+        {/* {commentTextarea} */}
       </div>
     </div>
   );

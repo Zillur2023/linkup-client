@@ -7,6 +7,9 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  Input,
+  Select,
+  SelectItem,
 } from "@heroui/react";
 import {
   ThumbsUp,
@@ -41,6 +44,8 @@ import { useRouter } from "next/navigation";
 import { ImageGallery } from "../shared/ImageGallery";
 import PostEditor from "./PostEditor";
 import PostComment from "./PostComment";
+import { SearchIcon } from "../shared/Navbar";
+import { useAppSelector } from "@/redux/hooks";
 
 interface PostsProps {
   postId?: string;
@@ -54,9 +59,9 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
     skip: !user?._id,
   });
   // console.log("POstUSerData", userData);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  // const [searchTerm, setSearchTerm] = useState<string>("");
+  const searchTerm = useAppSelector((state) => state.search.searchTerm);
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-
   const debounceSearch = useDebounce(searchTerm);
 
   const queryPost = postId
@@ -75,11 +80,8 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
   const [deletePost] = useDeletePostMutation();
   const inputRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
+  // console.log({ inputRef });
   const postRef = useRef<HTMLDivElement>(null); // Ref for the div to be converted to PDF
-
-  const handleCommentClick = (postId: string) => {
-    inputRef?.current[postId]?.focus();
-  };
 
   const handleLike = async (postId: string) => {
     if (!userData?.data?._id) {
@@ -141,32 +143,25 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
 
   return (
     <>
-      <div className=" space-y-5 my-5 ">
-        {userData && (
-          <Card className=" p-4">
-            <div className=" flex items-center justify-center gap-2  ">
-              <Avatar
-                radius="full"
-                src={userData?.data?.profileImage}
-                // size="md"
-              />
-              <PostEditor
-                openButtonText={`What's on your mind, ${userData?.data?.name}`}
-                size="md"
-                radius="full"
-              />
-            </div>
+      <div className=" space-y-5 ">
+        {userData && !postId && (
+          <Card className=" flex flex-row items-center justify-center gap-2 p-3 ">
+            <Avatar
+              radius="full"
+              src={userData?.data?.profileImage}
+              // size="md"
+            />
+            <PostEditor
+              openButtonText={`What's on your mind, ${userData?.data?.name}`}
+              size="md"
+              radius="full"
+            />
           </Card>
         )}
         {!postData && <PostSkeleton />}
 
         {postData?.data?.map((post) => (
-          <Card
-            ref={postRef}
-            key={post._id}
-            isFooterBlurred
-            className=" w-full p-5 "
-          >
+          <Card ref={postRef} key={post._id}>
             {/* Author Info */}
             <CardHeader className=" flex flex-col justify-start items-start relative ">
               {post?.isPremium && (
@@ -235,83 +230,85 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
               {/* <p className="my-5">{post.content}</p> */}
             </CardBody>
 
-            <CardFooter className="justify-between ">
+            <CardFooter className="flex flex-col gap-3">
               {/* Post Interactions */}
               {/* <Tooltip content={post?.likes?.[index+1]?.name}> */}
 
-              <LinkUpButton
-                onClick={() => handleLike(post._id)}
-                buttonId="like"
-                data={post?.likes}
-                startContent={
-                  <ThumbsUp
-                    className={`${
-                      post?.likes?.some(
-                        (item) => item?._id === userData?.data?._id
-                      )
-                        ? "text-blue-600 fill-current"
-                        : "text-gray-600"
-                    }`}
-                  />
-                }
-              >
-                <span>{post.likes.length}</span>
-              </LinkUpButton>
+              <div className=" w-full flex justify-between ">
+                <LinkUpButton
+                  onClick={() => handleLike(post._id)}
+                  buttonId="like"
+                  data={post?.likes}
+                  startContent={
+                    <ThumbsUp
+                      className={`${
+                        post?.likes?.some(
+                          (item) => item?._id === userData?.data?._id
+                        )
+                          ? "text-blue-600 fill-current"
+                          : "text-gray-600"
+                      }`}
+                    />
+                  }
+                >
+                  <span>{post.likes.length}</span>
+                </LinkUpButton>
 
-              <LinkUpButton
-                onClick={() => handleDislike(post._id)}
-                buttonId="dislike"
-                data={post?.dislikes}
-                startContent={
-                  <ThumbsDown
-                    className={`${
-                      post?.dislikes?.some(
-                        (item) => item?._id === userData?.data?._id
-                      )
-                        ? "text-blue-600 fill-current"
-                        : "text-gray-600"
-                    }`}
-                  />
-                }
-              >
-                <span>{post.dislikes.length}</span>
-              </LinkUpButton>
+                <LinkUpButton
+                  onClick={() => handleDislike(post._id)}
+                  buttonId="dislike"
+                  data={post?.dislikes}
+                  startContent={
+                    <ThumbsDown
+                      className={`${
+                        post?.dislikes?.some(
+                          (item) => item?._id === userData?.data?._id
+                        )
+                          ? "text-blue-600 fill-current"
+                          : "text-gray-600"
+                      }`}
+                    />
+                  }
+                >
+                  <span>{post.dislikes.length}</span>
+                </LinkUpButton>
 
-              <div className="">
                 <Button
                   size="sm"
                   variant="light"
-                  onClick={() => handleCommentClick(post._id)}
+                  onClick={() => inputRef?.current[post._id]?.focus()}
                   startContent={<MessageCircle />}
                 >
                   <span>{post?.comments?.length}</span>
                 </Button>
-              </div>
-              <Button size="sm" variant="light" startContent={<Share2 />}>
-                {/* <span>{post.comments?.length}</span> */}
-              </Button>
-              {/* <Button
+                <Button size="sm" variant="light" startContent={<Share2 />}>
+                  {/* <span>{post.comments?.length}</span> */}
+                </Button>
+                {/* <Button
                   size="sm"
                   className="flex items-center  bg-transparent hover:bg-gray-300 "
                 >
                    <Download size={18} onClick={() => generatePDF(post)} className="bg-gray-300 p-1 rounded-md w-full h-full" />
                 </Button> */}
-              <Button
-                size="sm"
-                variant="light"
-                onClick={() => generatePDF(postRef)}
-                startContent={<Download />}
-              />
+                <Button
+                  size="sm"
+                  variant="light"
+                  onClick={() => generatePDF(postRef)}
+                  startContent={<Download />}
+                />
+              </div>
+              <div className=" w-full">
+                <PostComment
+                  user={userData?.data}
+                  postId={post?._id}
+                  openButtonText={
+                    post?.comments?.length > 2 && comment && "See all comment"
+                  }
+                  comment={comment ? true : false}
+                  focusRef={(el) => (inputRef.current[post._id] = el)}
+                />
+              </div>
             </CardFooter>
-
-            <PostComment
-              postId={post?._id}
-              openButtonText={
-                post?.comments?.length > 2 && comment && "See all comment"
-              }
-              comment={comment ? true : false}
-              focusRef={(el) => (inputRef.current[post._id] = el)}
-            />
           </Card>
         ))}
       </div>

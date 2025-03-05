@@ -20,14 +20,22 @@ import {
   Tooltip,
   Tab,
   Tabs,
+  Listbox,
+  ListboxItem,
+  Card,
 } from "@heroui/react";
 import { House, Store, Users, Link as LogoLink, Group } from "lucide-react";
 // import Link from "next/link";
 import { useUser } from "@/context/UserProvider";
-import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
+import {
+  useGetAllUserQuery,
+  useGetUserByIdQuery,
+} from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setSearchTerm } from "@/redux/features/search/searchSlice";
 
 export const menuItems = [
   { href: "/", label: "home", icon: <House /> },
@@ -42,6 +50,14 @@ export default function Navbar() {
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
+  const searchTerm = useAppSelector((state) => state.search.searchTerm);
+  const { data: allUserData } = useGetAllUserQuery({ searchTerm });
+  console.log({ allUserData });
+  const dispatch = useAppDispatch();
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setSearchTerm(e.target.value));
+  };
   // const { images } = useGetUserByIdQuery<IUserData>(user?._id, {
   //   skip: !user?._id,
   //   selectFromResult: ({ data }) => ({
@@ -73,54 +89,90 @@ export default function Navbar() {
       isBordered
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      className=" py-0"
-      // classNames={{
-      //   item: [
-      //     "flex ",
-      //     "relative",
-      //     "h-full",
-      //     "justify-between",
-      //     // "items-center",
-      //     "hover:bg-default-200 rounded",
-      //     "data-[active=true]:after:content-['']",
-      //     "data-[active=true]:after:absolute",
-      //     "data-[active=true]:after:bottom-0",
-      //     "data-[active=true]:after:left-0",
-      //     "data-[active=true]:after:right-0",
-      //     "data-[active=true]:after:h-[2px]",
-      //     "data-[active=true]:after:rounded-[2px]",
-      //     "data-[active=true]:after:bg-primary",
-      //   ],
-      // }}
+      className=" py-0    "
       maxWidth="full"
     >
-      <NavbarContent className="   ">
+      <NavbarContent className="  -ml-6  ">
         <NavbarMenuToggle
           className="md:hidden "
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         />
-        <div className=" flex items-center justify-center gap-2">
-          <NavbarBrand>
-            <LogoLink />
-            <p className="font-bold md:text-2xl text-inherit">up</p>
-          </NavbarBrand>
-          <Input
-            classNames={{
-              base: "max-w-full sm:max-w-[10rem] h-10",
-              mainWrapper: "h-full",
-              input: "text-small",
-              inputWrapper:
-                "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
-            }}
-            placeholder="Type to search..."
-            size="sm"
-            startContent={<SearchIcon size={18} />}
-            type="search"
-          />
-        </div>
+        {!searchTerm ? (
+          <div className=" flex items-center justify-center gap-1 ">
+            <NavbarBrand>
+              <LogoLink />
+              <p className="font-bold md:text-2xl text-inherit">up</p>
+            </NavbarBrand>
+
+            <Input
+              onChange={handleSearchChange}
+              classNames={{
+                base: "max-w-full sm:max-w-[10rem] ",
+                mainWrapper: "h-full",
+                input: "text-small",
+                inputWrapper:
+                  "h-full font-normal border-green-400 bg-default-400/20 dark:bg-default-500/20",
+              }}
+              placeholder="Type to search..."
+              size="sm"
+              startContent={<SearchIcon size={18} />}
+              type="search"
+            />
+          </div>
+        ) : (
+          <Card className="   border-2   px-1 py-2 rounded-small ">
+            <div className=" flex items-center justify-center gap-1 ">
+              <NavbarBrand>
+                <LogoLink />
+                <p className="font-bold md:text-2xl text-inherit">up</p>
+              </NavbarBrand>
+
+              <Input
+                onChange={handleSearchChange}
+                classNames={{
+                  base: "max-w-full sm:max-w-[10rem] ",
+                  mainWrapper: "h-full",
+                  input: "text-small",
+                  inputWrapper:
+                    "h-full font-normal border-green-400 bg-default-400/20 dark:bg-default-500/20",
+                }}
+                placeholder="Type to search..."
+                size="sm"
+                startContent={<SearchIcon size={18} />}
+                type="search"
+              />
+            </div>
+            {searchTerm && ( // Conditional rendering
+              <Listbox
+                aria-label="Dynamic Actions"
+                onAction={(key) => alert(key)}
+              >
+                {allUserData?.data?.map((item, i) => (
+                  // <div key={item._id} as={Link} href={`/${item.name}`}>
+                  //   <div className="flex items-center space-x-2">
+                  //     <Avatar
+                  //       radius="full"
+                  //       className="w-6 h-6"
+                  //       src={item.profileImage}
+                  //     />
+                  //     <span>{item.name}</span>
+                  //   </div>
+                  // </div>
+                  <ListboxItem
+                    key={i}
+                    className={item.key === "delete" ? "text-danger" : ""}
+                    color={item.key === "delete" ? "danger" : "default"}
+                  >
+                    {item.name}
+                  </ListboxItem>
+                ))}
+              </Listbox>
+            )}
+          </Card>
+        )}
       </NavbarContent>
       {user && (
-        <NavbarContent className=" hidden sm:flex   w-1/2 " justify="center">
+        <NavbarContent className=" hidden sm:flex w-1/2  " justify="center">
           {/* <NavbarItem>
             <Link color="foreground" href="#">
               Features
@@ -130,30 +182,35 @@ export default function Navbar() {
           <Tabs
             aria-label="Options"
             selectedKey={pathname}
-            fullWidth
-            classNames={{
-              tabList:
-                "  h-full relative rounded-none  flex justify-evenly    ",
-              cursor: " bg-blue-500",
-              tab: "max-w-fit  h-full hover:bg-default-200 rounded-md p-4 ",
-              tabContent: "group-data-[selected=true]:text-blue-500",
-            }}
+            // fullWidth
             color="primary"
             variant="underlined"
           >
             {menuItems.map((item) => (
               <Tab
                 key={item.href}
-                title={item.icon}
-                href={item.href}
-                as={Link}
+                className=" max-w-fit h-full"
+                title={
+                  <Tooltip content={item.label}>
+                    <Button
+                      className={`${
+                        pathname === item.href ? "text-blue-500" : ""
+                      }  `}
+                      href={item.href}
+                      as={Link}
+                      variant="light"
+                    >
+                      {item.icon}
+                    </Button>
+                  </Tooltip>
+                }
               />
             ))}
           </Tabs>
         </NavbarContent>
       )}
 
-      <NavbarContent as="div" className="    " justify="end">
+      <NavbarContent as="div" className="   -mr-6 " justify="end">
         {userData ? (
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
@@ -168,9 +225,27 @@ export default function Navbar() {
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" variant="flat">
-              <DropdownItem key="profile" className="h-14 gap-2">
+              <DropdownItem
+                key={`${userData?.data?.email}`}
+                className="h-14 gap-2"
+              >
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{userData?.data?.email}</p>
+              </DropdownItem>
+              <DropdownItem
+                key={`${userData?.data?.name}`}
+                as={Link}
+                href={`/${userData?.data?.name}`}
+              >
+                <div className="flex items-center space-x-2  ">
+                  <Avatar
+                    radius="full"
+                    // size="sm"
+                    className=" w-6 h-6"
+                    src={userData?.data?.profileImage}
+                  />
+                  <span>{userData?.data?.name}</span>
+                </div>
               </DropdownItem>
               <DropdownItem key="logout" color="danger">
                 Log Out

@@ -7,8 +7,16 @@ import {
   useDisclosure,
   ModalFooter,
 } from "@heroui/modal";
-import { ThumbsUp } from "lucide-react";
-import { ReactNode } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  ReactNode,
+  useEffect,
+  useRef,
+} from "react";
+import LinkUpForm from "../form/LinkUpForm";
+import LinkUpTextarea from "../form/LinkUpTextarea";
+import { SendHorizontal } from "lucide-react";
 
 interface IProps {
   openButtonText?: ReactNode;
@@ -39,10 +47,13 @@ interface IProps {
     | "full"
     | undefined;
   buttonSize?: "sm" | "md" | "lg" | undefined;
+  fullWidth?: boolean;
   className?: string;
   onUpdate?: () => void;
   startContent?: ReactNode;
   footerButton?: boolean;
+  footer?: ReactNode;
+  scrollBehavior?: "inside" | "normal" | "outside" | undefined;
 }
 
 export default function LinkUpModal({
@@ -55,10 +66,13 @@ export default function LinkUpModal({
   variant = "light",
   modalSize,
   buttonSize = "sm",
+  fullWidth = true,
   className,
   onUpdate,
   startContent,
   footerButton = false,
+  footer,
+  scrollBehavior,
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -75,7 +89,8 @@ export default function LinkUpModal({
               size={buttonSize}
               radius={radius}
               variant={variant}
-              fullWidth
+              startContent={startContent}
+              fullWidth={fullWidth}
               className={className}
               onPress={onOpen}
             >
@@ -101,18 +116,21 @@ export default function LinkUpModal({
           {openButtonIcon || openButtonText}
         </Button> */}
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size={modalSize}>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        size={modalSize}
+        scrollBehavior={scrollBehavior}
+      >
         <ModalContent>
           {(onClose) => (
             <>
               {title && (
-                <ModalHeader className="flex justify-center ">
+                <ModalHeader className="flex flex-col items-center justify-center ">
                   {title}
                 </ModalHeader>
               )}
-              <ModalBody className=" flex items-center justify-center ">
-                {children}
-              </ModalBody>
+              <ModalBody className="  ">{children}</ModalBody>
 
               {footerButton && (
                 <ModalFooter>
@@ -132,6 +150,12 @@ export default function LinkUpModal({
                   </Button>
                 </ModalFooter>
               )}
+              {footer && (
+                <ModalFooter>
+                  <div className="  w-full ">{footer}</div>
+                </ModalFooter>
+              )}
+              {/* {footer && <ModalFooter>{renderFooter()}</ModalFooter>} */}
             </>
           )}
         </ModalContent>

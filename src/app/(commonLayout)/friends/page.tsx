@@ -12,12 +12,12 @@ const list = [
 
 const FriendsPage = () => {
   return (
-    <div className="flex ">
+    <div className="flex  justify-center gap-2 my-5 ">
       <div className="hidden lg:block  lg:w-[20%] sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto  ">
         <SidebarMenu />
       </div>
-      <div className=" lg:block   mx-auto w-full md:w-[80%]   ">
-        <div className="  gap-2 grid grid-cols-1 md:grid-cols-3 p-4 ">
+      <div className=" lg:block   mx-auto w-full md:w-[80%]    ">
+        <div className="  gap-2 grid grid-cols-1 md:grid-cols-3  ">
           {list.map((item, index) => (
             /* eslint-disable no-console */
             <Card key={index} shadow="sm">

@@ -2,7 +2,7 @@
 import { ReactNode, useEffect, useState, KeyboardEvent } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { Button, Textarea } from "@heroui/react";
+import { Button, Card, Textarea } from "@heroui/react";
 
 interface LinkUpTextareaProps {
   name: string;
@@ -40,6 +40,8 @@ export default function LinkUpTextarea({
     formState: { errors },
   } = useFormContext();
 
+  console.log({ focusRef });
+
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevent default behavior (e.g., new line)
@@ -49,7 +51,8 @@ export default function LinkUpTextarea({
   };
 
   return (
-    <div
+    <Card
+      // as={Button}
       className={`${
         endContent ? "relative" : ""
       } w-full rounded-lg bg-default-100  `}
@@ -92,6 +95,6 @@ export default function LinkUpTextarea({
           {endContent}
         </Button>
       )}
-    </div>
+    </Card>
   );
 }
