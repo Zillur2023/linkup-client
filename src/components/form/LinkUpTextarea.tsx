@@ -40,7 +40,7 @@ export default function LinkUpTextarea({
     formState: { errors },
   } = useFormContext();
 
-  console.log({ focusRef });
+  // console.log({ focusRef });
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 const EditProfile = (user: IUser) => {
   const [updateUser] = useUpdateUserMutation();
   const onSubmit = async (data: any, reset?: () => void) => {
-    console.log("post data", data);
+    // console.log("post data", data);
     const formData = new FormData();
 
     formData.append("coverImage", data?.coverImage);
@@ -27,7 +27,7 @@ const EditProfile = (user: IUser) => {
       })
     );
 
-    console.log("formDatA profileEdiT", [...formData.entries()]);
+    // console.log("formDatA profileEdiT", [...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {

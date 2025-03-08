@@ -17,7 +17,8 @@ export default function Home() {
 
       <div className="hidden lg:block  lg:w-[20%]  sticky top-[65px] h-[calc(100vh-65px)]  overflow-y-auto   ">
         {/* Part 3 */}
-        <SidebarMenu />
+        {/* <SidebarMenu /> */}
+        "Right side"
       </div>
     </div>
   );

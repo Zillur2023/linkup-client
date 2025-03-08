@@ -8,34 +8,34 @@ export const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: postData,
       }),
-      invalidatesTags: ["Post","User","Comment"],
+      invalidatesTags: ["Post", "User", "Comment"],
     }),
     getAllPost: builder.query({
       query: ({
         postId,
         userId,
-        searchTerm, 
-        sortBy, 
-        isPremium    
+        searchTerm,
+        sortBy,
+        isPremium,
       }: {
         postId?: string;
         userId?: string;
         searchTerm?: string; // Optional searchTerm
-        // sortBy?: "highestUpvotes" | "lowestUpvotes" | "highestDownvotes" | "lowestDownvotes" 
-        sortBy?: string; 
-        isPremium?: boolean; 
+        // sortBy?: "highestUpvotes" | "lowestUpvotes" | "highestDownvotes" | "lowestDownvotes"
+        sortBy?: string;
+        isPremium?: boolean;
       }) => {
-        let url = '/post/all-post'; // Base URL
-    
+        let url = "/post/all-post"; // Base URL
+
         // Append postId and userId as path parameters
         if (postId) {
           url += `/${postId}`;
         }
-        
+
         if (userId) {
           url += `/${userId}`;
         }
-    
+
         // Append searchTerm and sortBy as query parameters
         const params: string[] = [];
         if (searchTerm) {
@@ -47,13 +47,12 @@ export const postApi = baseApi.injectEndpoints({
         if (isPremium !== undefined) {
           params.push(`isPremium=${isPremium}`);
         }
-        
+
         // If there are any query parameters, append them to the URL
         if (params.length) {
-          url += `?${params.join('&')}`;
+          url += `?${params.join("&")}`;
         }
-        
-    
+
         return {
           url,
           method: "GET",
@@ -61,14 +60,14 @@ export const postApi = baseApi.injectEndpoints({
       },
       providesTags: ["Post"],
     }),
-    
+
     updateLikes: builder.mutation({
       query: (postData) => ({
         url: `/post/likes`,
         method: "PUT",
         body: postData,
       }),
-      invalidatesTags: ["Post","User"],
+      invalidatesTags: ["Post", "User"],
     }),
     updateDislikes: builder.mutation({
       query: (postData) => ({
@@ -76,7 +75,7 @@ export const postApi = baseApi.injectEndpoints({
         method: "PUT",
         body: postData,
       }),
-      invalidatesTags: ["Post","User"],
+      invalidatesTags: ["Post", "User"],
     }),
     updatePost: builder.mutation({
       query: (postData) => ({
@@ -84,14 +83,14 @@ export const postApi = baseApi.injectEndpoints({
         method: "PUT",
         body: postData,
       }),
-      invalidatesTags: ["Post","User"],
+      invalidatesTags: ["Post", "User"],
     }),
     deletePost: builder.mutation({
       query: (postId) => ({
         url: `/post/delete/${postId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Post","User"],
+      invalidatesTags: ["Post", "User"],
     }),
     isAvailableForVeried: builder.query({
       query: (id) => ({
@@ -110,7 +109,5 @@ export const {
   useUpdateDislikesMutation,
   useUpdatePostMutation,
   useDeletePostMutation,
-  useIsAvailableForVeriedQuery
+  useIsAvailableForVeriedQuery,
 } = postApi;
-
-

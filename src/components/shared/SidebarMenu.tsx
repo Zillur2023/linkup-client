@@ -2,10 +2,11 @@
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
-import { Avatar, Tab, Tabs } from "@heroui/react";
+import { Avatar, Listbox, ListboxItem, Tab, Tabs } from "@heroui/react";
 import Link from "next/link";
-import { Group, Store, Users } from "lucide-react";
+import { Group, House, Store, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function SidebarMenu() {
   const pathname = usePathname();
@@ -17,87 +18,52 @@ export default function SidebarMenu() {
 
   const sidebarItems = [
     {
-      href: `/${userName}`,
+      href: `/${userName}_${userData?.data?._id}`,
       label: `${userName ? userName : "User "}`,
       icon: (
         <Avatar
-          radius="full"
-          className=" w-6 h-6 "
+          // radius="full"
+          // size="sm"
+          className=" w-6 h-6  "
           src={userData?.data?.profileImage}
         />
       ),
     },
+    { href: "/", label: "home", icon: <House /> },
     { href: "/friends", label: "Friends", icon: <Users /> },
     { href: "/marketplace", label: "Marketplace", icon: <Store /> },
     { href: "#group", label: "Group", icon: <Group /> },
   ];
 
-  return (
-    <div>
-      <Tabs
-        aria-label="Options"
-        selectedKey={pathname}
-        fullWidth
-        placement="start"
-        variant="light"
-        className=" "
-      >
-        {/* {userData?.data && (
-          <Tab
-            key={`/${userData?.data?.name}`}
-            href={`/${userData?.data?.name}`}
-            as={Link}
-            title={
-              <div className="flex items-center space-x-2 border-2 ">
-                <Avatar
-                  radius="full"
-                  size="sm"
-                  src={userData?.data?.profileImage}
-                />
-                <span>{userData?.data?.name}</span>
-              </div>
-            }
-            className="  flex justify-start hover:bg-default-200"
-          />
-        )} */}
+  const [selectedKeys, setSelectedKeys] = useState(new Set([pathname]));
+  console.log({ selectedKeys });
+  console.log({ pathname });
 
-        {/* {sidebarItems?.map((item) => (
-          <Tab
-            key={item.href}
-            // as={TabButton}
-            // as={Button}
-            title={
-              <Button
-                fullWidth
-                variant="light"
-                startContent={item.icon}
-                href={item.href}
-                as={Link}
-                className=" w-full   border-2 border-green-400 "
-                size="sm"
-              >
-                {" "}
-                {item.label}{" "}
-              </Button>
-            }
-            className="  w-full flex justify-start  border-2 border-red-500 "
-          />
-        ))} */}
-        {sidebarItems?.map((item) => (
-          <Tab
-            key={item.href}
-            href={item.href}
-            as={Link}
-            title={
-              <div className="flex justify-center items-center space-x-2">
-                <span>{item.icon}</span>
-                <span> {item.label} </span>
-              </div>
-            }
-            className="  flex justify-start hover:bg-default-200"
-          />
-        ))}
-      </Tabs>
-    </div>
+  const handleSelectionChange = (keys: any) => {
+    setSelectedKeys(new Set([keys]));
+  };
+
+  return (
+    <Listbox
+      items={sidebarItems}
+      aria-label="Single selection example"
+      selectedKeys={selectedKeys}
+      selectionMode="single"
+      hideSelectedIcon
+      // variant="flat"
+      autoFocus
+      onSelectionChange={handleSelectionChange}
+    >
+      {(item) => (
+        <ListboxItem
+          key={item?.href}
+          as={Link}
+          href={item?.href}
+          startContent={item.icon}
+        >
+          {item.label}
+        </ListboxItem>
+      )}
+    </Listbox>
   );
 }

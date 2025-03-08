@@ -48,7 +48,7 @@ const Friends = () => {
             />
             <div className="   ">
               <p className="text-lg font-semibold text-default-500 ">
-                {friend.name}
+                {friend?.name}
               </p>
               <p className="text-sm font-semibold text-default-500 hover:underline ">
                 12 mutual friends

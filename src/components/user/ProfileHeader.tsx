@@ -27,7 +27,7 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
-  console.log({ profileRoute });
+  // console.log({ profileRoute });
   // export const ProfileHeader = (user: IUser) => {
   const pathname = usePathname();
   const [updateUser] = useUpdateUserMutation();
@@ -41,7 +41,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
       formData.append("profileImage", data?.profileImage);
     }
 
-    console.log("formDatA editCOver", [...formData.entries()]);
+    // console.log("formDatA editCOver", [...formData.entries()]);
 
     const toastId = toast.loading("loading..");
 

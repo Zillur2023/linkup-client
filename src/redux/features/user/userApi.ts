@@ -18,8 +18,17 @@ const userApi = baseApi.injectEndpoints({
     //   providesTags: ["User"],
     // }),
     getAllUser: builder.query({
-      query: ({ searchTerm }: { searchTerm?: string }) => {
+      query: ({
+        searchTerm,
+        userId,
+      }: {
+        searchTerm?: string;
+        userId?: string;
+      }) => {
         let url = `/user/all-user`; // Base URL
+        if (userId) {
+          url += `/${userId}`;
+        }
         // Append searchTerm and sortBy as query parameters
         const query: string[] = [];
         if (searchTerm) {

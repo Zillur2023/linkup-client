@@ -35,7 +35,7 @@ import { IUserData } from "@/type";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setSearchTerm } from "@/redux/features/search/searchSlice";
+import { setSearchTerm, setUserId } from "@/redux/features/search/searchSlice";
 
 export const menuItems = [
   { href: "/", label: "home", icon: <House /> },
@@ -51,11 +51,12 @@ export default function Navbar() {
     skip: !user?._id,
   });
   const searchTerm = useAppSelector((state) => state.search.searchTerm);
+  console.log({ searchTerm });
   const { data: allUserData } = useGetAllUserQuery({ searchTerm });
-  console.log({ allUserData });
+  // console.log("allUserData?.data?.[0]?.name", allUserData?.data?.[0]?.name);
   const dispatch = useAppDispatch();
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: any) => {
     dispatch(setSearchTerm(e.target.value));
   };
   // const { images } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -97,7 +98,12 @@ export default function Navbar() {
           className="md:hidden "
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         />
-        {!searchTerm ? (
+
+        <Card
+          shadow={searchTerm && allUserData?.data?.length > 0 ? "md" : "none"}
+          radius={searchTerm && allUserData?.data?.length > 0 ? "md" : "none"}
+          className="  px-1 py-2  "
+        >
           <div className=" flex items-center justify-center gap-1 ">
             <NavbarBrand>
               <LogoLink />
@@ -106,6 +112,7 @@ export default function Navbar() {
 
             <Input
               onChange={handleSearchChange}
+              // onClick={handleSearchChange}
               classNames={{
                 base: "max-w-full sm:max-w-[10rem] ",
                 mainWrapper: "h-full",
@@ -119,47 +126,21 @@ export default function Navbar() {
               type="search"
             />
           </div>
-        ) : (
-          <Card className="   border-2   px-1 py-2 rounded-small ">
-            <div className=" flex items-center justify-center gap-1 ">
-              <NavbarBrand>
-                <LogoLink />
-                <p className="font-bold md:text-2xl text-inherit">up</p>
-              </NavbarBrand>
-
-              <Input
-                onChange={handleSearchChange}
-                classNames={{
-                  base: "max-w-full sm:max-w-[10rem] ",
-                  mainWrapper: "h-full",
-                  input: "text-small",
-                  inputWrapper:
-                    "h-full font-normal border-green-400 bg-default-400/20 dark:bg-default-500/20",
-                }}
-                placeholder="Type to search..."
-                size="sm"
-                startContent={<SearchIcon size={18} />}
-                type="search"
-              />
-            </div>
-            {searchTerm && ( // Conditional rendering
+          {searchTerm &&
+            allUserData?.data?.length > 0 && ( // Conditional rendering
               <Listbox
                 aria-label="Dynamic Actions"
-                onAction={(key) => alert(key)}
+                // onAction={(key) => alert(key)}
               >
                 {allUserData?.data?.map((item, i) => (
-                  // <div key={item._id} as={Link} href={`/${item.name}`}>
-                  //   <div className="flex items-center space-x-2">
-                  //     <Avatar
-                  //       radius="full"
-                  //       className="w-6 h-6"
-                  //       src={item.profileImage}
-                  //     />
-                  //     <span>{item.name}</span>
-                  //   </div>
-                  // </div>
                   <ListboxItem
                     key={i}
+                    as={Link}
+                    href={`${item.name}_${item._id}`}
+                    onClick={() => {
+                      dispatch(setSearchTerm(""));
+                      dispatch(setUserId(item?._id));
+                    }}
                     className={item.key === "delete" ? "text-danger" : ""}
                     color={item.key === "delete" ? "danger" : "default"}
                   >
@@ -168,8 +149,7 @@ export default function Navbar() {
                 ))}
               </Listbox>
             )}
-          </Card>
-        )}
+        </Card>
       </NavbarContent>
       {user && (
         <NavbarContent className=" hidden sm:flex w-1/2  " justify="center">

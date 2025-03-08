@@ -61,6 +61,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   // console.log("POstUSerData", userData);
   // const [searchTerm, setSearchTerm] = useState<string>("");
   const searchTerm = useAppSelector((state) => state.search.searchTerm);
+  console.log({ searchTerm });
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   const debounceSearch = useDebounce(searchTerm);
 
@@ -73,7 +74,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
-  // console.log({ postData });
+  console.log({ postData });
 
   const [updateLike] = useUpdateLikesMutation();
   const [updateDislike] = useUpdateDislikesMutation();
