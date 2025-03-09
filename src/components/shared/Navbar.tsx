@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Navbar as HeroUiNabvar,
   NavbarBrand,
@@ -24,7 +24,14 @@ import {
   ListboxItem,
   Card,
 } from "@heroui/react";
-import { House, Store, Users, Link as LogoLink, Group } from "lucide-react";
+import {
+  House,
+  Store,
+  Users,
+  Link as LogoLink,
+  Group,
+  Search,
+} from "lucide-react";
 // import Link from "next/link";
 import { useUser } from "@/context/UserProvider";
 import {
@@ -32,7 +39,7 @@ import {
   useGetUserByIdQuery,
 } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setSearchTerm, setUserId } from "@/redux/features/search/searchSlice";
@@ -46,6 +53,7 @@ export const menuItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [isFocused, setIsFocused] = useState(false);
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
@@ -56,9 +64,25 @@ export default function Navbar() {
   // console.log("allUserData?.data?.[0]?.name", allUserData?.data?.[0]?.name);
   const dispatch = useAppDispatch();
 
-  const handleSearchChange = (e: any) => {
-    dispatch(setSearchTerm(e.target.value));
+  const [search, setSearch] = useState("");
+  console.log({ search });
+  const router = useRouter();
+
+  const handleChange = () => {
+    router.push(`/search/top?q=${encodeURIComponent(search)}`);
+    // if (value.length >= 3) {
+    //   router.push(`/search/top?q=${encodeURIComponent(search)}`);
+    // }
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleChange();
+    }
+  };
+
+  // const handleSearchChange = (e: any) => {
+  //   dispatch(setSearchTerm(e.target.value));
+  // };
   // const { images } = useGetUserByIdQuery<IUserData>(user?._id, {
   //   skip: !user?._id,
   //   selectFromResult: ({ data }) => ({
@@ -111,8 +135,9 @@ export default function Navbar() {
             </NavbarBrand>
 
             <Input
-              onChange={handleSearchChange}
+              onChange={(e) => setSearch(e.target.value)}
               // onClick={handleSearchChange}
+              onKeyDown={handleKeyDown}
               classNames={{
                 base: "max-w-full sm:max-w-[10rem] ",
                 mainWrapper: "h-full",
@@ -122,8 +147,10 @@ export default function Navbar() {
               }}
               placeholder="Type to search..."
               size="sm"
-              startContent={<SearchIcon size={18} />}
+              startContent={!isFocused && <Search strokeWidth={1} />}
               type="search"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
             />
           </div>
           {searchTerm &&
@@ -268,39 +295,3 @@ export default function Navbar() {
     </HeroUiNabvar>
   );
 }
-
-export const SearchIcon = ({
-  size = 24,
-  strokeWidth = 1.5,
-  width = 24,
-  height = 24,
-  ...props
-}) => {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      focusable="false"
-      height={height || size}
-      role="presentation"
-      viewBox="0 0 24 24"
-      width={width || size}
-      {...props}
-    >
-      <path
-        d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={strokeWidth}
-      />
-      <path
-        d="M22 22L20 20"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={strokeWidth}
-      />
-    </svg>
-  );
-};
