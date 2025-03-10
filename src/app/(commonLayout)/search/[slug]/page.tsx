@@ -25,7 +25,7 @@ const SearchPage = () => {
       case "top":
         return <p>Top</p>;
       case "posts":
-        return <Posts />;
+        return <Posts searchTerm={query!} />;
       default:
         return null;
     }

@@ -32,7 +32,7 @@ export const friends = [
   },
 ];
 
-const Friends = () => {
+const ProfileFriends = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 my-5  w-full md:w-[70%]  mx-auto  ">
       {friends?.map((friend, i) => (
@@ -76,4 +76,4 @@ const Friends = () => {
   );
 };
 
-export default Friends;
+export default ProfileFriends;

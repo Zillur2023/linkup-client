@@ -1,11 +1,11 @@
 import React from "react";
-import { friends } from "./Friends";
+import { friends } from "./ProfileFriends";
 import { Avatar, Button, Card } from "@heroui/react";
 import Posts from "../post/Posts";
 import { IUser } from "@/type";
 import Link from "next/link";
 
-const User = (user: IUser) => {
+const ProfileHome = (user: IUser) => {
   return (
     <div className=" flex justify-center w-full md:w-[70%] mx-auto gap-2 my-5">
       <div className=" w-full  space-y-5 hidden lg:block  lg:w-[40%] sticky top-[65px] h-min  ">
@@ -65,4 +65,4 @@ const FriendsGrid = (user: IUser) => {
   );
 };
 
-export default User;
+export default ProfileHome;

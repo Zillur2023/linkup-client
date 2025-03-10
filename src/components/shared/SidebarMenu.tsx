@@ -24,6 +24,8 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const url = query ? `${pathname}?q=${query}` : pathname;
+  console.log({ url });
+
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
@@ -34,7 +36,7 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
 
   const defaultItems: MenuItem[] = [
     {
-      href: `/${userName}_${userData?.data?._id}`,
+      href: `/profile?id=${userData?.data?._id}`,
       label: userName,
       icon: <Avatar className="w-6 h-6" src={profileImage} />,
     },

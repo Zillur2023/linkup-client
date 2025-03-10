@@ -16,9 +16,9 @@ import LinkUpReset from "../form/LinkUpReset";
 import LinkUpModal from "../shared/LinkUpModal";
 import { toast } from "sonner";
 import { useUpdateUserMutation } from "@/redux/features/user/userApi";
-import EditProfile from "./EditProfile";
-import { usePathname } from "next/navigation";
-import { friends } from "./Friends";
+import EditProfile from "./ProfileEdit";
+import { usePathname, useSearchParams } from "next/navigation";
+import { friends } from "./ProfileFriends";
 import Link from "next/link";
 
 interface ProfileHeaderProps {
@@ -30,6 +30,13 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
   // console.log({ profileRoute });
   // export const ProfileHeader = (user: IUser) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const sk = searchParams.get("sk");
+  const url = sk ? `${pathname}?id=${id}&sk=${sk}` : `${pathname}?id=${id}`;
+  // const url = query ? `${pathname}?id=${query}` : pathname;
+  console.log({ url });
+  console.log({ pathname });
   const [updateUser] = useUpdateUserMutation();
 
   const handleEditImage = async (data: any, reset?: () => void) => {
@@ -202,7 +209,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
           <Divider />
           <Tabs
             aria-label="Tabs"
-            selectedKey={pathname}
+            selectedKey={url}
             // fullWidth
 
             color="primary"

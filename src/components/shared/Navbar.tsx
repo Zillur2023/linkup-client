@@ -15,8 +15,6 @@ import {
   DropdownItem,
   Avatar,
   Input,
-  Breadcrumbs,
-  BreadcrumbItem,
   Tooltip,
   Tab,
   Tabs,
@@ -52,6 +50,7 @@ export const menuItems = [
 ];
 
 export default function Navbar() {
+  const [search, setSearch] = useState("");
   const pathname = usePathname();
   const [isFocused, setIsFocused] = useState(false);
   const { user } = useUser();
@@ -60,16 +59,15 @@ export default function Navbar() {
   });
   const searchTerm = useAppSelector((state) => state.search.searchTerm);
   console.log({ searchTerm });
-  const { data: allUserData } = useGetAllUserQuery({ searchTerm });
+  const { data: allUserData } = useGetAllUserQuery({ searchTerm: search });
   // console.log("allUserData?.data?.[0]?.name", allUserData?.data?.[0]?.name);
   const dispatch = useAppDispatch();
 
-  const [search, setSearch] = useState("");
   console.log({ search });
   const router = useRouter();
 
   const handleChange = () => {
-    router.push(`/search/top?q=${encodeURIComponent(search)}`);
+    router.push(`/search/top?q=${search}`);
     // if (value.length >= 3) {
     //   router.push(`/search/top?q=${encodeURIComponent(search)}`);
     // }
@@ -138,6 +136,7 @@ export default function Navbar() {
               onChange={(e) => setSearch(e.target.value)}
               // onClick={handleSearchChange}
               onKeyDown={handleKeyDown}
+              value={search}
               classNames={{
                 base: "max-w-full sm:max-w-[10rem] ",
                 mainWrapper: "h-full",
@@ -153,7 +152,7 @@ export default function Navbar() {
               onBlur={() => setIsFocused(false)}
             />
           </div>
-          {searchTerm &&
+          {search &&
             allUserData?.data?.length > 0 && ( // Conditional rendering
               <Listbox
                 aria-label="Dynamic Actions"
@@ -163,9 +162,10 @@ export default function Navbar() {
                   <ListboxItem
                     key={i}
                     as={Link}
-                    href={`${item.name}_${item._id}`}
+                    href={`/profile?id=${item._id}`}
                     onClick={() => {
                       dispatch(setSearchTerm(""));
+                      setSearch("");
                       dispatch(setUserId(item?._id));
                     }}
                     className={item.key === "delete" ? "text-danger" : ""}

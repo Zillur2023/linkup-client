@@ -44,15 +44,19 @@ import { useRouter } from "next/navigation";
 import { ImageGallery } from "../shared/ImageGallery";
 import PostEditor from "./PostEditor";
 import PostComment from "./PostComment";
-import { SearchIcon } from "../shared/Navbar";
 import { useAppSelector } from "@/redux/hooks";
 
 interface PostsProps {
   postId?: string;
   comment?: boolean;
+  searchTerm?: string;
 }
 
-const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
+const Posts: React.FC<PostsProps> = ({
+  postId,
+  comment = true,
+  searchTerm,
+}) => {
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -60,7 +64,7 @@ const Posts: React.FC<PostsProps> = ({ postId, comment = true }) => {
   });
   // console.log("POstUSerData", userData);
   // const [searchTerm, setSearchTerm] = useState<string>("");
-  const searchTerm = useAppSelector((state) => state.search.searchTerm);
+  // const searchTerm = useAppSelector((state) => state.search.searchTerm);
   console.log({ searchTerm });
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   const debounceSearch = useDebounce(searchTerm);
