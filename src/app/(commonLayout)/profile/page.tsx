@@ -3,8 +3,9 @@
 import ProfileFriends from "@/components/profile/ProfileFriends";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import ProfileHome from "@/components/profile/ProfileHome";
+import { useGetAllPostQuery } from "@/redux/features/post/postApi";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
-import { IUserData } from "@/type";
+import { IPostData, IUserData } from "@/type";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const ProfilePage = () => {
@@ -14,6 +15,10 @@ const ProfilePage = () => {
   const sk = searchParams.get("sk");
 
   const { data: userData } = useGetUserByIdQuery<IUserData>(id);
+  //   console.log("profile userData", userData);
+
+  const { data: postData } = useGetAllPostQuery<IPostData>({ userId: id! });
+  console.log("ProfilePage postData", postData);
 
   const profileRoute = [
     { href: `${pathname}?id=${id}`, label: "posts" },

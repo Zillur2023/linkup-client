@@ -7,9 +7,10 @@ import { useParams, useSearchParams } from "next/navigation";
 const SearchPage = () => {
   const params = useParams();
   const { slug } = params;
-  console.log({ slug });
+  // console.log({ slug });
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
+  console.log({ query });
 
   const items = [
     { href: `/search/top?q=${query}`, label: "All", icon: <Newspaper /> },
@@ -23,9 +24,10 @@ const SearchPage = () => {
   const renderSection = () => {
     switch (slug) {
       case "top":
+        // return <Posts searchQuery={query!} />;
         return <p>Top</p>;
       case "posts":
-        return <Posts searchTerm={query!} />;
+        return <Posts searchQuery={query!} />;
       default:
         return null;
     }

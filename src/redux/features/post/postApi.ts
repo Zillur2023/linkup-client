@@ -10,48 +10,43 @@ export const postApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Post", "User", "Comment"],
     }),
+
     getAllPost: builder.query({
       query: ({
         postId,
         userId,
-        searchTerm,
+        searchQuery,
         sortBy,
         isPremium,
       }: {
         postId?: string;
         userId?: string;
-        searchTerm?: string; // Optional searchTerm
-        // sortBy?: "highestUpvotes" | "lowestUpvotes" | "highestDownvotes" | "lowestDownvotes"
-        sortBy?: string;
+        searchQuery?: string;
+        sortBy?:
+          | "highestUpvotes"
+          | "lowestUpvotes"
+          | "highestDownvotes"
+          | "lowestDownvotes";
         isPremium?: boolean;
       }) => {
-        let url = "/post/all-post"; // Base URL
+        const params = new URLSearchParams();
 
-        // Append postId and userId as path parameters
-        if (postId) {
-          url += `/${postId}`;
-        }
+        if (postId) params.append("postId", postId);
+        if (userId) params.append("userId", userId);
+        if (searchQuery) params.append("searchQuery", searchQuery);
+        if (sortBy) params.append("sortBy", sortBy);
+        if (isPremium !== undefined)
+          params.append("isPremium", isPremium.toString());
+        // console.log(
+        //   "getAllPosts params:",
+        //   Object.fromEntries(params.entries())
+        // );
 
-        if (userId) {
-          url += `/${userId}`;
-        }
+        const url = `/post/all-post${
+          params.toString() ? `?${params.toString()}` : ""
+        }`;
 
-        // Append searchTerm and sortBy as query parameters
-        const params: string[] = [];
-        if (searchTerm) {
-          params.push(`searchTerm=${encodeURIComponent(searchTerm)}`);
-        }
-        if (sortBy) {
-          params.push(`sortBy=${sortBy}`);
-        }
-        if (isPremium !== undefined) {
-          params.push(`isPremium=${isPremium}`);
-        }
-
-        // If there are any query parameters, append them to the URL
-        if (params.length) {
-          url += `?${params.join("&")}`;
-        }
+        console.log("getAllPosts url", url);
 
         return {
           url,
@@ -60,7 +55,6 @@ export const postApi = baseApi.injectEndpoints({
       },
       providesTags: ["Post"],
     }),
-
     updateLikes: builder.mutation({
       query: (postData) => ({
         url: `/post/likes`,

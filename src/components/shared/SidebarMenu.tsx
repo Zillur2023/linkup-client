@@ -24,7 +24,7 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const url = query ? `${pathname}?q=${query}` : pathname;
-  console.log({ url });
+  // console.log({ url });
 
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -59,7 +59,7 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
       aria-label="Sidebar Menu"
       selectedKeys={selectedKeys}
       selectionMode="single"
-      hideSelectedIcon
+      // hideSelectedIcon
       autoFocus
       onSelectionChange={handleSelectionChange}
     >

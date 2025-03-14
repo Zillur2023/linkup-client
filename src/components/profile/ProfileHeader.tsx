@@ -35,8 +35,8 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
   const sk = searchParams.get("sk");
   const url = sk ? `${pathname}?id=${id}&sk=${sk}` : `${pathname}?id=${id}`;
   // const url = query ? `${pathname}?id=${query}` : pathname;
-  console.log({ url });
-  console.log({ pathname });
+  // console.log({ url });
+  // console.log({ pathname });
   const [updateUser] = useUpdateUserMutation();
 
   const handleEditImage = async (data: any, reset?: () => void) => {

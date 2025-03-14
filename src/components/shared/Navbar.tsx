@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Navbar as HeroUiNabvar,
   NavbarBrand,
@@ -39,8 +39,7 @@ import {
 import { IUserData } from "@/type";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setSearchTerm, setUserId } from "@/redux/features/search/searchSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 export const menuItems = [
   { href: "/", label: "home", icon: <House /> },
@@ -50,6 +49,7 @@ export const menuItems = [
 ];
 
 export default function Navbar() {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState("");
   const pathname = usePathname();
   const [isFocused, setIsFocused] = useState(false);
@@ -57,24 +57,20 @@ export default function Navbar() {
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
-  const searchTerm = useAppSelector((state) => state.search.searchTerm);
-  console.log({ searchTerm });
-  const { data: allUserData } = useGetAllUserQuery({ searchTerm: search });
-  // console.log("allUserData?.data?.[0]?.name", allUserData?.data?.[0]?.name);
-  const dispatch = useAppDispatch();
+  const { data: allUserData } = useGetAllUserQuery({ searchQuery: search });
 
   console.log({ search });
   const router = useRouter();
 
   const handleChange = () => {
     router.push(`/search/top?q=${search}`);
-    // if (value.length >= 3) {
-    //   router.push(`/search/top?q=${encodeURIComponent(search)}`);
-    // }
   };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && inputRef.current) {
+      inputRef.current.blur(); // Removes focus from input
       handleChange();
+      // setIsFocused(false);
     }
   };
 
@@ -112,7 +108,7 @@ export default function Navbar() {
       isBordered
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      className=" py-0    "
+      className=" py-0     "
       maxWidth="full"
     >
       <NavbarContent className="  -ml-6  ">
@@ -122,9 +118,13 @@ export default function Navbar() {
         />
 
         <Card
-          shadow={searchTerm && allUserData?.data?.length > 0 ? "md" : "none"}
-          radius={searchTerm && allUserData?.data?.length > 0 ? "md" : "none"}
-          className="  px-1 py-2  "
+          shadow={
+            search && isFocused && allUserData?.data?.length > 0 ? "md" : "none"
+          }
+          radius={
+            search && isFocused && allUserData?.data?.length > 0 ? "md" : "none"
+          }
+          className="  px-1 py-2 absolute top-2 "
         >
           <div className=" flex items-center justify-center gap-1 ">
             <NavbarBrand>
@@ -133,8 +133,8 @@ export default function Navbar() {
             </NavbarBrand>
 
             <Input
+              ref={inputRef}
               onChange={(e) => setSearch(e.target.value)}
-              // onClick={handleSearchChange}
               onKeyDown={handleKeyDown}
               value={search}
               classNames={{
@@ -153,6 +153,7 @@ export default function Navbar() {
             />
           </div>
           {search &&
+            isFocused &&
             allUserData?.data?.length > 0 && ( // Conditional rendering
               <Listbox
                 aria-label="Dynamic Actions"
@@ -164,9 +165,9 @@ export default function Navbar() {
                     as={Link}
                     href={`/profile?id=${item._id}`}
                     onClick={() => {
-                      dispatch(setSearchTerm(""));
                       setSearch("");
-                      dispatch(setUserId(item?._id));
+                      // dispatch(setSearchTerm(""));
+                      // dispatch(setUserId(item?._id));
                     }}
                     className={item.key === "delete" ? "text-danger" : ""}
                     color={item.key === "delete" ? "danger" : "default"}

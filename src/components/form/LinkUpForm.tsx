@@ -39,7 +39,7 @@ export default function LinkUpForm({
     onSubmit(data, reset);
   });
 
-  console.log("Form Errors:", methods.formState.errors);
+  // console.log("Form Errors:", methods.formState.errors);
 
   return (
     <FormProvider {...methods}>

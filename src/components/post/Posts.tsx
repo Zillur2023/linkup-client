@@ -48,15 +48,18 @@ import { useAppSelector } from "@/redux/hooks";
 
 interface PostsProps {
   postId?: string;
+  userId?: string;
   comment?: boolean;
-  searchTerm?: string;
+  searchQuery?: string;
 }
 
 const Posts: React.FC<PostsProps> = ({
   postId,
+  userId,
   comment = true,
-  searchTerm,
+  searchQuery,
 }) => {
+  console.log("Post compoents userID", userId);
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -65,19 +68,28 @@ const Posts: React.FC<PostsProps> = ({
   // console.log("POstUSerData", userData);
   // const [searchTerm, setSearchTerm] = useState<string>("");
   // const searchTerm = useAppSelector((state) => state.search.searchTerm);
-  console.log({ searchTerm });
+  console.log({ searchQuery });
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-  const debounceSearch = useDebounce(searchTerm);
+  // const debounceSearchQuery = useDebounce(searchQuery);
 
   const queryPost = postId
     ? { postId }
     : {
-        // searchTerm,
-        searchTerm: debounceSearch,
-        sortBy,
+        userId,
+        // searchQuery: debounceSearchQuery,
+        searchQuery,
+        // sortBy,
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
+  // const queryPost = userId
+  //   ? { userId }
+  //   : {
+  //       searchQuery: debounceSearchQuery,
+  //       sortBy,
+  //       isPremium: userData?.data?.isVerified ? true : undefined,
+  //     };
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
+  // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
   console.log({ postData });
 
   const [updateLike] = useUpdateLikesMutation();
@@ -149,7 +161,7 @@ const Posts: React.FC<PostsProps> = ({
   return (
     <>
       <div className=" space-y-5 ">
-        {userData && !postId && (
+        {userData && !searchQuery && !postId && (
           <Card className=" flex flex-row items-center justify-center gap-2 p-3 ">
             <Avatar
               radius="full"

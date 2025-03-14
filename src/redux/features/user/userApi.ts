@@ -10,34 +10,22 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    // getAllUser: builder.query({
-    //   query: () => ({
-    //     url: `/user/all-user`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["User"],
-    // }),
+
     getAllUser: builder.query({
       query: ({
-        searchTerm,
+        searchQuery,
         userId,
       }: {
-        searchTerm?: string;
+        searchQuery?: string;
         userId?: string;
       }) => {
-        let url = `/user/all-user`; // Base URL
-        if (userId) {
-          url += `/${userId}`;
-        }
-        // Append searchTerm and sortBy as query parameters
-        const query: string[] = [];
-        if (searchTerm) {
-          query.push(`searchTerm=${encodeURIComponent(searchTerm)}`);
-        }
+        let url = `/user/all-user${userId ? `/${userId}` : ""}`;
 
-        // If there are any query parameters, append them to the URL
-        if (query.length) {
-          url += `?${query.join("&")}`;
+        const params = new URLSearchParams();
+        if (searchQuery) params.append("searchQuery", searchQuery);
+
+        if (params.toString()) {
+          url += `?${params.toString()}`;
         }
 
         return {
