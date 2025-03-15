@@ -20,6 +20,7 @@ import EditProfile from "./ProfileEdit";
 import { usePathname, useSearchParams } from "next/navigation";
 import { friends } from "./ProfileFriends";
 import Link from "next/link";
+import TabsMenu from "../shared/TabsMenu";
 
 interface ProfileHeaderProps {
   user: IUser;
@@ -207,33 +208,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
             </div>
           </div>
           <Divider />
-          <Tabs
-            aria-label="Tabs"
-            selectedKey={url}
-            // fullWidth
-
-            color="primary"
-            variant="underlined"
-          >
-            {profileRoute.map((item) => (
-              <Tab
-                key={item.href}
-                className=" max-w-fit h-full"
-                title={
-                  <Button
-                    className={`${
-                      pathname === item.href ? "text-blue-500" : ""
-                    }  `}
-                    href={item.href}
-                    as={Link}
-                    variant="light"
-                  >
-                    {item.label}
-                  </Button>
-                }
-              />
-            ))}
-          </Tabs>
+          <TabsMenu selectedKey={url} items={profileRoute} />
         </div>
       </div>
     </Card>
