@@ -41,40 +41,13 @@ const SearchPage = () => {
 
   return (
     <div className="flex flex-col md:flex-row  justify-center gap-2 my-5  ">
-      {/* <div className="hidden lg:block  lg:w-[20%] sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto ">
+      <div className="hidden md:block  md:w-[25%] sticky md:top-0 lg:top-[65px]  h-[calc(100vh-90px)]  overflow-y-auto ">
         <SidebarMenu items={items} />
-      </div> */}
-      <div>
-        <TabsMenu selectedKey={url} items={items} />
-        {/* <Tabs
-          aria-label="Tabs"
-          selectedKey={url}
-          // fullWidth
-
-          color="primary"
-          variant="underlined"
-        >
-          {items.map((item) => (
-            <Tab
-              key={item.href}
-              className=" w-full h-full"
-              title={
-                <Button
-                  className={`${
-                    pathname === item.href ? "text-blue-500" : ""
-                  }  `}
-                  href={item.href}
-                  as={Link}
-                  variant="light"
-                >
-                  {item.label}
-                </Button>
-              }
-            />
-          ))}
-        </Tabs> */}
       </div>
-      <div className=" lg:block    mx-auto w-full md:w-[80%] ">
+      <div className=" block md:hidden">
+        <TabsMenu selectedKey={url} items={items} />
+      </div>
+      <div className="  md:block  w-full md:w-[75%]   ">
         <div className=" mx-auto w-[70%] ">{renderSection()}</div>
       </div>
     </div>

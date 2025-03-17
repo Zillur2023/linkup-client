@@ -12,12 +12,14 @@ interface TabsMenuProps {
     icon?: ReactNode;
   }[];
   tooltip?: boolean;
+  isIconOnly?: boolean;
 }
 
 const TabsMenu: React.FC<TabsMenuProps> = ({
   selectedKey,
   items,
   tooltip = false,
+  isIconOnly = false,
 }) => {
   return (
     <Tabs
@@ -34,7 +36,9 @@ const TabsMenu: React.FC<TabsMenuProps> = ({
             tooltip ? (
               <Tooltip content={item?.icon}>
                 <Button
-                  isIconOnly
+                  // size={isIconOnly ? "lg" : "md"}
+                  size={"lg"}
+                  isIconOnly={isIconOnly}
                   className={`${
                     selectedKey === item.href ? "text-blue-500" : ""
                   }   `}

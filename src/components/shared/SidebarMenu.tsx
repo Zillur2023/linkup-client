@@ -23,7 +23,8 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
-  const url = query ? `${pathname}?q=${query}` : pathname;
+  const id = searchParams.get("id");
+  const url = query ? `${pathname}?q=${query}` : `${pathname}?id=${id}`;
   // console.log({ url });
 
   const { user } = useUser();
@@ -69,6 +70,7 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
           as={Link}
           href={item.href}
           startContent={item.icon}
+          // className=" py-3"
         >
           {item.label}
         </ListboxItem>

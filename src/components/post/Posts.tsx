@@ -161,7 +161,7 @@ const Posts: React.FC<PostsProps> = ({
   return (
     <>
       <div className=" space-y-5 ">
-        {userData && !searchQuery && !postId && (
+        {userData && postData?.data?.length > 0 && !searchQuery && !postId && (
           <Card className=" flex flex-row items-center justify-center gap-2 p-3 ">
             <Avatar
               radius="full"

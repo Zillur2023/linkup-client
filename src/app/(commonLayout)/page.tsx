@@ -1,24 +1,33 @@
+"use client";
 import Posts from "@/components/post/Posts";
 import SidebarMenu from "@/components/shared/SidebarMenu";
+import { useGetAllUserQuery } from "@/redux/features/user/userApi";
+import { IUser } from "@/type";
+import { Avatar } from "@heroui/react";
 
 export default function Home() {
+  const { data: allUserData } = useGetAllUserQuery({ searchQuery: "" });
+  const items = allUserData?.data?.map((user: IUser) => ({
+    href: `/profile?id=${user._id}`,
+    label: user?.name, // Assuming user has a name
+    icon: <Avatar className="w-6 h-6" src={user?.profileImage} />,
+  }));
+
+  console.log("User Menu Items:", items);
+
   return (
-    <div className=" flex justify-center gap-2 my-5">
-      <div className="hidden lg:block  lg:w-[20%] sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto   ">
+    <div className=" flex justify-center  gap-2 my-5  ">
+      <div className="hidden md:block  md:w-[25%] sticky md:top-0 lg:top-[65px]  h-[calc(100vh-90px)]  overflow-y-auto   ">
         <SidebarMenu />
       </div>
 
-      <div className=" lg:block w-full  lg:w-[60%]  mx-auto  ">
-        <div className=" lg:block w-full md:w-[60%]  lg:w-[70%]  mx-auto  ">
-          <Posts />
-        </div>
-        {/* <Posts /> */}
+      <div className=" md:block  w-full  md:w-[50%] lg:px-10    ">
+        <Posts />
       </div>
 
-      <div className="hidden lg:block  lg:w-[20%]  sticky top-[65px] h-[calc(100vh-65px)]  overflow-y-auto   ">
-        {/* Part 3 */}
-        {/* <SidebarMenu /> */}
-        "Right side"
+      <div className="hidden md:block  md:w-[25%]  sticky md:top-0 lg:top-[65px]  h-[calc(100vh-90px)]    overflow-y-auto   ">
+        <h3 className=" text-xl font-medium text-neutral-800">Users</h3>
+        <SidebarMenu items={items} />
       </div>
     </div>
   );
