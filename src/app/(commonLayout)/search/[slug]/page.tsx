@@ -2,6 +2,7 @@
 import Posts from "@/components/post/Posts";
 import SidebarMenu from "@/components/shared/SidebarMenu";
 import TabsMenu from "@/components/shared/TabsMenu";
+import TopSearch from "@/components/common/TopSearch";
 import { Button, Tab, Tabs } from "@heroui/react";
 import { FileText, Newspaper } from "lucide-react";
 import Link from "next/link";
@@ -15,7 +16,7 @@ const SearchPage = () => {
   // console.log({ slug });
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
-  console.log({ query });
+  // console.log({ query });
   const url = query ? `${pathname}?q=${query}` : pathname;
 
   const items = [
@@ -31,7 +32,7 @@ const SearchPage = () => {
     switch (slug) {
       case "top":
         // return <Posts searchQuery={query!} />;
-        return <p>Top</p>;
+        return <TopSearch query={query!} />;
       case "posts":
         return <Posts searchQuery={query!} />;
       default:

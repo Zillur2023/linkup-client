@@ -21,11 +21,11 @@ const Profile = () => {
   // const userId = useAppSelector((state) => state.search.userId);
   // console.log({ userId });
   const searchTerm = useAppSelector((state) => state.search.searchTerm);
-  console.log({ searchTerm });
+  // console.log({ searchTerm });
 
   // console.log({ id });
   const pathname = usePathname();
-  console.log({ pathname });
+  // console.log({ pathname });
   const { user } = useUser();
   // const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
   //   skip: !user?._id,
@@ -35,14 +35,14 @@ const Profile = () => {
     id
   );
 
-  console.log({ userData });
+  // console.log({ userData });
 
   const { data: allUserData } = useGetAllUserQuery({
     // searchTerm,
     userId: id!,
   });
 
-  console.log({ allUserData });
+  // console.log({ allUserData });
 
   // console.log("pathname.replace()", pathname?.replace("/", ""));
 
@@ -63,7 +63,7 @@ const Profile = () => {
     { href: `/profile?id=${id}&sk=friends`, label: "friends" },
   ];
 
-  console.log("profileRoute?.[0]?.href", profileRoute?.[0]?.href);
+  // console.log("profileRoute?.[0]?.href", profileRoute?.[0]?.href);
 
   // const isPathValid = profileRoute.some((route) => route.href === pathname);
 

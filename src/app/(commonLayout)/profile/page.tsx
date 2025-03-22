@@ -16,6 +16,7 @@ const ProfilePage = () => {
 
   const { data: userData } = useGetUserByIdQuery<IUserData>(id);
   //   console.log("profile userData", userData);
+  // console.log("zillurChat", userData?.data?.chats?.[0]?.content);
 
   const { data: postData } = useGetAllPostQuery<IPostData>({ userId: id! });
   console.log("ProfilePage postData", postData);

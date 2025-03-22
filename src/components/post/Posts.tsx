@@ -59,7 +59,7 @@ const Posts: React.FC<PostsProps> = ({
   comment = true,
   searchQuery,
 }) => {
-  console.log("Post compoents userID", userId);
+  // console.log("Post compoents userID", userId);
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -68,7 +68,7 @@ const Posts: React.FC<PostsProps> = ({
   // console.log("POstUSerData", userData);
   // const [searchTerm, setSearchTerm] = useState<string>("");
   // const searchTerm = useAppSelector((state) => state.search.searchTerm);
-  console.log({ searchQuery });
+  // console.log({ searchQuery });
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   // const debounceSearchQuery = useDebounce(searchQuery);
 
@@ -90,7 +90,9 @@ const Posts: React.FC<PostsProps> = ({
   //     };
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
   // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
-  console.log({ postData });
+  // console.log({ postData });
+  const zillurPostData = postData?.data?.[0]?.comments?.[0]?.comment;
+  // console.log({ zillurPostData });
 
   const [updateLike] = useUpdateLikesMutation();
   const [updateDislike] = useUpdateDislikesMutation();

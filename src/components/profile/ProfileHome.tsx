@@ -6,8 +6,8 @@ import { IUser } from "@/type";
 import Link from "next/link";
 
 const ProfileHome = (user: IUser) => {
-  console.log("ProfileHome user", user);
-  console.log("ProfileHome user id", user?._id);
+  // console.log("ProfileHome user", user);
+  // console.log("ProfileHome user id", user?._id);
   return (
     <div className=" flex justify-center w-full md:w-[70%] mx-auto gap-2 my-5">
       <div className=" w-full  space-y-5 hidden lg:block  lg:w-[40%] sticky top-[65px] h-min  ">

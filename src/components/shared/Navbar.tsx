@@ -17,8 +17,17 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
+  User,
 } from "@heroui/react";
-import { Search, House, Users, Store, Menu, Group } from "lucide-react";
+import {
+  Search,
+  House,
+  Users,
+  Store,
+  Menu,
+  Group,
+  MessageCircleMore,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserProvider";
@@ -27,6 +36,7 @@ import {
   useGetUserByIdQuery,
 } from "@/redux/features/user/userApi";
 import TabsMenu from "./TabsMenu";
+import { IUser } from "@/type";
 
 // Define types for better type safety
 interface MenuItem {
@@ -173,6 +183,62 @@ const UserDropdown: React.FC<{ userData: UserData | null }> = ({
   );
 };
 
+const ChatDropdown: React.FC<{ userData: IUser | null }> = ({ userData }) => {
+  // Use a Map to store the last chat for each unique senderId-receiverId pair
+  const lastChatsMap = new Map();
+
+  userData?.chats?.forEach((chat) => {
+    // Create a sorted key to handle reverse pairs (e.g., user1-user2 and user2-user1)
+    const key = [chat.senderId._id, chat.receiverId._id].sort().join("-");
+
+    // If the key doesn't exist in the Map or the current chat is more recent, add/update it
+    if (
+      !lastChatsMap.has(key) ||
+      new Date(chat.createdAt) > new Date(lastChatsMap.get(key).createdAt)
+    ) {
+      lastChatsMap.set(key, chat);
+    }
+  });
+
+  // Convert the Map values back into an array of last chats
+  const lastChatsArray = Array.from(lastChatsMap.values());
+
+  console.log({ lastChatsArray });
+  console.log("chatDropdown UserDta", userData);
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <MessageCircleMore />
+      </DropdownTrigger>
+      <DropdownMenu aria-label="Profile Actions" variant="flat">
+        {lastChatsArray.map((item) => (
+          <DropdownItem key={item._id} className="h-14 gap-2">
+            <User
+              avatarProps={{
+                src:
+                  item.senderId._id === userData?._id
+                    ? item.receiverId.profileImage // If the sender is the current user, show receiver's profile image
+                    : item.senderId.profileImage, // If the receiver is the current user, show sender's profile image
+              }}
+              description={
+                item.senderId._id === userData?._id
+                  ? `You: ${item.content}` // If the sender is the current user
+                  : item.content // If the sender is someone else
+              }
+              name={
+                item.senderId._id === userData?._id
+                  ? item.receiverId.name // If the sender is the current user, show receiver's name
+                  : item.senderId.name // If the receiver is the current user, show sender's name
+              }
+            />
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
+  );
+};
+
 // Navbar Component
 const Navbar: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -283,7 +349,8 @@ const Navbar: React.FC = () => {
         <NavbarContent className="sm:flex w-full md:w-1/2 " justify="center">
           <TabsMenu selectedKey={pathname} items={menuItems} tooltip={true} />
         </NavbarContent>
-        <NavbarContent className="-mr-6 " justify="end">
+        <NavbarContent className="-mr-6 " as={"div"} justify="end">
+          <ChatDropdown userData={userData?.data || null} />
           <UserDropdown userData={userData?.data || null} />
         </NavbarContent>
       </HeroUiNavbar>

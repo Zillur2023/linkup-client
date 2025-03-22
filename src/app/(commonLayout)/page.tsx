@@ -13,7 +13,7 @@ export default function Home() {
     icon: <Avatar className="w-6 h-6" src={user?.profileImage} />,
   }));
 
-  console.log("User Menu Items:", items);
+  // console.log("User Menu Items:", items);
 
   return (
     <div className=" flex justify-center  gap-2 my-5  ">

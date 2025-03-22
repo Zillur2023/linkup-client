@@ -1,18 +1,61 @@
 import { SVGProps } from "react";
 
+// export interface IUser {
+//   _id: string;
+//   name: string;
+//   email: string;
+//   bio?: string;
+//   profileImage?: string;
+//   coverImage?: string;
+//   followers: string[];
+//   following: string[];
+//   isVerified: boolean;
+//   role: "admin" | "user";
+//   paymentStatus?: "Pending" | "Paid" | "Failed";
+//   transactionId?: string;
+// }
+
+export interface IChat {
+  _id?: string;
+  senderId: IUser;
+  receiverId: IUser;
+  content: string;
+  isRead?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export interface IUser {
-  _id: string;
+  _id?: string;
   name: string;
   email: string;
+  password: string;
+  needsPasswordChange: boolean;
+  passwordChangedAt?: Date;
   bio?: string;
   profileImage?: string;
   coverImage?: string;
-  followers: string[];
-  following: string[];
+  chats?: IChat[];
+  followers: string[]; // Array of ObjectIds referencing 'User'
+  following: string[]; // Array of ObjectIds referencing 'User'
+  friendRequestsSent: string[];
+  friendRequestsReceived: string[];
+  friends: string[];
   isVerified: boolean;
   role: "admin" | "user";
+  gender?: "Male" | "Female" | "Other";
+  dateOfBirth?: string;
+  location?: string;
+  website?: string;
+  phone?: string;
+  joinedAt?: string;
+  lastActiveAt?: string;
+  status: "in-progress" | "blocked";
   paymentStatus?: "Pending" | "Paid" | "Failed";
   transactionId?: string;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IUserData {
