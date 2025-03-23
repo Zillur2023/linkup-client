@@ -3,6 +3,7 @@ import Posts from "../post/Posts";
 import { useGetAllUserQuery } from "@/redux/features/user/userApi";
 import { Listbox, ListboxItem } from "@heroui/react";
 import Link from "next/link";
+import { IUser } from "@/type";
 
 const TopSearch = ({ query }: { query: string }) => {
   const { data: allUserData } = useGetAllUserQuery({ searchQuery: query });
@@ -10,7 +11,7 @@ const TopSearch = ({ query }: { query: string }) => {
   return (
     <div>
       <Listbox aria-label="Search Results">
-        {allUserData?.data?.map((user) => (
+        {allUserData?.data?.map((user: IUser) => (
           <ListboxItem
             key={user._id}
             as={Link}

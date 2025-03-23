@@ -65,6 +65,7 @@ export default function LinkUpTextarea({
         placeholder={placeholder}
         required={required}
         size={size}
+        fullWidth
         value={value}
         type={type}
         errorMessage={errors[name]?.message as string}

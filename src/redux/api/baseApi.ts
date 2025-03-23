@@ -23,7 +23,7 @@ const baseQuery = fetchBaseQuery({
 
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  tagTypes: ["User", "Post", "Comment"],
+  tagTypes: ["User", "Post", "Comment", "Chat"],
   baseQuery,
   // baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api/v1" }),
   endpoints: () => ({}),

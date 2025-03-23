@@ -44,6 +44,7 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
               {data?.map((item) => item?.name).join("\n")}
             </div>
           }
+          closeDelay={0}
           placement="bottom"
         >
           <Button

@@ -1,4 +1,5 @@
 "use client";
+import UsersList from "@/components/common/UsersList";
 import Posts from "@/components/post/Posts";
 import SidebarMenu from "@/components/shared/SidebarMenu";
 import { useGetAllUserQuery } from "@/redux/features/user/userApi";
@@ -16,7 +17,7 @@ export default function Home() {
   // console.log("User Menu Items:", items);
 
   return (
-    <div className=" flex justify-center  gap-2 my-5  ">
+    <div className=" flex justify-center  gap-2 my-5 border-2 border-red-400  ">
       <div className="hidden md:block  md:w-[25%] sticky md:top-0 lg:top-[65px]  h-[calc(100vh-90px)]  overflow-y-auto   ">
         <SidebarMenu />
       </div>
@@ -27,7 +28,8 @@ export default function Home() {
 
       <div className="hidden md:block  md:w-[25%]  sticky md:top-0 lg:top-[65px]  h-[calc(100vh-90px)]    overflow-y-auto   ">
         <h3 className=" text-xl font-medium text-neutral-800">Users</h3>
-        <SidebarMenu items={items} />
+        {/* <SidebarMenu items={items} /> */}
+        <UsersList />
       </div>
     </div>
   );

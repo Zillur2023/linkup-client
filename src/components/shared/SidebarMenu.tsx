@@ -3,7 +3,7 @@
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
-import { Avatar, Listbox, ListboxItem } from "@heroui/react";
+import { Avatar, Listbox, ListboxItem, Tab, Tabs } from "@heroui/react";
 import Link from "next/link";
 import { Group, House, Store, Users } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -48,33 +48,58 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
   ];
 
   const menuItems = items ? items : defaultItems;
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set([url]));
+  // const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set([url]));
 
-  const handleSelectionChange = (keys: any) => {
-    setSelectedKeys(new Set([keys as string]));
-  };
+  // const handleSelectionChange = (keys: any) => {
+  //   setSelectedKeys(new Set([keys as string]));
+  // };
 
   return (
-    <Listbox
-      items={menuItems}
-      aria-label="Sidebar Menu"
-      selectedKeys={selectedKeys}
-      selectionMode="single"
-      // hideSelectedIcon
-      autoFocus
-      onSelectionChange={handleSelectionChange}
-    >
-      {(item) => (
-        <ListboxItem
-          key={item.href}
-          as={Link}
-          href={item.href}
-          startContent={item.icon}
-          // className=" py-3"
-        >
-          {item.label}
-        </ListboxItem>
-      )}
-    </Listbox>
+    <>
+      <Tabs
+        aria-label="Options"
+        selectedKey={pathname}
+        fullWidth
+        placement="start"
+        variant="light"
+        className=" "
+      >
+        {menuItems?.map((item) => (
+          <Tab
+            key={item.href}
+            href={item.href}
+            as={Link}
+            title={
+              <div className="flex justify-center items-center space-x-2">
+                <span>{item.icon}</span>
+                <span> {item.label} </span>
+              </div>
+            }
+            className="  flex justify-start hover:bg-default-200"
+          />
+        ))}
+      </Tabs>
+      {/* <Listbox
+        items={menuItems}
+        aria-label="Sidebar Menu"
+        selectedKeys={selectedKeys}
+        selectionMode="single"
+        hideSelectedIcon
+        autoFocus
+        onSelectionChange={handleSelectionChange}
+      >
+        {(item) => (
+          <ListboxItem
+            key={item.href}
+            as={Link}
+            href={item.href}
+            startContent={item.icon}
+            // className=" py-3"
+          >
+            {item.label}
+          </ListboxItem>
+        )}
+      </Listbox> */}
+    </>
   );
 }

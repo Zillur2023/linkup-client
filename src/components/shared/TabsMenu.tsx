@@ -34,7 +34,7 @@ const TabsMenu: React.FC<TabsMenuProps> = ({
           className="w-full h-full"
           title={
             tooltip ? (
-              <Tooltip content={item?.icon}>
+              <Tooltip content={item?.icon} closeDelay={0}>
                 <Button
                   // size={isIconOnly ? "lg" : "md"}
                   size={"lg"}

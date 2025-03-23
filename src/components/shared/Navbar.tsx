@@ -101,7 +101,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={handleKeyDown}
           classNames={{
-            base: `  w-[10rem]  md:w-full 
+            base: ` w-[8rem]  md:w-[10rem]  md:w-full 
           
             `,
             mainWrapper: "h-full",
@@ -194,7 +194,8 @@ const ChatDropdown: React.FC<{ userData: IUser | null }> = ({ userData }) => {
     // If the key doesn't exist in the Map or the current chat is more recent, add/update it
     if (
       !lastChatsMap.has(key) ||
-      new Date(chat.createdAt) > new Date(lastChatsMap.get(key).createdAt)
+      new Date(String(chat.createdAt)) >
+        new Date(lastChatsMap.get(key).createdAt)
     ) {
       lastChatsMap.set(key, chat);
     }
@@ -204,12 +205,12 @@ const ChatDropdown: React.FC<{ userData: IUser | null }> = ({ userData }) => {
   const lastChatsArray = Array.from(lastChatsMap.values());
 
   console.log({ lastChatsArray });
-  console.log("chatDropdown UserDta", userData);
+  // console.log("chatDropdown UserDta", userData)
 
   return (
     <Dropdown>
       <DropdownTrigger>
-        <MessageCircleMore />
+        <MessageCircleMore size={36} />
       </DropdownTrigger>
       <DropdownMenu aria-label="Profile Actions" variant="flat">
         {lastChatsArray.map((item) => (
@@ -269,11 +270,11 @@ const Navbar: React.FC = () => {
           className="py-0 "
           maxWidth="full"
         >
-          <NavbarContent className=" w-[30%] ">
+          <NavbarContent className=" w-[20%] ">
             <NavbarBrand>LinkUp</NavbarBrand>
           </NavbarContent>
-          <NavbarContent className=" w-[60%] " justify="center">
-            <div className="  w-full  flex justify-end -mr-[18%]">
+          <NavbarContent className=" w-[40%] md:w-[60%] " justify="center">
+            <div className=" w-full  flex justify-end -mr-[18%]">
               <SearchBar
                 search={search}
                 isFocused={isFocused}
@@ -286,7 +287,8 @@ const Navbar: React.FC = () => {
             </div>
           </NavbarContent>
 
-          <NavbarContent className="w-[10%]  " justify="end">
+          <NavbarContent className="w-[20%]  " as={"div"} justify="end">
+            <ChatDropdown userData={userData?.data || null} />
             <UserDropdown userData={userData?.data || null} />
           </NavbarContent>
           <NavbarMenu>
