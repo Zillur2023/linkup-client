@@ -65,6 +65,14 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    sendFriendRequest: builder.mutation({
+      query: (data) => ({
+        url: `/user/sendFriendRequest`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
 
     updateVerified: builder.mutation({
       query: (id) => ({
@@ -90,6 +98,7 @@ export const {
   useGetUserByIdQuery,
   useUpdateUserMutation,
   useUpdateFollowUnfollowMutation,
+  useSendFriendRequestMutation,
   useUpdateVerifiedMutation,
   useDeleteUserMutation,
 } = userApi;

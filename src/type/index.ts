@@ -32,7 +32,7 @@ export interface IUser {
   followers: string[]; // Array of ObjectIds referencing 'User'
   following: string[]; // Array of ObjectIds referencing 'User'
   friendRequestsSent: string[];
-  friendRequestsReceived: string[];
+  friendRequestsReceived: IUser[];
   friends: string[];
   isVerified: boolean;
   role: "admin" | "user";
