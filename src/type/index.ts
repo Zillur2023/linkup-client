@@ -1,20 +1,5 @@
 import { SVGProps } from "react";
 
-// export interface IUser {
-//   _id: string;
-//   name: string;
-//   email: string;
-//   bio?: string;
-//   profileImage?: string;
-//   coverImage?: string;
-//   followers: string[];
-//   following: string[];
-//   isVerified: boolean;
-//   role: "admin" | "user";
-//   paymentStatus?: "Pending" | "Paid" | "Failed";
-//   transactionId?: string;
-// }
-
 export interface IChat {
   _id?: string;
   senderId: IUser;
@@ -23,6 +8,14 @@ export interface IChat {
   isRead?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+interface IUserProps {
+  avatarProps: {
+    src: string;
+  };
+  description?: string;
+  name: string;
 }
 
 export interface IUser {

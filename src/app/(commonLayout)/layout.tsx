@@ -1,4 +1,4 @@
-import Navbar from "@/components/shared/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import { ReactNode } from "react";
 
 export default function layout({ children }: { children: ReactNode }) {
