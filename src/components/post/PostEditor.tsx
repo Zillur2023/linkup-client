@@ -8,7 +8,7 @@ import {
   useUpdatePostMutation,
 } from "@/redux/features/post/postApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Checkbox } from "@heroui/react";
+import { Button, Checkbox, Textarea } from "@heroui/react";
 import { IPost, IUserData } from "@/type";
 import { useUser } from "@/context/UserProvider";
 import LinkUpModal from "../shared/LinkUpModal";
@@ -26,6 +26,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import ListItem from "@tiptap/extension-list-item";
 import { useEditor } from "@tiptap/react";
 import { toast } from "sonner";
+import LinkUpTextarea from "../form/LinkUpTextarea";
 
 interface PostEditorProps {
   updatePostData?: IPost;
@@ -74,8 +75,10 @@ const PostEditor: React.FC<PostEditorProps> = ({
   const [createPost] = useCreatePostMutation();
   const [updatePost] = useUpdatePostMutation();
 
-  const onSubmit = async (data: any, reset?: () => void) => {
-    // console.log("post data", data);
+  const onSubmit = async (data: any, reset?: (values?: any) => void) => {
+    console.log({ data });
+    const extractedText = data?.content.replace(/<\/?p>/g, "");
+    console.log({ extractedText });
     const formData = new FormData();
 
     // formData.append("image", data?.images);
@@ -94,6 +97,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
           _id: updatePostData?._id,
           // isPremium: updatePostData?.isPremium,
           author: userData?.data?._id,
+          // content: data?.content.replace(/<\/?p>/g, ""),
           // images: updatePostData?.images,
           // content: updatePostData?.content,
         })
@@ -101,10 +105,13 @@ const PostEditor: React.FC<PostEditorProps> = ({
     } else {
       formData.append(
         "data",
-        JSON.stringify({ ...data, author: userData?.data?._id })
+        JSON.stringify({
+          ...data,
+          author: userData?.data?._id,
+          // content: data?.content.replace(/<\/?p>/g, ""),
+        })
       );
     }
-    // console.log("formDatA post", [...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {
@@ -112,9 +119,16 @@ const PostEditor: React.FC<PostEditorProps> = ({
         ? await updatePost(formData).unwrap()
         : await createPost(formData).unwrap();
       // const res =  await createPost(formData).unwrap()
+      console.log({ res });
+      console.log("res?.data?.content", res?.data?.content);
       if (res.success) {
         toast.success(res.message, { id: toastId });
-        reset?.();
+        // reset?.();
+        reset?.({
+          isPremium: res?.data?.isPremium,
+          content: res?.data?.content,
+          images: res?.data?.images, // Ensure an array
+        });
         editor?.commands.clearContent();
       }
     } catch (error: any) {
@@ -144,21 +158,32 @@ const PostEditor: React.FC<PostEditorProps> = ({
       >
         <LinkUpCheckbox name="isPremium" label="Premium Post" />
         <div className="py-3">
-          <LinkUpEditor name="content" editor={editor} />
+          {/* <LinkUpEditor name="content" editor={editor} /> */}
+          {/* <LinkUpTextarea name="content" /> */}
+          <Textarea
+            placeholder="Enter your description"
+            variant="flat"
+            size="lg"
+            maxRows={15}
+            classNames={{
+              inputWrapper: "!bg-transparent shadow-none", // Added shadow-none here
+              input: "!bg-transparent",
+            }}
+          />
         </div>
 
-        <div className="py-3">
+        <div className=" mb-2">
           <LinkUpInputFile name="images" label="Upload image" />
         </div>
 
         <div className="flex gap-4">
-          <Button className="w-full" size="sm" color="primary" type="submit">
-            Submit
+          <Button fullWidth size="sm" color="primary" type="submit">
+            Post
           </Button>
           {/* <Button type="reset" size="sm" variant="bordered">
             Reset
           </Button> */}
-          <LinkUpReset editor={editor} />
+          {/* <LinkUpReset editor={editor} /> */}
         </div>
       </LinkUpForm>
     </LinkUpModal>

@@ -1,3 +1,5 @@
+import { useRemoveFriendMutation } from "@/redux/features/user/userApi";
+import { IUser } from "@/type";
 import {
   Avatar,
   Button,
@@ -9,33 +11,18 @@ import {
 } from "@heroui/react";
 import { Ellipsis } from "lucide-react";
 
-export const friends = [
-  {
-    name: "Zillur Rahman",
-    image:
-      "https://img.freepik.com/premium-photo/boss-man-looking-camera-smiling-young-businessman-banker-with-beard-photo-with-close-up-portrait_321831-5908.jpg?semt=ais_hybrid",
-  },
-  {
-    name: "Zillur Rahman",
-    image:
-      "https://img.freepik.com/premium-photo/boss-man-looking-camera-smiling-young-businessman-banker-with-beard-photo-with-close-up-portrait_321831-5908.jpg?semt=ais_hybrid",
-  },
-  {
-    name: "Zillur Rahman",
-    image:
-      "https://img.freepik.com/premium-photo/boss-man-looking-camera-smiling-young-businessman-banker-with-beard-photo-with-close-up-portrait_321831-5908.jpg?semt=ais_hybrid",
-  },
-  {
-    name: "Zillur Rahman",
-    image:
-      "https://img.freepik.com/premium-photo/boss-man-looking-camera-smiling-young-businessman-banker-with-beard-photo-with-close-up-portrait_321831-5908.jpg?semt=ais_hybrid",
-  },
-];
+const ProfileFriends = ({ user }: { user: IUser }) => {
+  const [removeFriend] = useRemoveFriendMutation();
 
-const ProfileFriends = () => {
+  const RemoveFriend = async (friendId: string) => {
+    try {
+      await removeFriend({ userId: user?._id, friendId });
+    } catch (error) {}
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 my-5  w-full md:w-[70%]  mx-auto  ">
-      {friends?.map((friend, i) => (
+      {user?.friends?.map((friend, i) => (
         <Card
           key={i}
           className=" p-3 flex flex-row items-center justify-between "
@@ -43,7 +30,7 @@ const ProfileFriends = () => {
           <div className=" flex items-center gap-4">
             <Avatar
               radius="lg"
-              src={friend?.image} // Default Image
+              src={friend?.profileImage} // Default Image
               className=" w-24 h-24 "
             />
             <div className="   ">
@@ -67,7 +54,12 @@ const ProfileFriends = () => {
                 Edit Friend list
               </DropdownItem>
               <DropdownItem key="Unfollow">Unfollow</DropdownItem>
-              <DropdownItem key="Unfriend">Unfriend</DropdownItem>
+              <DropdownItem
+                key="Unfriend"
+                onClick={() => RemoveFriend(friend?._id)}
+              >
+                Unfriend
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </Card>

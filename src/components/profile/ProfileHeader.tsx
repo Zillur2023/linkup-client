@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import { useUpdateUserMutation } from "@/redux/features/user/userApi";
 import EditProfile from "./ProfileEdit";
 import { usePathname, useSearchParams } from "next/navigation";
-import { friends } from "./ProfileFriends";
 import Link from "next/link";
 import TabsMenu from "../shared/TabsMenu";
 
@@ -175,24 +174,24 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
                 {user?.name}
               </p>
               <p className=" text-center lg:text-start">
-                {friends?.length} friends
+                {user?.friends?.length} friends
               </p>
               <div className=" flex flex-col lg:flex-row items-center justify-between ">
                 <Link href={`/${user?.name}/friends`}>
                   <AvatarGroup
                     max={8}
                     className=" hover:cursor-pointer"
-                    total={friends?.length}
+                    total={user?.friends?.length}
                     renderCount={(count) => (
                       <p className="text-small text-foreground font-medium ms-2 hover:underline hover:cursor-pointer">
                         +{count} others
                       </p>
                     )}
                   >
-                    {friends?.map((friend, i) => (
+                    {user?.friends?.map((friend, i) => (
                       <Avatar
                         key={i}
-                        src={friend?.image}
+                        src={friend?.profileImage}
                         onClick={() => console.log({ i })}
                       />
                     ))}

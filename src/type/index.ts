@@ -33,7 +33,7 @@ export interface IUser {
   following: string[]; // Array of ObjectIds referencing 'User'
   friendRequestsSent: string[];
   friendRequestsReceived: IUser[];
-  friends: string[];
+  friends: IUser[];
   isVerified: boolean;
   role: "admin" | "user";
   gender?: "Male" | "Female" | "Other";

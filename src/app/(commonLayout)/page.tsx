@@ -14,8 +14,6 @@ export default function Home() {
     icon: <Avatar className="w-6 h-6" src={user?.profileImage} />,
   }));
 
-  // console.log("User Menu Items:", items);
-
   return (
     <div className=" flex justify-center  gap-2 my-5 border-2 border-red-400  ">
       <div className="hidden md:block  md:w-[25%] sticky md:top-0 lg:top-[65px]  h-[calc(100vh-90px)]  overflow-y-auto   ">

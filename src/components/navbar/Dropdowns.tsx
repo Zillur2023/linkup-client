@@ -84,9 +84,6 @@ export const ChatDropdown: React.FC<{ userData: IUser }> = ({ userData }) => {
   // Convert the Map values back into an array of last chats
   const lastChatsArray = Array.from(lastChatsMap.values());
 
-  console.log({ lastChatsArray });
-  // console.log("chatDropdown UserDta", userData)
-
   return (
     <>
       <Dropdown>

@@ -35,6 +35,7 @@ const userApi = baseApi.injectEndpoints({
       },
       providesTags: ["User"],
     }),
+
     getUserByEmail: builder.query({
       query: (email) => ({
         url: `/user/${email}`,
@@ -42,6 +43,7 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
+
     getUserById: builder.query({
       query: (id: any) => ({
         url: `/user/${id}`,
@@ -49,6 +51,7 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
+
     updateUser: builder.mutation({
       query: (formData) => ({
         url: `/user/update`,
@@ -57,6 +60,7 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User", "Post"],
     }),
+
     updateFollowUnfollow: builder.mutation({
       query: (data) => ({
         url: `user/update-follow-unfollow/${data.targetId}`,
@@ -65,9 +69,37 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+
     sendFriendRequest: builder.mutation({
       query: (data) => ({
         url: `/user/sendFriendRequest`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    acceptFriendRequest: builder.mutation({
+      query: (data) => ({
+        url: `/user/acceptFriendRequest`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    rejectFriendRequest: builder.mutation({
+      query: (data) => ({
+        url: `/user/rejectFriendRequest`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    removeFriend: builder.mutation({
+      query: (data) => ({
+        url: `/user/removeFriend`,
         method: "PUT",
         body: data,
       }),
@@ -81,6 +113,7 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `/user/delete/${id}`,
@@ -99,6 +132,9 @@ export const {
   useUpdateUserMutation,
   useUpdateFollowUnfollowMutation,
   useSendFriendRequestMutation,
+  useAcceptFriendRequestMutation,
+  useRejectFriendRequestMutation,
+  useRemoveFriendMutation,
   useUpdateVerifiedMutation,
   useDeleteUserMutation,
 } = userApi;

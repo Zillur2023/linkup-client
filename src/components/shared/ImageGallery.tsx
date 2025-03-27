@@ -31,23 +31,29 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const imageGallery = images
-    ? images
-    : field?.value?.map((file) =>
-        typeof file === "string" ? file : URL.createObjectURL(file)
-      ) || [];
+  let imageGallery;
 
-  // const imageGallery = field?.value
-  //   ? Array.isArray(field.value)
-  //     ? field.value.map((file) =>
-  //         typeof file === "string" ? file : URL.createObjectURL(file)
-  //       )
-  //     : [
-  //         typeof field.value === "string"
-  //           ? field.value
-  //           : URL.createObjectURL(field.value),
-  //       ]
-  //   : [];
+  if (images) {
+    imageGallery = images
+      ? images
+      : field?.value?.map((file) =>
+          typeof file === "string" ? file : URL.createObjectURL(file)
+        ) || [];
+  } else if (field) {
+    imageGallery = field?.value
+      ? Array.isArray(field.value)
+        ? field.value.map((file) =>
+            typeof file === "string" ? file : URL.createObjectURL(file)
+          )
+        : [
+            typeof field.value === "string"
+              ? field.value
+              : URL.createObjectURL(field.value),
+          ]
+      : [];
+  }
+
+  console.log({ imageGallery });
 
   const handleImageRemove = (index: number) => {
     const updatedFiles = field?.value.filter((_, i: number) => i !== index);
@@ -93,7 +99,8 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           <Image
             radius="none"
             alt="Post"
-            className="z-0 w-[400px] h-auto object-cover "
+            width={400}
+            height={225}
             src={imageGallery[0]}
             onClick={() => handleImageClick(0)}
           />
@@ -107,7 +114,8 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               key={idx}
               radius="none"
               alt={`Post ${idx + 1}`}
-              className="z-0 w-[400] h-full object-cover "
+              width={400}
+              height={225}
               src={img}
               onClick={() => handleImageClick(idx)}
             />
@@ -120,21 +128,24 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           <Image
             radius="none"
             alt="Post 1"
-            className="z-0 w-[270px] h-[200px] object-cover "
+            width={270}
+            height={225}
             src={imageGallery[0]}
             onClick={() => handleImageClick(0)}
           />
           <Image
             radius="none"
             alt="Post 2"
-            className="z-0 w-[270px] h-[200px] object-cover "
+            width={270}
+            height={225}
             src={imageGallery[1]}
             onClick={() => handleImageClick(1)}
           />
           <Image
             radius="none"
             alt="Post 3"
-            className="z-0 w-[270px] h-[200px] object-cover "
+            width={270}
+            height={225}
             src={imageGallery[2]}
             onClick={() => handleImageClick(2)}
           />
@@ -148,7 +159,8 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               <Image
                 radius="none"
                 alt={`Post ${idx + 1}`}
-                className="z-0 w-[400px] h-[200px] object-cover "
+                width={400}
+                height={200}
                 src={img}
                 onClick={() => handleImageClick(idx)}
               />

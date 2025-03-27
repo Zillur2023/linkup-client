@@ -17,6 +17,8 @@ import {
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import { SendHorizontal } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { commentValidationSchema } from "@/schemas";
 
 interface IProps {
   openButtonText?: ReactNode;
@@ -54,6 +56,7 @@ interface IProps {
   footerButton?: boolean;
   footer?: ReactNode;
   scrollBehavior?: "inside" | "normal" | "outside" | undefined;
+  focusRef?: (el: HTMLTextAreaElement | null) => void;
 }
 
 export default function LinkUpModal({
@@ -73,8 +76,10 @@ export default function LinkUpModal({
   footerButton = false,
   footer,
   scrollBehavior,
+  focusRef,
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  // console.log({ focusRef });
 
   return (
     <>
@@ -155,6 +160,7 @@ export default function LinkUpModal({
                   <div className="  w-full ">{footer}</div>
                 </ModalFooter>
               )}
+
               {/* {footer && <ModalFooter>{renderFooter()}</ModalFooter>} */}
             </>
           )}

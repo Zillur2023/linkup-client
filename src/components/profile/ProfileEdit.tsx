@@ -12,8 +12,7 @@ import { toast } from "sonner";
 
 const ProfileEdit = (user: IUser) => {
   const [updateUser] = useUpdateUserMutation();
-  const onSubmit = async (data: any, reset?: () => void) => {
-    // console.log("post data", data);
+  const onSubmit = async (data: any, reset?: (values?: any) => void) => {
     const formData = new FormData();
 
     formData.append("coverImage", data?.coverImage);
@@ -32,10 +31,14 @@ const ProfileEdit = (user: IUser) => {
     const toastId = toast.loading("loading...");
     try {
       const res = await updateUser(formData).unwrap();
-      // const res =  await createPost(formData).unwrap()
       if (res.success) {
         toast.success(res.message, { id: toastId });
-        reset?.();
+        // reset?.();
+        reset?.({
+          bio: res.data?.bio, // Use updated bio
+          profileImage: res.data?.profileImage, // Use updated profile image
+          coverImage: res.data?.coverImage, // Use updated cover image
+        });
       }
     } catch (error: any) {
       console.log({ error });

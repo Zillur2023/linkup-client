@@ -10,13 +10,10 @@ import { useParams, usePathname, useSearchParams } from "next/navigation";
 
 const SearchPage = () => {
   const pathname = usePathname();
-  console.log({ pathname });
   const params = useParams();
   const { slug } = params;
-  // console.log({ slug });
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
-  // console.log({ query });
   const url = query ? `${pathname}?q=${query}` : pathname;
 
   const items = [

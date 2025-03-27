@@ -15,11 +15,8 @@ const ProfilePage = () => {
   const sk = searchParams.get("sk");
 
   const { data: userData } = useGetUserByIdQuery<IUserData>(id);
-  //   console.log("profile userData", userData);
-  // console.log("zillurChat", userData?.data?.chats?.[0]?.content);
 
   const { data: postData } = useGetAllPostQuery<IPostData>({ userId: id! });
-  console.log("ProfilePage postData", postData);
 
   const profileRoute = [
     { href: `${pathname}?id=${id}`, label: "posts" },
@@ -28,7 +25,7 @@ const ProfilePage = () => {
 
   const renderSection = () => {
     if (sk === "friends") {
-      return <ProfileFriends />;
+      return <ProfileFriends user={userData?.data} />;
     }
     return <ProfileHome {...userData?.data} />;
   };

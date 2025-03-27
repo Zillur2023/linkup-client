@@ -2,8 +2,10 @@
 import SidebarMenu from "@/components/shared/SidebarMenu";
 import { useUser } from "@/context/UserProvider";
 import {
+  useAcceptFriendRequestMutation,
   useGetAllUserQuery,
   useGetUserByIdQuery,
+  useRejectFriendRequestMutation,
   useSendFriendRequestMutation,
 } from "@/redux/features/user/userApi";
 import { IUser, IUserData } from "@/type";
@@ -18,6 +20,23 @@ import {
 import { toast } from "sonner";
 
 const FriendRequestsReceived = ({ user }: { user: IUser }) => {
+  const [rejectFriendRequest] = useRejectFriendRequestMutation();
+  const [acceptFriendRequest] = useAcceptFriendRequestMutation();
+
+  const RejectFriendRequest = async (requesterId: string) => {
+    try {
+      await rejectFriendRequest({ userId: user?._id, requesterId });
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to  reject friend request");
+    }
+  };
+
+  const AcceptFriendRequest = async (requesterId: string) => {
+    try {
+      await acceptFriendRequest({ userId: user?._id, requesterId });
+    } catch (error: any) {}
+  };
+
   return (
     <div>
       <h3 className=" mb-2 font-semibold text-xl"> Friend Requests </h3>
@@ -36,8 +55,14 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
               />
             </CardBody>
             <CardFooter className=" flex flex-col gap-1">
-              <Button fullWidth> Confirm </Button>
-              <Button fullWidth> Delete </Button>
+              <Button fullWidth onClick={() => AcceptFriendRequest(item?._id)}>
+                {" "}
+                Confirm{" "}
+              </Button>
+              <Button fullWidth onClick={() => RejectFriendRequest(item?._id)}>
+                {" "}
+                Delete{" "}
+              </Button>
             </CardFooter>
           </Card>
         ))}
@@ -71,17 +96,11 @@ const SuggestedFriends = () => {
       !userData?.data?.friendRequestsSent?.includes(usr?._id)
   );
 
-  console.log({ filteredUsers });
-  console.log(
-    "userData?.data?.friendRequestsReceived",
-    userData?.data?.friendRequestsReceived
-  );
-
-  const createSendRequest = async (id: string) => {
+  const SendFriendRequest = async (receiverId: string) => {
     try {
-      await sendFriendRequest({ senderId: user?._id, receiverId: id });
+      await sendFriendRequest({ senderId: user?._id, receiverId });
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to create chat");
+      toast.error(error?.data?.message || "Failed to send friend request");
     }
   };
 
@@ -102,9 +121,8 @@ const SuggestedFriends = () => {
               />
             </CardBody>
             <CardFooter className=" flex flex-col gap-1">
-              <Button fullWidth onClick={() => createSendRequest(item._id)}>
-                {" "}
-                Add friends{" "}
+              <Button fullWidth onClick={() => SendFriendRequest(item._id)}>
+                Add friend
               </Button>
               <Button fullWidth> Remove </Button>
             </CardFooter>

@@ -27,11 +27,9 @@ const RegisterPage: React.FC = () => {
 
   // const onSubmit: SubmitHandler<IRegisterUser> = async (data) => {
   const onSubmit = async (data: any, reset?: () => void) => {
-    // console.log("registewr data", data);
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     formData.append("profileImage", data?.profileImage);
-    // console.log("formDatA", [...formData.entries()]);
 
     const toastId = toast.loading("loading..");
 
