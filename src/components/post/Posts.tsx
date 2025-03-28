@@ -7,6 +7,7 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  Divider,
 } from "@heroui/react";
 import {
   ThumbsUp,
@@ -45,27 +46,29 @@ import PostComment from "./PostComment";
 interface PostsProps {
   postId?: string;
   userId?: string;
-  comment?: boolean;
+  showAllComments?: boolean;
   searchQuery?: string;
-  focusRef?: (el: HTMLTextAreaElement | null) => void;
   modalCommentRef?: any;
 }
 
 const Posts: React.FC<PostsProps> = ({
   postId,
   userId,
-  comment = true,
+  showAllComments = false,
   searchQuery,
-  focusRef,
   modalCommentRef,
 }) => {
-  console.log({ modalCommentRef });
+  const [updateLike] = useUpdateLikesMutation();
+  const [updateDislike] = useUpdateDislikesMutation();
+  const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
+  const [deletePost] = useDeletePostMutation();
+  const inputRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
+  const postRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
-
   // const debounceSearchQuery = useDebounce(searchQuery);
 
   const queryPost = postId
@@ -77,22 +80,9 @@ const Posts: React.FC<PostsProps> = ({
         // sortBy,
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
-  // const queryPost = userId
-  //   ? { userId }
-  //   : {
-  //       searchQuery: debounceSearchQuery,
-  //       sortBy,
-  //       isPremium: userData?.data?.isVerified ? true : undefined,
-  //     };
+
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
   // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
-
-  const [updateLike] = useUpdateLikesMutation();
-  const [updateDislike] = useUpdateDislikesMutation();
-  const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
-  const [deletePost] = useDeletePostMutation();
-  const inputRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
-  const postRef = useRef<HTMLDivElement>(null); // Ref for the div to be converted to PDF
 
   const handleLike = async (postId: string) => {
     if (!userData?.data?._id) {
@@ -171,9 +161,18 @@ const Posts: React.FC<PostsProps> = ({
       {!postData && <PostSkeleton />}
 
       {postData?.data?.map((post: IPost) => (
-        <Card ref={postRef} key={post._id}>
+        <Card
+          ref={postRef}
+          key={post._id}
+          shadow={postId ? "none" : "md"}
+          className={` ${postId ? "!px-0" : ""} `}
+        >
           {/* Author Info */}
-          <CardHeader className=" flex flex-col justify-start items-start relative ">
+          <CardHeader
+            className={` ${
+              postId ? "!px-0" : ""
+            }flex flex-col justify-start items-start relative `}
+          >
             {post?.isPremium && (
               <div className="absolute top-14 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg">
                 <Crown size={16} /> {/* Use a crown icon or similar */}
@@ -187,11 +186,13 @@ const Posts: React.FC<PostsProps> = ({
                 {post?.author?._id !== userData?.data?._id && (
                   <LinkUpButton
                     onClick={() =>
-                      handleUpdateFollowUnfollow(post?.author?._id)
+                      handleUpdateFollowUnfollow(post?.author?._id as string)
                     }
                     buttonId="followOrUnfollow"
                   >
-                    {userData?.data?.following?.includes(post?.author?._id)
+                    {userData?.data?.following?.includes(
+                      post?.author?._id as string
+                    )
                       ? "Unfollow"
                       : "Follow"}
                   </LinkUpButton>
@@ -222,14 +223,15 @@ const Posts: React.FC<PostsProps> = ({
             </div>
             <div className=" w-full flex justify-end items-center "></div>
           </CardHeader>
-          <CardBody>
-            <p className="mb-3">{post?.content}</p>
+          <CardBody className={` ${postId ? "!px-0" : ""}`}>
+            <p className="mb-3 text-medium ">{post?.content}</p>
 
             {post?.images && <ImageGallery images={post?.images} />}
           </CardBody>
 
-          <CardFooter className="flex flex-col gap-3">
-            <div className=" w-full flex justify-between ">
+          <CardFooter className={` ${postId ? "!px-0" : ""} flex flex-col `}>
+            {/* <Divider /> */}
+            <div className=" w-full flex justify-between pl-[10%] pr-[10%]   ">
               <LinkUpButton
                 onClick={() => handleLike(post._id)}
                 buttonId="like"
@@ -269,30 +271,24 @@ const Posts: React.FC<PostsProps> = ({
               </LinkUpButton>
 
               {!modalCommentRef ? (
-                <Button
-                  size="sm"
-                  variant="light"
-                  onClick={() => {
-                    inputRef?.current[post?._id]?.focus();
-                    // setModalRef(true);
-                  }}
+                <PostComment
+                  user={userData?.data}
+                  post={post}
                   startContent={<MessageCircle />}
-                >
-                  <span>{post?.comments?.length}</span>
-                </Button>
+                  openButtonText={<span>{post?.comments?.length}</span>}
+                  showAllComments={showAllComments ? true : false}
+                  hideComments={true}
+                />
               ) : (
                 modalCommentRef
               )}
 
-              <Button size="sm" variant="light" startContent={<Share2 />}>
-                {/* <span>{post.comments?.length}</span> */}
-              </Button>
-              {/* <Button
-                  size="sm"
-                  className="flex items-center  bg-transparent hover:bg-gray-300 "
-                >
-                   <Download size={18} onClick={() => generatePDF(post)} className="bg-gray-300 p-1 rounded-md w-full h-full" />
-                </Button> */}
+              <Button
+                size="sm"
+                variant="light"
+                startContent={<Share2 />}
+              ></Button>
+
               <Button
                 size="sm"
                 variant="light"
@@ -300,14 +296,17 @@ const Posts: React.FC<PostsProps> = ({
                 startContent={<Download />}
               />
             </div>
-            <div className=" w-full ">
+            {/* <Divider /> */}
+            <div className=" w-full mt-2 ">
               <PostComment
                 user={userData?.data}
                 post={post}
                 openButtonText={
-                  post?.comments?.length > 2 && comment && "See all comment"
+                  post?.comments?.length > 2 &&
+                  !showAllComments &&
+                  "See all comment"
                 }
-                comment={comment ? true : false}
+                showAllComments={showAllComments ? true : false}
                 focusRef={(el) => (inputRef.current[post?._id] = el)}
               />
             </div>

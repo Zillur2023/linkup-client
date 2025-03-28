@@ -142,7 +142,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
       openButtonText={openButtonText}
       buttonSize={size}
       radius={radius}
-      title={`${updatePostData ? "Update Post" : "Create a new post"}`}
+      header={`${updatePostData ? "Update Post" : "Create post"}`}
       variant="ghost"
       openButtonIcon={openButtonIcon}
       className=" flex justify-start"
@@ -156,12 +156,15 @@ const PostEditor: React.FC<PostEditorProps> = ({
           images: updatePostData?.images, // Ensure an array
         }}
       >
-        <LinkUpCheckbox name="isPremium" label="Premium Post" />
+        {userData?.data?.isVerified && (
+          <LinkUpCheckbox name="isPremium" label="Premium Post" />
+        )}
         <div className="py-3">
           {/* <LinkUpEditor name="content" editor={editor} /> */}
           {/* <LinkUpTextarea name="content" /> */}
           <Textarea
-            placeholder="Enter your description"
+            // placeholder="Enter your description"
+            placeholder={`What's on your mind, ${userData?.data?.name}`}
             variant="flat"
             size="lg"
             maxRows={15}

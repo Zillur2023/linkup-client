@@ -113,6 +113,7 @@ const ChatDrawer = ({
   return (
     <Drawer
       placement="bottom"
+      shouldBlockScroll={false}
       isDismissable={false}
       isKeyboardDismissDisabled={true}
       isOpen={isOpen}

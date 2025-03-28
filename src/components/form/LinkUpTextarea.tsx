@@ -79,7 +79,7 @@ export default function LinkUpTextarea({
         isReadOnly={isReadOnly}
         // ref={textAreaRef}
         ref={(el) => {
-          // textAreaRef.current = e;
+          textAreaRef.current = el;
           register(name).ref(el); // Register ref for react-hook-form
           if (focusRef) focusRef(el); // Apply focusRef as well
         }}

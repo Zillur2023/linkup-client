@@ -86,7 +86,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
                 </span>
               }
               startContent={<Camera />}
-              title={`${
+              header={`${
                 user?.coverImage ? "Update cover image" : "Add cover image"
               }`}
               variant="solid"
@@ -131,7 +131,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
                 <LinkUpModal
                   radius="full"
                   openButtonIcon={<Camera />}
-                  title={`${
+                  header={`${
                     user?.profileImage
                       ? "Update profile image"
                       : "Add profile image"

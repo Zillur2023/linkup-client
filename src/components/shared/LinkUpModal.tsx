@@ -22,9 +22,10 @@ import { commentValidationSchema } from "@/schemas";
 
 interface IProps {
   openButtonText?: ReactNode;
+  startContent?: ReactNode;
   openButtonIcon?: ReactNode;
   actionButtonText?: string;
-  title?: string;
+  header?: ReactNode;
   children: ReactNode;
   radius?: "sm" | "md" | "lg" | "full" | "none" | undefined;
   variant?:
@@ -52,7 +53,6 @@ interface IProps {
   fullWidth?: boolean;
   className?: string;
   onUpdate?: () => void;
-  startContent?: ReactNode;
   footerButton?: boolean;
   footer?: ReactNode;
   scrollBehavior?: "inside" | "normal" | "outside" | undefined;
@@ -60,10 +60,11 @@ interface IProps {
 }
 
 export default function LinkUpModal({
+  startContent,
   openButtonText,
   openButtonIcon,
   actionButtonText,
-  title,
+  header,
   children,
   radius,
   variant = "light",
@@ -72,7 +73,6 @@ export default function LinkUpModal({
   fullWidth = true,
   className,
   onUpdate,
-  startContent,
   footerButton = false,
   footer,
   scrollBehavior,
@@ -96,7 +96,7 @@ export default function LinkUpModal({
               variant={variant}
               startContent={startContent}
               fullWidth={fullWidth}
-              className={className}
+              className={`${className} `}
               onPress={onOpen}
             >
               {openButtonText}
@@ -125,14 +125,15 @@ export default function LinkUpModal({
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         size={modalSize}
+        className=" h-full "
         scrollBehavior={scrollBehavior}
       >
-        <ModalContent>
+        <ModalContent className=" min-h-[90vh]  ">
           {(onClose) => (
             <>
-              {title && (
+              {header && (
                 <ModalHeader className="flex flex-col items-center justify-center ">
-                  {title}
+                  <div>{header}</div>
                 </ModalHeader>
               )}
               <ModalBody className="  ">{children}</ModalBody>

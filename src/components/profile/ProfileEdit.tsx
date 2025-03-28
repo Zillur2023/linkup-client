@@ -50,7 +50,7 @@ const ProfileEdit = (user: IUser) => {
     <LinkUpModal
       startContent={<Edit />}
       openButtonText={"Edit Profile"}
-      title={` Edit Profile`}
+      header={` Edit Profile`}
       variant="solid"
     >
       <LinkUpForm
