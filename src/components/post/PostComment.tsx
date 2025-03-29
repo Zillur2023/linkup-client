@@ -25,7 +25,15 @@ import {
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import ActionButton from "../shared/ActionButton";
 import { formatTime } from "@/uitls/formatTime";
-import { Avatar, Button, Card } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  Card,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/react";
 
 interface PostCommentProps {
   user: IUser;
@@ -35,6 +43,7 @@ interface PostCommentProps {
   showAllComments?: boolean;
   hideComments?: boolean;
   focusRef?: (el: HTMLTextAreaElement | null) => void;
+  clickRef?: any;
 }
 
 const PostComment: React.FC<PostCommentProps> = ({
@@ -45,6 +54,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   showAllComments,
   hideComments,
   focusRef,
+  clickRef,
 }) => {
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
   const [expandedComments, setExpandedComments] = useState<{
@@ -53,11 +63,15 @@ const PostComment: React.FC<PostCommentProps> = ({
   const editCommentRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>(
     {}
   );
+
   const router = useRouter();
 
-  const [deleteComment] = useDeleteCommentMutation();
-  const [createComment] = useCreateCommentMutation();
-  const [updateComment] = useUpdateCommentMutation();
+  const [deleteComment, { isLoading: deleteCommentLoading }] =
+    useDeleteCommentMutation();
+  const [createComment, { isLoading: createCommentLoading }] =
+    useCreateCommentMutation();
+  const [updateComment, { isLoading: updateCommentLoading }] =
+    useUpdateCommentMutation();
   const { data: allCommentData } = useGetAllCommentQuery(post?._id, {
     skip: !post?._id,
   });
@@ -74,11 +88,6 @@ const PostComment: React.FC<PostCommentProps> = ({
 
   // Handle creating a new comment
   const handleCreateComment = async (data: any, reset?: () => void) => {
-    if (!user?._id) {
-      router.push("/login");
-      return;
-    }
-
     try {
       const newComment = {
         ...data,
@@ -114,7 +123,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    const toastId = toast.loading("Loading...");
+    const toastId = toast.loading("");
     try {
       const res = await deleteComment(commentId).unwrap();
       if (res) {
@@ -151,12 +160,12 @@ const PostComment: React.FC<PostCommentProps> = ({
       <LinkUpTextarea
         name="comment"
         size="sm"
-        // focusRef={focusRef}
-        focusRef={
-          modalCommentRef
-            ? (el) => (modalCommentRef.current[post?._id] = el)
-            : focusRef
-        }
+        focusRef={focusRef}
+        // focusRef={
+        //   modalCommentRef
+        //     ? (el) => (modalCommentRef.current[post?._id] = el)
+        //     : focusRef
+        // }
         placeholder="Add a comment"
         endContent={<SendHorizontal />}
         onSubmit={handleCreateComment}
@@ -167,6 +176,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   return (
     <div>
       <LinkUpModal
+        clickRef={clickRef}
         modalSize="2xl"
         startContent={startContent}
         openButtonText={openButtonText}
@@ -182,6 +192,7 @@ const PostComment: React.FC<PostCommentProps> = ({
             showAllComments={true}
             modalCommentRef={
               <Button
+                fullWidth
                 size="sm"
                 variant="light"
                 onClick={() => {
@@ -225,7 +236,7 @@ const PostComment: React.FC<PostCommentProps> = ({
                         </p>
 
                         <p className=" text-medium  text-start">
-                          {isExpanded ? comment?.comment : truncatedText}
+                          {/* {isExpanded ? comment?.comment : truncatedText}
                           {shouldShowSeeMore && (
                             <button
                               onClick={() => toggleExpandComment(comment._id)}
@@ -233,57 +244,77 @@ const PostComment: React.FC<PostCommentProps> = ({
                             >
                               {isExpanded ? " See less" : " ...See more"}
                             </button>
-                          )}
+                          )} */}
+                          {updateCommentLoading
+                            ? editingComment?.comment
+                            : comment?.comment}
                         </p>
                       </Card>
                       <div>
-                        <div className=" flex items-center gap-4">
-                          <span className="text-gray-400 text-xs ">
-                            {formatTime(comment?.createdAt)}
-                          </span>
-                          <button className="text-gray-500 hover:text-gray-700 text-xs">
-                            Like
-                          </button>
+                        {!updateCommentLoading ? (
+                          <div className=" flex items-center gap-4">
+                            <span className="text-gray-400 text-xs ">
+                              {formatTime(comment?.createdAt)}
+                            </span>
+                            <button className="text-gray-500 hover:text-gray-700 text-xs">
+                              Like
+                            </button>
 
-                          <button className="text-gray-500 hover:text-gray-700 text-xs">
-                            Reply
-                          </button>
-                        </div>
+                            <button className="text-gray-500 hover:text-gray-700 text-xs">
+                              Reply
+                            </button>
+                          </div>
+                        ) : (
+                          "Updating..."
+                        )}
                       </div>
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <Button
-                        startContent={<Ellipsis />}
-                        isIconOnly
-                        radius="full"
-                        variant="light"
-                      />
-                    </div>
+                    {user?._id === comment?.userId?._id && (
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <ActionButton
+                          onEdit={() => handleEditComment(comment)}
+                          onDelete={() => handleDeleteComment(comment._id)}
+                        />
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
-                <div className="mt-2 ">
-                  <LinkUpForm
-                    resolver={zodResolver(commentValidationSchema)}
-                    onSubmit={(data, reset) => handleUpdateComment(data, reset)}
-                    defaultValues={{ comment: editingComment?.comment }}
-                  >
-                    <LinkUpTextarea
-                      name="comment"
-                      size="sm"
-                      focusRef={(el) =>
-                        (editCommentRef.current[comment?._id] = el)
+                <div className="mt-2 flex gap-1 ">
+                  <div>
+                    {user && (
+                      <Avatar
+                        size="sm"
+                        radius="full"
+                        src={user?.profileImage}
+                      />
+                    )}
+                  </div>
+                  <div className=" w-full">
+                    <LinkUpForm
+                      resolver={zodResolver(commentValidationSchema)}
+                      onSubmit={(data, reset) =>
+                        handleUpdateComment(data, reset)
                       }
-                      placeholder="Edit your comment"
-                      endContent={<SendHorizontal />}
-                      onSubmit={handleUpdateComment}
-                    />
-                  </LinkUpForm>
-                  <div
-                    onClick={() => setEditingComment(null)}
-                    className="flex justify-start text-xs text-blue-500 hover:text-blue-600 hover:underline"
-                  >
-                    Edit Cancel
+                      defaultValues={{ comment: editingComment?.comment }}
+                    >
+                      <LinkUpTextarea
+                        name="comment"
+                        size="sm"
+                        focusRef={(el) =>
+                          (editCommentRef.current[comment?._id] = el)
+                        }
+                        placeholder="Edit your comment"
+                        endContent={<SendHorizontal />}
+                        onSubmit={handleUpdateComment}
+                      />
+                    </LinkUpForm>
+                    <div
+                      onClick={() => setEditingComment(null)}
+                      className="flex justify-start text-xs text-blue-500 hover:text-blue-600 hover:underline"
+                    >
+                      Edit Cancel
+                    </div>
                   </div>
                 </div>
               )}

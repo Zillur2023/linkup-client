@@ -1,3 +1,4 @@
+import { IPost } from "@/type";
 import {
   Button,
   Dropdown,
@@ -5,64 +6,85 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/react";
-import { EllipsisVertical } from "lucide-react";
-// import { VerticalDotsIcon } from "../table/VerticalDotsIcon";
-export const VerticalDotsIcon = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}: {
-  size?: number;
-  width?: number;
-  height?: number;
-  [key: string]: any;
-}) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height={height || size}
-    width={width || size}
-    role="presentation"
-    viewBox="0 0 24 24"
-    {...props}
-  >
-    <path
-      d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-      fill="currentColor"
-    />
-  </svg>
-);
+import { Ellipsis, EllipsisVertical } from "lucide-react";
+import { useRef } from "react";
+import PostEditor from "../post/PostEditor";
+import LinkUpModal from "./LinkUpModal";
+
 interface ActionButtonProps {
   onEdit?: () => void;
-  onDelete?: () => Promise<void>;
+  onDelete?: () => void;
+  confirmDelete?: () => void;
+  post?: IPost;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({ onEdit, onDelete }) => {
+const ActionButton: React.FC<ActionButtonProps> = ({
+  onEdit,
+  onDelete,
+  confirmDelete,
+  post,
+}) => {
+  const editRef = useRef<HTMLButtonElement | null>(null);
+  const deleteRef = useRef<HTMLButtonElement | null>(null);
+
   return (
-    <div className="relative flex justify-end items-center gap-2">
+    <div className="">
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light">
-            {/* <VerticalDotsIcon className="text-default-300" width={24} height={24} /> */}
-            <EllipsisVertical />
+          <Button isIconOnly size="sm" radius="full" variant="light">
+            {post ? <EllipsisVertical /> : <Ellipsis />}
           </Button>
         </DropdownTrigger>
         <DropdownMenu>
-          <DropdownItem onClick={onEdit} key="edit">
-            Edit
+          <DropdownItem
+            key="edit"
+            onClick={() => {
+              if (onEdit) {
+                onEdit(); // Call onEdit if provided
+              } else if (post) {
+                editRef.current?.click(); // Trigger the hidden button
+              }
+            }}
+          >
+            {"Edit"}
           </DropdownItem>
           <DropdownItem
-            onClick={onDelete}
-            key="logout"
+            key="delete"
             className="text-danger"
             color="danger"
+            onClick={() => {
+              if (onDelete) {
+                onDelete();
+              } else if (post) {
+                deleteRef.current?.click();
+              }
+            }}
           >
-            Delete
+            {"Delete"}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
+
+      {/* Show PostEditor only when editing */}
+      <div className=" hidden">
+        <PostEditor clickRef={editRef} post={post} openButtonText="Edit" />
+      </div>
+      <div className=" hidden">
+        <LinkUpModal
+          className="min-h-[10vh]"
+          clickRef={deleteRef}
+          modalSize={"xs"}
+          variant="ghost"
+          footerButton={true}
+          openButtonText={"Delete"}
+          actionButtonText="Delete"
+          onUpdate={confirmDelete}
+        >
+          <p className=" mt-5  text-red-500 font-semibold text-medium flex items-center justify-center ">
+            Are your sure to delete this post
+          </p>
+        </LinkUpModal>
+      </div>
     </div>
   );
 };

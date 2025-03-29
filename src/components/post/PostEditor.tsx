@@ -8,7 +8,7 @@ import {
   useUpdatePostMutation,
 } from "@/redux/features/post/postApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Checkbox, Textarea } from "@heroui/react";
+import { Button, Checkbox, Textarea, User } from "@heroui/react";
 import { IPost, IUserData } from "@/type";
 import { useUser } from "@/context/UserProvider";
 import LinkUpModal from "../shared/LinkUpModal";
@@ -29,51 +29,31 @@ import { toast } from "sonner";
 import LinkUpTextarea from "../form/LinkUpTextarea";
 
 interface PostEditorProps {
-  updatePostData?: IPost;
+  post?: IPost;
   openButtonIcon?: ReactNode;
   openButtonText?: ReactNode;
   size?: "sm" | "md" | "lg" | undefined;
   radius?: "sm" | "md" | "lg" | "full" | "none" | undefined;
+  clickRef?: any;
 }
 
 const PostEditor: React.FC<PostEditorProps> = ({
-  updatePostData,
+  post,
   openButtonIcon,
   openButtonText,
   size,
   radius,
+  clickRef,
 }) => {
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
   });
 
-  const editor = useEditor({
-    extensions: [
-      // StarterKit,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Highlight,
-      Color.configure({ types: [TextStyle.name, ListItem.name] }),
-      // TextStyle.configure({ types: [ListItem.name] }),
-      TextStyle.configure({}),
-      StarterKit.configure({
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
-      }),
-    ],
-    content: updatePostData?.content,
-  });
-
-  const [createPost] = useCreatePostMutation();
-  const [updatePost] = useUpdatePostMutation();
+  const [createPost, { isLoading: createPostLoading }] =
+    useCreatePostMutation();
+  const [updatePost, { isLoading: updatePostLoading }] =
+    useUpdatePostMutation();
 
   const onSubmit = async (data: any, reset?: (values?: any) => void) => {
     console.log({ data });
@@ -89,12 +69,12 @@ const PostEditor: React.FC<PostEditorProps> = ({
       });
     }
 
-    if (updatePostData) {
+    if (post) {
       formData.append(
         "data",
         JSON.stringify({
           ...data,
-          _id: updatePostData?._id,
+          _id: post?._id,
           // isPremium: updatePostData?.isPremium,
           author: userData?.data?._id,
           // content: data?.content.replace(/<\/?p>/g, ""),
@@ -115,7 +95,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
 
     const toastId = toast.loading("loading...");
     try {
-      const res = updatePostData
+      const res = post
         ? await updatePost(formData).unwrap()
         : await createPost(formData).unwrap();
       // const res =  await createPost(formData).unwrap()
@@ -129,7 +109,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
           content: res?.data?.content,
           images: res?.data?.images, // Ensure an array
         });
-        editor?.commands.clearContent();
+        // editor?.commands.clearContent();
       }
     } catch (error: any) {
       console.log({ error });
@@ -141,37 +121,38 @@ const PostEditor: React.FC<PostEditorProps> = ({
     <LinkUpModal
       openButtonText={openButtonText}
       buttonSize={size}
+      // modalSize="2xl"
       radius={radius}
-      header={`${updatePostData ? "Update Post" : "Create post"}`}
+      header={`${post ? "Update Post" : "Create post"}`}
       variant="ghost"
       openButtonIcon={openButtonIcon}
       className=" flex justify-start"
+      clickRef={clickRef}
     >
+      <User
+        className=" flex justify-start"
+        avatarProps={{
+          src: `${userData?.data?.profileImage}`,
+        }}
+        description="Public"
+        name={userData?.data?.name}
+      />
       <LinkUpForm
         resolver={zodResolver(postEditorValidationSchema)}
         onSubmit={onSubmit}
         defaultValues={{
-          isPremium: updatePostData?.isPremium,
-          content: updatePostData?.content,
-          images: updatePostData?.images, // Ensure an array
+          isPremium: post?.isPremium,
+          content: post?.content,
+          images: post?.images, // Ensure an array
         }}
       >
         {userData?.data?.isVerified && (
           <LinkUpCheckbox name="isPremium" label="Premium Post" />
         )}
         <div className="py-3">
-          {/* <LinkUpEditor name="content" editor={editor} /> */}
-          {/* <LinkUpTextarea name="content" /> */}
-          <Textarea
-            // placeholder="Enter your description"
+          <LinkUpTextarea
+            name="content"
             placeholder={`What's on your mind, ${userData?.data?.name}`}
-            variant="flat"
-            size="lg"
-            maxRows={15}
-            classNames={{
-              inputWrapper: "!bg-transparent shadow-none", // Added shadow-none here
-              input: "!bg-transparent",
-            }}
           />
         </div>
 
@@ -181,7 +162,13 @@ const PostEditor: React.FC<PostEditorProps> = ({
 
         <div className="flex gap-4">
           <Button fullWidth size="sm" color="primary" type="submit">
-            Post
+            {createPostLoading
+              ? "Posting..."
+              : updatePostLoading
+              ? "Updating..."
+              : post
+              ? "Update"
+              : "Post"}
           </Button>
           {/* <Button type="reset" size="sm" variant="bordered">
             Reset

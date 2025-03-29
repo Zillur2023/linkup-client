@@ -57,6 +57,7 @@ interface IProps {
   footer?: ReactNode;
   scrollBehavior?: "inside" | "normal" | "outside" | undefined;
   focusRef?: (el: HTMLTextAreaElement | null) => void;
+  clickRef?: any;
 }
 
 export default function LinkUpModal({
@@ -77,6 +78,7 @@ export default function LinkUpModal({
   footer,
   scrollBehavior,
   focusRef,
+  clickRef,
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   // console.log({ focusRef });
@@ -91,6 +93,8 @@ export default function LinkUpModal({
           )
         : openButtonText && (
             <Button
+              ref={clickRef}
+              as={"div"}
               size={buttonSize}
               radius={radius}
               variant={variant}
@@ -125,10 +129,10 @@ export default function LinkUpModal({
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         size={modalSize}
-        className=" h-full "
+        // className=" h-full "
         scrollBehavior={scrollBehavior}
       >
-        <ModalContent className=" min-h-[90vh]  ">
+        <ModalContent>
           {(onClose) => (
             <>
               {header && (

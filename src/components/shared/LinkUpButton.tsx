@@ -48,6 +48,7 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
           placement="bottom"
         >
           <Button
+            fullWidth
             size="sm"
             onClick={handleClick}
             disabled={loadingStates[buttonId]}
@@ -67,6 +68,7 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
         </Tooltip>
       ) : (
         <Button
+          fullWidth
           size="sm"
           onClick={handleClick}
           disabled={loadingStates[buttonId]}

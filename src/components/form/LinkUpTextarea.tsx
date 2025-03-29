@@ -17,8 +17,6 @@ interface LinkUpTextareaProps {
   focusRef?: (el: HTMLTextAreaElement | null) => void;
   endContent?: ReactNode;
   onSubmit?: (data: any, reset?: () => void) => void; // Updated type
-  modalRef?: boolean;
-  modalRef2?: boolean;
 }
 
 export default function LinkUpTextarea({
@@ -58,15 +56,20 @@ export default function LinkUpTextarea({
     }
   };
 
+  console.log("watch(name)", watch(name));
+  console.log({ name });
+
   return (
     <Card
-      // as={Button}
+      shadow={name === "content" ? "none" : "md"}
       className={`${endContent ? "relative" : ""} w-full rounded-lg   `}
     >
       <Textarea
         {...register(name)}
         label={label}
-        minRows={!watch(name) ? 1 : 2}
+        // minRows={!watch(name) ? 1 : 2}
+        minRows={name === "content" ? 4 : 1}
+        maxRows={name === "content" ? 12 : 8}
         labelPlacement={labelPlacement}
         placeholder={placeholder}
         required={required}
@@ -87,7 +90,7 @@ export default function LinkUpTextarea({
         //  endContent && <Button isDisabled={!watch(name)} type="submit" isIconOnly  className="absolute bottom-2 right-2 bg-transparent">{endContent}</Button>
         // }
         // isClearable
-        className={`${watch(name) && endContent ? "pb-9" : ""}`}
+        className={`${watch(name) && endContent ? "pb-8" : ""} `}
         onKeyDown={handleKeyDown} // Add onKeyDown handler
         variant="flat"
         classNames={{

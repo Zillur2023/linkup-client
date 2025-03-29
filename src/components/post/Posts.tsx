@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
   Avatar,
   Button,
@@ -8,14 +8,13 @@ import {
   CardFooter,
   CardHeader,
   Divider,
+  User,
 } from "@heroui/react";
 import {
   ThumbsUp,
   ThumbsDown,
   MessageCircle,
   Share2,
-  Trash2,
-  Pencil,
   Download,
   Crown,
 } from "lucide-react";
@@ -42,6 +41,7 @@ import { useRouter } from "next/navigation";
 import { ImageGallery } from "../shared/ImageGallery";
 import PostEditor from "./PostEditor";
 import PostComment from "./PostComment";
+import ActionButton from "../shared/ActionButton";
 
 interface PostsProps {
   postId?: string;
@@ -62,8 +62,13 @@ const Posts: React.FC<PostsProps> = ({
   const [updateDislike] = useUpdateDislikesMutation();
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
   const [deletePost] = useDeletePostMutation();
-  const inputRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
+  const modalRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const postRef = useRef<HTMLDivElement>(null);
+  const clickMessageRef = useRef<HTMLButtonElement | null>(null);
+  // const clickMessageRef = useRef<{ [key: string]: HTMLButtonElement | null }>(
+  //   {}
+  // );
+  console.log({ clickMessageRef });
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -198,26 +203,10 @@ const Posts: React.FC<PostsProps> = ({
                   </LinkUpButton>
                 )}
                 {post?.author?._id === userData?.data?._id && (
-                  <PostEditor
-                    updatePostData={post}
-                    openButtonIcon={<Pencil />}
+                  <ActionButton
+                    post={post}
+                    confirmDelete={() => handleDelete(post?._id)}
                   />
-                  // <ActionButton/>
-                )}
-
-                {post?.author?._id === userData?.data?._id && (
-                  <LinkUpModal
-                    modalSize={"xs"}
-                    variant="ghost"
-                    footerButton={true}
-                    openButtonIcon={<Trash2 className=" text-red-400" />}
-                    actionButtonText="Delete"
-                    onUpdate={() => handleDelete(post?._id)}
-                  >
-                    <p className=" mt-5  text-red-500 font-semibold text-medium flex items-center justify-center ">
-                      Are your sure to delete this post
-                    </p>
-                  </LinkUpModal>
                 )}
               </div>
             </div>
@@ -271,7 +260,23 @@ const Posts: React.FC<PostsProps> = ({
               </LinkUpButton>
 
               {!modalCommentRef ? (
+                <Button
+                  fullWidth
+                  onClick={() => clickMessageRef.current?.click()}
+                  size="sm"
+                  variant="light"
+                  startContent={<MessageCircle />}
+                >
+                  {" "}
+                  {post?.comments?.length}{" "}
+                </Button>
+              ) : (
+                modalCommentRef
+              )}
+              <div className=" hidden">
                 <PostComment
+                  clickRef={clickMessageRef}
+                  focusRef={(el) => (modalRef.current[post?._id] = el)}
                   user={userData?.data}
                   post={post}
                   startContent={<MessageCircle />}
@@ -279,17 +284,17 @@ const Posts: React.FC<PostsProps> = ({
                   showAllComments={showAllComments ? true : false}
                   hideComments={true}
                 />
-              ) : (
-                modalCommentRef
-              )}
+              </div>
 
               <Button
+                fullWidth
                 size="sm"
                 variant="light"
                 startContent={<Share2 />}
               ></Button>
 
               <Button
+                fullWidth
                 size="sm"
                 variant="light"
                 onClick={() => generatePDF(postRef)}
@@ -307,7 +312,7 @@ const Posts: React.FC<PostsProps> = ({
                   "See all comment"
                 }
                 showAllComments={showAllComments ? true : false}
-                focusRef={(el) => (inputRef.current[post?._id] = el)}
+                focusRef={(el) => (modalRef.current[post?._id] = el)}
               />
             </div>
           </CardFooter>
