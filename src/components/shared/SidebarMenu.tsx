@@ -3,11 +3,10 @@
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { IUserData } from "@/type";
-import { Avatar, Listbox, ListboxItem, Tab, Tabs } from "@heroui/react";
+import { Avatar, Tab, Tabs } from "@heroui/react";
 import Link from "next/link";
 import { Group, House, Store, Users } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface MenuItem {
   href: string;
@@ -21,10 +20,10 @@ interface SidebarMenuProps {
 
 export default function SidebarMenu({ items }: SidebarMenuProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const query = searchParams.get("q");
-  const id = searchParams.get("id");
-  const url = query ? `${pathname}?q=${query}` : `${pathname}?id=${id}`;
+  // const searchParams = useSearchParams();
+  // const query = searchParams.get("q");
+  // const id = searchParams.get("id");
+  // const url = query ? `${pathname}?q=${query}` : `${pathname}?id=${id}`;
   // console.log({ url });
 
   const { user } = useUser();

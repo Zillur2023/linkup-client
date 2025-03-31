@@ -6,8 +6,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 const ProfileHome = (user: IUser) => {
-  // console.log("ProfileHome user", user);
-  // console.log("ProfileHome user id", user?._id);
   return (
     <div className=" flex justify-center w-full md:w-[70%] mx-auto gap-2 my-5">
       {user?.friends?.length > 0 && (

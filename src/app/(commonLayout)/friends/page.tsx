@@ -34,7 +34,9 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
   const AcceptFriendRequest = async (requesterId: string) => {
     try {
       await acceptFriendRequest({ userId: user?._id, requesterId });
-    } catch (error: any) {}
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   return (
@@ -42,7 +44,6 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
       <h3 className=" mb-2 font-semibold text-xl"> Friend Requests </h3>
       <div className="  gap-2 grid grid-cols-1 md:grid-cols-3  ">
         {user?.friendRequestsReceived?.map((item, index) => (
-          /* eslint-disable no-console */
           <Card key={index} shadow="sm">
             <CardBody className="overflow-visible p-0">
               <Image
@@ -55,11 +56,17 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
               />
             </CardBody>
             <CardFooter className=" flex flex-col gap-1">
-              <Button fullWidth onClick={() => AcceptFriendRequest(item?._id)}>
+              <Button
+                fullWidth
+                onClick={() => AcceptFriendRequest(item?._id as string)}
+              >
                 {" "}
                 Confirm{" "}
               </Button>
-              <Button fullWidth onClick={() => RejectFriendRequest(item?._id)}>
+              <Button
+                fullWidth
+                onClick={() => RejectFriendRequest(item?._id as string)}
+              >
                 {" "}
                 Delete{" "}
               </Button>
@@ -85,10 +92,10 @@ const SuggestedFriends = () => {
   });
   const [sendFriendRequest] = useSendFriendRequestMutation();
 
-  const items = allUserData?.data?.filter((usr) => usr?._id !== user?._id);
+  // const items = allUserData?.data?.filter((usr) => usr?._id !== user?._id);
 
   const filteredUsers = allUserData?.data?.filter(
-    (usr) =>
+    (usr: any) =>
       usr._id !== user?._id &&
       !userData?.data?.friendRequestsReceived?.some(
         (item) => item?._id === usr?._id
@@ -121,7 +128,10 @@ const SuggestedFriends = () => {
               />
             </CardBody>
             <CardFooter className=" flex flex-col gap-1">
-              <Button fullWidth onClick={() => SendFriendRequest(item._id)}>
+              <Button
+                fullWidth
+                onClick={() => SendFriendRequest(item._id as string)}
+              >
                 Add friend
               </Button>
               <Button fullWidth> Remove </Button>

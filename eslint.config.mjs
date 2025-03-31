@@ -9,8 +9,15 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [
+export default [
+  // Extend Next.js defaults
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-];
 
-export default eslintConfig;
+  // Add your custom rules
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off", // Disable the rule
+      // Other custom rules...
+    },
+  },
+];

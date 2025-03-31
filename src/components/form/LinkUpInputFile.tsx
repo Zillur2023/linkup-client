@@ -13,7 +13,6 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
   const {
     control,
     reset,
-    watch,
     formState: { errors },
   } = useFormContext();
 

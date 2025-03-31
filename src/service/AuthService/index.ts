@@ -2,6 +2,17 @@
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 
+export const setToken = async ({
+  accessToken,
+  refreshToken,
+}: {
+  accessToken: string;
+  refreshToken: string;
+}) => {
+  (await cookies()).set("accessToken", accessToken);
+  (await cookies()).set("refreshToken", refreshToken);
+};
+
 export const getUser = async () => {
   const token = (await cookies()).get("accessToken")?.value;
 

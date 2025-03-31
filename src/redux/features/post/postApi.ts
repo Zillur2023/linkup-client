@@ -46,14 +46,12 @@ export const postApi = baseApi.injectEndpoints({
           params.toString() ? `?${params.toString()}` : ""
         }`;
 
-        console.log("getAllPosts url", url);
-
         return {
           url,
           method: "GET",
         };
       },
-      providesTags: ["Post"],
+      providesTags: ["User", "Post", "Comment"],
     }),
     updateLikes: builder.mutation({
       query: (postData) => ({

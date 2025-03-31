@@ -1,40 +1,43 @@
-
 import { baseApi } from "../../api/baseApi";
 
-
 export const authApi = baseApi.injectEndpoints({
-    endpoints: (builder) => ({
-      createComment: builder.mutation({
-        query: (commentData) => ({
-          url: '/comment/create',
-          method: 'POST',
-          body: commentData,
-        }),
-        invalidatesTags: ["Comment","Post","User"]
+  endpoints: (builder) => ({
+    createComment: builder.mutation({
+      query: (commentData) => ({
+        url: "/comment/create",
+        method: "POST",
+        body: commentData,
       }),
-      getAllComment: builder.query({
-        query: (postId) => ({
-          url: `/comment/all-comment/${postId}`,
-          method: 'GET',
-        }),
-        providesTags: ["Comment","Post","User"]
-      }),
-       updateComment: builder.mutation({
-        query: (comment) => ({
-          url: `/comment/update`,
-          method: 'PUT',
-          body: comment,
-        }),
-        invalidatesTags: ["Comment", "Post", "User"]
-       }),
-      deleteComment: builder.mutation({
-        query: (commentId) => ({
-          url: `/comment/delete/${commentId}`,
-          method: 'DELETE',
-        }),
-        invalidatesTags: ["Comment","Post","User"]
-      }),
+      invalidatesTags: ["Comment", "Post", "User"],
     }),
-  });
-  
-  export const { useCreateCommentMutation, useGetAllCommentQuery, useUpdateCommentMutation, useDeleteCommentMutation } = authApi;
+    getAllComment: builder.query({
+      query: (postId) => ({
+        url: `/comment/all-comment/${postId}`,
+        method: "GET",
+      }),
+      providesTags: ["Comment", "Post", "User"],
+    }),
+    updateComment: builder.mutation({
+      query: (comment) => ({
+        url: `/comment/update`,
+        method: "PUT",
+        body: comment,
+      }),
+      invalidatesTags: ["Comment", "Post", "User", "Chat"],
+    }),
+    deleteComment: builder.mutation({
+      query: (commentId) => ({
+        url: `/comment/delete/${commentId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Comment", "Post", "User"],
+    }),
+  }),
+});
+
+export const {
+  useCreateCommentMutation,
+  useGetAllCommentQuery,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
+} = authApi;

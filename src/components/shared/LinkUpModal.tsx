@@ -7,18 +7,7 @@ import {
   useDisclosure,
   ModalFooter,
 } from "@heroui/modal";
-import {
-  cloneElement,
-  isValidElement,
-  ReactNode,
-  useEffect,
-  useRef,
-} from "react";
-import LinkUpForm from "../form/LinkUpForm";
-import LinkUpTextarea from "../form/LinkUpTextarea";
-import { SendHorizontal } from "lucide-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { commentValidationSchema } from "@/schemas";
+import { ReactNode } from "react";
 
 interface IProps {
   openButtonText?: ReactNode;
@@ -56,8 +45,8 @@ interface IProps {
   footerButton?: boolean;
   footer?: ReactNode;
   scrollBehavior?: "inside" | "normal" | "outside" | undefined;
-  focusRef?: (el: HTMLTextAreaElement | null) => void;
   clickRef?: any;
+  backdrop?: "transparent" | "opaque" | "blur" | undefined;
 }
 
 export default function LinkUpModal({
@@ -77,11 +66,10 @@ export default function LinkUpModal({
   footerButton = false,
   footer,
   scrollBehavior,
-  focusRef,
   clickRef,
+  backdrop,
 }: IProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  // console.log({ focusRef });
 
   return (
     <>
@@ -94,7 +82,7 @@ export default function LinkUpModal({
         : openButtonText && (
             <Button
               ref={clickRef}
-              as={"div"}
+              // as={"div"}
               size={buttonSize}
               radius={radius}
               variant={variant}
@@ -131,6 +119,7 @@ export default function LinkUpModal({
         size={modalSize}
         // className=" h-full "
         scrollBehavior={scrollBehavior}
+        backdrop={backdrop}
       >
         <ModalContent>
           {(onClose) => (
@@ -160,13 +149,7 @@ export default function LinkUpModal({
                   </Button>
                 </ModalFooter>
               )}
-              {footer && (
-                <ModalFooter>
-                  <div className="  w-full ">{footer}</div>
-                </ModalFooter>
-              )}
-
-              {/* {footer && <ModalFooter>{renderFooter()}</ModalFooter>} */}
+              {footer && <ModalFooter>{footer}</ModalFooter>}
             </>
           )}
         </ModalContent>

@@ -7,15 +7,13 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  Divider,
-  User,
+  Tooltip,
 } from "@heroui/react";
 import {
   ThumbsUp,
   ThumbsDown,
   MessageCircle,
   Share2,
-  Download,
   Crown,
 } from "lucide-react";
 import { useUser } from "@/context/UserProvider";
@@ -24,7 +22,6 @@ import {
   useUpdateFollowUnfollowMutation,
 } from "@/redux/features/user/userApi";
 import { IPost, IPostData, IUserData } from "@/type";
-import useDebounce from "@/hooks/debounce.hooks";
 import {
   useDeletePostMutation,
   useGetAllPostQuery,
@@ -35,13 +32,12 @@ import { toast } from "sonner";
 import { PostSkeleton } from "../shared/Skeleton";
 import Author from "../shared/Author";
 import LinkUpButton from "../shared/LinkUpButton";
-import LinkUpModal from "../shared/LinkUpModal";
-import { generatePDF } from "@/uitls/generatePDF";
 import { useRouter } from "next/navigation";
 import { ImageGallery } from "../shared/ImageGallery";
 import PostEditor from "./PostEditor";
 import PostComment from "./PostComment";
 import ActionButton from "../shared/ActionButton";
+import { formatPostDate, formatPostTooltipDate } from "@/uitls/formatDate";
 
 interface PostsProps {
   postId?: string;
@@ -64,11 +60,9 @@ const Posts: React.FC<PostsProps> = ({
   const [deletePost] = useDeletePostMutation();
   const modalRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const postRef = useRef<HTMLDivElement>(null);
-  const clickMessageRef = useRef<HTMLButtonElement | null>(null);
-  // const clickMessageRef = useRef<{ [key: string]: HTMLButtonElement | null }>(
-  //   {}
-  // );
-  console.log({ clickMessageRef });
+  const clickMessageRef = useRef<{ [key: string]: HTMLButtonElement | null }>(
+    {}
+  );
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
@@ -88,6 +82,7 @@ const Posts: React.FC<PostsProps> = ({
 
   const { data: postData } = useGetAllPostQuery<IPostData>(queryPost);
   // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
+  console.log({ postData });
 
   const handleLike = async (postId: string) => {
     if (!userData?.data?._id) {
@@ -127,7 +122,7 @@ const Posts: React.FC<PostsProps> = ({
       return;
     }
     try {
-      const res = await updateFollowUnfollow({
+      await updateFollowUnfollow({
         targetId: id,
         loginUserId: userData?.data?._id,
       }).unwrap();
@@ -186,7 +181,15 @@ const Posts: React.FC<PostsProps> = ({
             )}
 
             <div className=" w-full flex justify-between items-center ">
-              <Author author={post?.author} className="text-lg font-semibold" />
+              <Author
+                author={post?.author}
+                // description={formatPostDate(post?.createdAt)}
+                description={
+                  <Tooltip content={formatPostTooltipDate(post?.createdAt)}>
+                    {formatPostDate(post?.createdAt)}
+                  </Tooltip>
+                }
+              />
               <div className="flex items-center gap-3">
                 {post?.author?._id !== userData?.data?._id && (
                   <LinkUpButton
@@ -262,25 +265,27 @@ const Posts: React.FC<PostsProps> = ({
               {!modalCommentRef ? (
                 <Button
                   fullWidth
-                  onClick={() => clickMessageRef.current?.click()}
+                  onClick={() => clickMessageRef.current[post?._id]?.click()}
+                  // onClick={() => clickMessageRef.current?.click()}
                   size="sm"
                   variant="light"
                   startContent={<MessageCircle />}
                 >
-                  {" "}
-                  {post?.comments?.length}{" "}
+                  {post?.comments?.length}
                 </Button>
               ) : (
                 modalCommentRef
               )}
-              <div className=" hidden">
+              <div className=" hidden ">
                 <PostComment
-                  clickRef={clickMessageRef}
+                  clickRef={(el: any) =>
+                    (clickMessageRef.current[post?._id] = el)
+                  }
                   focusRef={(el) => (modalRef.current[post?._id] = el)}
                   user={userData?.data}
                   post={post}
                   startContent={<MessageCircle />}
-                  openButtonText={<span>{post?.comments?.length}</span>}
+                  openButtonText={`${post?.comments?.length}`}
                   showAllComments={showAllComments ? true : false}
                   hideComments={true}
                 />
@@ -293,13 +298,13 @@ const Posts: React.FC<PostsProps> = ({
                 startContent={<Share2 />}
               ></Button>
 
-              <Button
+              {/* <Button
                 fullWidth
                 size="sm"
                 variant="light"
                 onClick={() => generatePDF(postRef)}
                 startContent={<Download />}
-              />
+              /> */}
             </div>
             {/* <Divider /> */}
             <div className=" w-full mt-2 ">

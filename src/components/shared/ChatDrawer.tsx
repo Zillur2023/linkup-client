@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import { SendHorizontal } from "lucide-react";
+import { formatChatTooltipDate } from "@/uitls/formatDate";
 
 export interface ISelectedUser {
   _id: string;
@@ -56,7 +57,7 @@ const ChatMessages = ({
             )}
             {!isLastFromSender && <div className="w-10 h-10 mr-2"></div>}
             <Tooltip
-              content={new Date(String(msg?.createdAt)).toLocaleString()}
+              content={formatChatTooltipDate(msg?.createdAt)}
               closeDelay={0}
             >
               <Card className={`p-3 max-w-xs rounded-xl shadow-md break-words`}>
@@ -77,7 +78,6 @@ const ChatDrawer = ({
   selectedUser: ISelectedUser | null;
   userData: IUser;
 }) => {
-  console.log({ selectedUser, userData });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [createChat] = useCreateChatMutation();
 
@@ -114,16 +114,17 @@ const ChatDrawer = ({
     <Drawer
       placement="bottom"
       shouldBlockScroll={false}
-      isDismissable={false}
-      isKeyboardDismissDisabled={true}
+      // isDismissable={false}
+      // isKeyboardDismissDisabled={true}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size="md"
       backdrop="transparent"
-      className="w-[23%] bottom-0 left-[70%]"
+      className="w-[80%] md:w-[40%] lg:w-[23%] bottom-0 left-[10%] md:left-[50%] lg:left-[70%]"
     >
       <DrawerContent>
-        {(onClose) => (
+        {/* {(onClose) => ( */}
+        {() => (
           <>
             <DrawerHeader className="flex flex-col gap-1">
               <div className="text-start">{selectedUser?.user}</div>
@@ -143,6 +144,7 @@ const ChatDrawer = ({
                     name="content"
                     size="sm"
                     placeholder="Aa"
+                    minRows={1}
                     endContent={<SendHorizontal />}
                     onSubmit={handleCreateChat}
                   />

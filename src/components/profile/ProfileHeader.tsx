@@ -1,14 +1,5 @@
 import { IUser } from "@/type";
-import {
-  Avatar,
-  Button,
-  Card,
-  AvatarGroup,
-  Tabs,
-  Tab,
-  Divider,
-  Tooltip,
-} from "@heroui/react";
+import { Avatar, Button, Card, AvatarGroup, Divider } from "@heroui/react";
 import { Camera } from "lucide-react";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpInputFile from "../form/LinkUpInputFile";
@@ -27,7 +18,6 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
-  // console.log({ profileRoute });
   // export const ProfileHeader = (user: IUser) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -35,8 +25,6 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
   const sk = searchParams.get("sk");
   const url = sk ? `${pathname}?id=${id}&sk=${sk}` : `${pathname}?id=${id}`;
   // const url = query ? `${pathname}?id=${query}` : pathname;
-  // console.log({ url });
-  // console.log({ pathname });
   const [updateUser] = useUpdateUserMutation();
 
   const handleEditImage = async (data: any, reset?: () => void) => {

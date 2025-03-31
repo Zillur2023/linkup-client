@@ -1,7 +1,7 @@
 "use client";
 
-import { BaseSyntheticEvent, ReactNode } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { ReactNode } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
 interface formConfig {
   defaultValues?: Record<string, any>;

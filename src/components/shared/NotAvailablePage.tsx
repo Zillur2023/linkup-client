@@ -30,7 +30,7 @@ const NotAvailablePage: React.FC = () => {
 
         {/* Heading */}
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-          Oops! This Content Isn't Available
+          Oops! This Content Isn&apos;t Available
         </h1>
 
         {/* Description */}

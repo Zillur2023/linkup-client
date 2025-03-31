@@ -1,6 +1,5 @@
 "use client";
-import React, { ReactNode } from "react";
-import { FieldValues } from "react-hook-form";
+import React, { ReactNode, useRef } from "react";
 
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import {
@@ -8,25 +7,18 @@ import {
   useUpdatePostMutation,
 } from "@/redux/features/post/postApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Checkbox, Textarea, User } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { IPost, IUserData } from "@/type";
 import { useUser } from "@/context/UserProvider";
 import LinkUpModal from "../shared/LinkUpModal";
 import { postEditorValidationSchema } from "@/schemas";
 import LinkUpInputFile from "../form/LinkUpInputFile";
 import LinkUpForm from "../form/LinkUpForm";
-import LinkUpEditor from "../form/LinkUpEditor";
 import LinkUpCheckbox from "../form/LinkUpCheckbox";
-import LinkUpReset from "../form/LinkUpReset";
-import StarterKit from "@tiptap/starter-kit";
-import Highlight from "@tiptap/extension-highlight";
-import TextAlign from "@tiptap/extension-text-align";
-import { Color } from "@tiptap/extension-color";
-import TextStyle from "@tiptap/extension-text-style";
-import ListItem from "@tiptap/extension-list-item";
-import { useEditor } from "@tiptap/react";
+
 import { toast } from "sonner";
 import LinkUpTextarea from "../form/LinkUpTextarea";
+import Author from "../shared/Author";
 
 interface PostEditorProps {
   post?: IPost;
@@ -45,6 +37,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
   radius,
   clickRef,
 }) => {
+  const clickSubmitRef = useRef<HTMLButtonElement | null>(null);
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
     skip: !user?._id,
@@ -56,9 +49,6 @@ const PostEditor: React.FC<PostEditorProps> = ({
     useUpdatePostMutation();
 
   const onSubmit = async (data: any, reset?: (values?: any) => void) => {
-    console.log({ data });
-    const extractedText = data?.content.replace(/<\/?p>/g, "");
-    console.log({ extractedText });
     const formData = new FormData();
 
     // formData.append("image", data?.images);
@@ -77,7 +67,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
           _id: post?._id,
           // isPremium: updatePostData?.isPremium,
           author: userData?.data?._id,
-          // content: data?.content.replace(/<\/?p>/g, ""),
+          // content: data?.content,
           // images: updatePostData?.images,
           // content: updatePostData?.content,
         })
@@ -88,7 +78,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
         JSON.stringify({
           ...data,
           author: userData?.data?._id,
-          // content: data?.content.replace(/<\/?p>/g, ""),
+          // content: data?.content,
         })
       );
     }
@@ -99,8 +89,6 @@ const PostEditor: React.FC<PostEditorProps> = ({
         ? await updatePost(formData).unwrap()
         : await createPost(formData).unwrap();
       // const res =  await createPost(formData).unwrap()
-      console.log({ res });
-      console.log("res?.data?.content", res?.data?.content);
       if (res.success) {
         toast.success(res.message, { id: toastId });
         // reset?.();
@@ -122,21 +110,35 @@ const PostEditor: React.FC<PostEditorProps> = ({
       openButtonText={openButtonText}
       buttonSize={size}
       // modalSize="2xl"
+      scrollBehavior="inside"
       radius={radius}
       header={`${post ? "Update Post" : "Create post"}`}
+      footer={
+        <div className=" w-full ">
+          <Button
+            fullWidth
+            size="sm"
+            color="primary"
+            onClick={() => clickSubmitRef?.current?.click()}
+          >
+            {createPostLoading
+              ? "Posting..."
+              : updatePostLoading
+              ? "Updating..."
+              : post
+              ? "Update"
+              : "Post"}
+          </Button>
+        </div>
+      }
       variant="ghost"
       openButtonIcon={openButtonIcon}
       className=" flex justify-start"
       clickRef={clickRef}
     >
-      <User
-        className=" flex justify-start"
-        avatarProps={{
-          src: `${userData?.data?.profileImage}`,
-        }}
-        description="Public"
-        name={userData?.data?.name}
-      />
+      <div className=" text-start">
+        <Author author={userData?.data} description="Public" />
+      </div>
       <LinkUpForm
         resolver={zodResolver(postEditorValidationSchema)}
         onSubmit={onSubmit}
@@ -153,15 +155,23 @@ const PostEditor: React.FC<PostEditorProps> = ({
           <LinkUpTextarea
             name="content"
             placeholder={`What's on your mind, ${userData?.data?.name}`}
+            minRows={4}
+            maxRows={12}
           />
         </div>
 
-        <div className=" mb-2">
+        <div className=" ">
           <LinkUpInputFile name="images" label="Upload image" />
         </div>
 
-        <div className="flex gap-4">
-          <Button fullWidth size="sm" color="primary" type="submit">
+        <div className=" hidden">
+          <Button
+            ref={clickSubmitRef}
+            fullWidth
+            size="sm"
+            color="primary"
+            type="submit"
+          >
             {createPostLoading
               ? "Posting..."
               : updatePostLoading
@@ -170,10 +180,6 @@ const PostEditor: React.FC<PostEditorProps> = ({
               ? "Update"
               : "Post"}
           </Button>
-          {/* <Button type="reset" size="sm" variant="bordered">
-            Reset
-          </Button> */}
-          {/* <LinkUpReset editor={editor} /> */}
         </div>
       </LinkUpForm>
     </LinkUpModal>

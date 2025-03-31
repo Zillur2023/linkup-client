@@ -33,7 +33,7 @@ const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["User"],
+      providesTags: ["User", "Post", "Comment"],
     }),
 
     getUserByEmail: builder.query({
@@ -49,7 +49,7 @@ const userApi = baseApi.injectEndpoints({
         url: `/user/${id}`,
         method: "GET",
       }),
-      providesTags: ["User"],
+      providesTags: ["User", "Post", "Comment"],
     }),
 
     updateUser: builder.mutation({

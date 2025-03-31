@@ -3,9 +3,7 @@ import Posts from "@/components/post/Posts";
 import SidebarMenu from "@/components/shared/SidebarMenu";
 import TabsMenu from "@/components/shared/TabsMenu";
 import TopSearch from "@/components/common/TopSearch";
-import { Button, Tab, Tabs } from "@heroui/react";
 import { FileText, Newspaper } from "lucide-react";
-import Link from "next/link";
 import { useParams, usePathname, useSearchParams } from "next/navigation";
 
 const SearchPage = () => {

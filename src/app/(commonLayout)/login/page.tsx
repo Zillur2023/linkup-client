@@ -10,7 +10,7 @@ import { useUser } from "@/context/UserProvider";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import LinkUpForm from "@/components/form/LinkUpForm";
 import LinkUpInput from "@/components/form/LinkUpInput";
-import PostEditor from "@/components/post/PostEditor";
+import { setToken } from "@/service/AuthService";
 
 export type ILoginUser = {
   email: string;
@@ -21,7 +21,7 @@ const LoginPage = () => {
   const router = useRouter();
   // const dispatch = useAppDispatch();
   const [login] = useLoginMutation();
-  const { user, setIsLoading: userLoading } = useUser();
+  const { setIsLoading: userLoading } = useUser();
 
   const onSubmit = async (formData: ILoginUser) => {
     const toastId = toast.loading("Logging in...");
@@ -31,6 +31,7 @@ const LoginPage = () => {
 
       if (res?.success) {
         userLoading(true);
+        setToken(res?.data);
         router.push("/");
         toast.success(res?.message, { id: toastId });
       }

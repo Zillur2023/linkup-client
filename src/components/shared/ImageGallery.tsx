@@ -1,12 +1,7 @@
-import {
-  Button,
-  Card,
-  Image,
-  Modal,
-  ModalContent,
-  useDisclosure,
-} from "@heroui/react";
+import { Button, Card, Image } from "@heroui/react";
 import { ImageUp, X } from "lucide-react";
+import LinkUpModal from "./LinkUpModal";
+import { useRef } from "react";
 
 type ControllerField = {
   onChange: (value: File[]) => void;
@@ -29,7 +24,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
   reset,
   field,
 }) => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const clickRef = useRef<HTMLButtonElement | null>(null);
 
   let imageGallery;
 
@@ -53,8 +48,6 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
       : [];
   }
 
-  console.log({ imageGallery });
-
   const handleImageRemove = (index: number) => {
     const updatedFiles = field?.value.filter((_, i: number) => i !== index);
 
@@ -64,7 +57,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
   };
 
   const handleImageClick = (index: number) => {
-    // console.log(`Image ${index + 1} clicked`); // Replace this with your modal logic
+    console.log(`Image ${index + 1} clicked`); // Replace this with your modal logic
   };
 
   if (!imageGallery || imageGallery.length === 0) return null;
@@ -74,7 +67,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
       {field?.name === "images" && addImage && (
         <Button
           onClick={addImage}
-          className=" z-10 top-2 left-2 absolute "
+          className=" z-50 top-2 left-2 absolute "
           radius="full"
           startContent={<ImageUp size={15} />}
           size="sm"
@@ -85,10 +78,14 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
       {field?.name === "images" && reset && (
         // <Button onClick={() => reset}  isIconOnly radius="full" className="  z-10 top-2 right-2 absolute  "  size="sm">
         <Button
-          onClick={() => field?.onChange([])}
+          onClick={() => {
+            // reset();
+            field?.onChange([]);
+          }}
+          // onClick={() => field?.onChange([])}
           isIconOnly
           radius="full"
-          className="  z-10 top-2 right-2 absolute  "
+          className="  z-50 top-2 right-2 absolute  "
           size="sm"
         >
           <X size={20} />
@@ -153,78 +150,82 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
       )}
 
       {imageGallery.length >= 4 && (
-        <div className="grid grid-cols-2 gap-1">
-          {imageGallery.slice(0, 4).map((img, idx) => (
-            <div key={idx} className="relative">
-              <Image
-                radius="none"
-                alt={`Post ${idx + 1}`}
-                width={400}
-                height={200}
-                src={img}
-                onClick={() => handleImageClick(idx)}
-              />
-              {/* Show the overlay only on the last (4th) image */}
-              {idx === 3 && imageGallery.length - 4 > 0 && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white  cursor-pointer"
-                  // onPress={onOpen}
-                  role="button" // Adds accessibility for keyboard navigation
-                  tabIndex={0} // Makes it focusable
-                  onClick={(e) => {
-                    e.stopPropagation(); // Stop event from bubbling to parent button
-                    onOpen();
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && onOpen()} // Handles keyboard interaction
-                >
-                  +{imageGallery.length - 4} More
-                </div>
-              )}
-            </div>
-          ))}
+        <div className=" flex">
+          <div className="grid grid-cols-2 gap-1">
+            {imageGallery.slice(0, 4).map((img, idx) => (
+              <div key={idx} className="relative">
+                <Image
+                  radius="none"
+                  alt={`Post ${idx + 1}`}
+                  width={400}
+                  height={200}
+                  src={img}
+                  // onClick={() => handleImageClick(idx)}
+                  // onClick={() => onOpen()}
+                />
+                {/* Show the overlay only on the last (4th) image */}
+                {idx === 3 && imageGallery.length - 4 > 0 && (
+                  <Button
+                    isDisabled={images ? true : false}
+                    as={"div"}
+                    variant="flat"
+                    className="absolute  w-full h-full inset-0 z-50       cursor-pointer"
+                    onClick={() => {
+                      clickRef.current?.click();
+                    }}
+                    onKeyDown={(e) => e.key === "Enter"} // Handles keyboard interaction
+                  >
+                    +{imageGallery.length - 4} More
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
-
-      {/* Modal for Field Images */}
       {field && (
-        <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="4xl">
-          <ModalContent>
-            {(onClose) => (
-              <>
-                <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 p-3">
-                  {field?.value.map((file, index) => (
-                    <Card key={index} className=" relative" shadow="sm">
-                      <Button
-                        onClick={() => handleImageRemove(index)}
-                        className=" z-20 top-2 right-2 absolute"
-                        isIconOnly
-                        radius="full"
-                        size="sm"
-                      >
-                        <X size={20} />
-                      </Button>
-                      <Image
-                        // alt={image}
-                        alt={`preview-${index}`}
-                        className="w-[240px] object-cover h-[140px]"
-                        radius="lg"
-                        shadow="sm"
-                        // src={image}
-                        // src={URL.createObjectURL(file)}
-                        src={
-                          typeof file === "string"
-                            ? file
-                            : URL.createObjectURL(file)
-                        }
-                        width="100%"
-                      />
-                    </Card>
-                  ))}
-                </div>
-              </>
-            )}
-          </ModalContent>
-        </Modal>
+        <div className=" hidden">
+          {" "}
+          <LinkUpModal
+            clickRef={clickRef}
+            openButtonText={"show all image"}
+            modalSize="3xl"
+            scrollBehavior="inside"
+            header={"Remove image"}
+            backdrop="transparent"
+          >
+            <div className="gap-2 grid md:grid-cols-3 lg:grid-cols-4 ">
+              {field?.value.map((file, index) => (
+                <Card key={index} className=" relative" shadow="sm">
+                  <Button
+                    onClick={() => handleImageRemove(index)}
+                    className=" z-20 top-2 right-2 absolute"
+                    isIconOnly
+                    radius="full"
+                    size="sm"
+                  >
+                    <X size={20} />
+                  </Button>
+                  <Image
+                    // alt={image}
+                    alt={`preview-${index}`}
+                    className="w-[240px] object-cover h-[140px]"
+                    radius="lg"
+                    shadow="sm"
+                    // src={image}
+                    // src={URL.createObjectURL(file)}
+                    src={
+                      typeof file === "string"
+                        ? file
+                        : URL.createObjectURL(file)
+                    }
+                    width="100%"
+                  />
+                </Card>
+              ))}
+            </div>
+          </LinkUpModal>
+        </div>
       )}
     </div>
   );

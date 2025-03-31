@@ -6,16 +6,8 @@ export interface IChat {
   receiverId: IUser;
   content: string;
   isRead?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface IUserProps {
-  avatarProps: {
-    src: string;
-  };
-  description?: string;
-  name: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUser {
@@ -47,8 +39,8 @@ export interface IUser {
   paymentStatus?: "Pending" | "Paid" | "Failed";
   transactionId?: string;
   isDeleted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUserData {

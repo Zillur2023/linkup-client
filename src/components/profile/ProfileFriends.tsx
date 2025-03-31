@@ -17,7 +17,9 @@ const ProfileFriends = ({ user }: { user: IUser }) => {
   const RemoveFriend = async (friendId: string) => {
     try {
       await removeFriend({ userId: user?._id, friendId });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -56,7 +58,7 @@ const ProfileFriends = ({ user }: { user: IUser }) => {
               <DropdownItem key="Unfollow">Unfollow</DropdownItem>
               <DropdownItem
                 key="Unfriend"
-                onClick={() => RemoveFriend(friend?._id)}
+                onClick={() => RemoveFriend(friend?._id as string)}
               >
                 Unfriend
               </DropdownItem>

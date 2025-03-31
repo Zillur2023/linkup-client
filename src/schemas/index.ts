@@ -1,4 +1,3 @@
-import { image } from "@heroui/react";
 import { z } from "zod";
 
 export const loginValidationSchema = z.object({

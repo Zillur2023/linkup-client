@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import LinkUpModal from "../shared/LinkUpModal";
@@ -15,25 +14,11 @@ import Posts from "./Posts";
 import LinkUpForm from "../form/LinkUpForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { commentValidationSchema } from "@/schemas";
-import {
-  Ellipsis,
-  MessageCircle,
-  SendHorizontal,
-  VerifiedIcon,
-  X,
-} from "lucide-react";
+import { MessageCircle, SendHorizontal } from "lucide-react";
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import ActionButton from "../shared/ActionButton";
-import { formatTime } from "@/uitls/formatTime";
-import {
-  Avatar,
-  Button,
-  Card,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/react";
+import { Avatar, Button, Card } from "@heroui/react";
+import { formatCommentDate } from "@/uitls/formatDate";
 
 interface PostCommentProps {
   user: IUser;
@@ -56,6 +41,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   focusRef,
   clickRef,
 }) => {
+  console.log({ post });
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
   const [expandedComments, setExpandedComments] = useState<{
     [key: string]: boolean;
@@ -64,14 +50,15 @@ const PostComment: React.FC<PostCommentProps> = ({
     {}
   );
 
-  const router = useRouter();
+  const modalCommentRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>(
+    {}
+  );
 
-  const [deleteComment, { isLoading: deleteCommentLoading }] =
-    useDeleteCommentMutation();
-  const [createComment, { isLoading: createCommentLoading }] =
-    useCreateCommentMutation();
-  const [updateComment, { isLoading: updateCommentLoading }] =
-    useUpdateCommentMutation();
+  // const router = useRouter();
+
+  const [deleteComment] = useDeleteCommentMutation();
+  const [createComment] = useCreateCommentMutation();
+  const [updateComment] = useUpdateCommentMutation();
   const { data: allCommentData } = useGetAllCommentQuery(post?._id, {
     skip: !post?._id,
   });
@@ -81,10 +68,6 @@ const PostComment: React.FC<PostCommentProps> = ({
     : showAllComments
     ? allCommentData?.data
     : allCommentData?.data?.slice(0, 2);
-
-  const modalCommentRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>(
-    {}
-  );
 
   // Handle creating a new comment
   const handleCreateComment = async (data: any, reset?: () => void) => {
@@ -102,7 +85,10 @@ const PostComment: React.FC<PostCommentProps> = ({
   };
 
   // Handle updating an existing comment
-  const handleUpdateComment = async (data: any, reset?: () => void) => {
+  const handleUpdateComment = async (
+    data: any,
+    reset?: (values?: any) => void
+  ) => {
     if (!editingComment || !user?._id) {
       return;
     }
@@ -114,9 +100,10 @@ const PostComment: React.FC<PostCommentProps> = ({
         postId: post?._id,
         userId: user?._id,
       };
-      await updateComment(updatedComment).unwrap();
+      const res = await updateComment(updatedComment).unwrap();
+      console.log({ res });
+      reset?.({ comment: res?.data?.comment }); // Reset the form
       setEditingComment(null); // Reset editing state
-      reset?.(); // Reset the form
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update comment");
     }
@@ -152,25 +139,27 @@ const PostComment: React.FC<PostCommentProps> = ({
     }
   }, [editingComment]);
 
-  const commentTextarea = (
-    <LinkUpForm
-      resolver={zodResolver(commentValidationSchema)}
-      onSubmit={handleCreateComment}
-    >
-      <LinkUpTextarea
-        name="comment"
-        size="sm"
-        focusRef={focusRef}
-        // focusRef={
-        //   modalCommentRef
-        //     ? (el) => (modalCommentRef.current[post?._id] = el)
-        //     : focusRef
-        // }
-        placeholder="Add a comment"
-        endContent={<SendHorizontal />}
+  const addComment = (
+    <div className=" w-full">
+      <LinkUpForm
+        resolver={zodResolver(commentValidationSchema)}
         onSubmit={handleCreateComment}
-      />
-    </LinkUpForm>
+      >
+        <LinkUpTextarea
+          name="comment"
+          size="sm"
+          // focusRef={focusRef}
+          focusRef={
+            modalCommentRef
+              ? (el) => (modalCommentRef.current[post?._id] = el)
+              : focusRef
+          }
+          placeholder="Add a comment"
+          endContent={<SendHorizontal />}
+          onSubmit={handleCreateComment}
+        />
+      </LinkUpForm>
+    </div>
   );
 
   return (
@@ -181,8 +170,8 @@ const PostComment: React.FC<PostCommentProps> = ({
         startContent={startContent}
         openButtonText={openButtonText}
         fullWidth={false}
-        header={`${user?.name}'s post`}
-        footer={commentTextarea}
+        header={`${post?.author?.name}'s post`}
+        footer={addComment}
         scrollBehavior="inside"
         className={`${!hideComments ? "mb-2" : ""}`}
       >
@@ -208,26 +197,27 @@ const PostComment: React.FC<PostCommentProps> = ({
       </LinkUpModal>
 
       <div className="flex-1 overflow-y-auto space-y-2 ">
-        {commentData?.map((comment: IComment) => {
+        {commentData?.map((item: IComment) => {
           const maxWords = 20;
-          const words = comment?.comment.split(" ");
+          const words = item?.comment.split(" ");
           const truncatedText = words.slice(0, maxWords).join(" ");
           const shouldShowSeeMore = words.length > maxWords;
-          const isExpanded = expandedComments[comment._id] || false;
+          const isExpanded = expandedComments[item._id] || false;
 
           return (
-            <div key={comment?._id} className="   ">
-              {editingComment?._id !== comment?._id ? (
+            <div key={item?._id} className="   ">
+              {editingComment?._id !== item?._id ? (
                 <>
                   <div className=" flex gap-1 relative group ">
                     <div>
-                      {user && (
-                        <Avatar
-                          size="sm"
-                          radius="full"
-                          src={user?.profileImage}
-                        />
-                      )}
+                      {/* {user && ( */}
+                      <Avatar
+                        size="sm"
+                        radius="full"
+                        // src={user?.profileImage}
+                        src={item?.userId?.profileImage}
+                      />
+                      {/* )} */}
                     </div>
                     <div className=" ">
                       <Card className="  p-3 break-words ">
@@ -236,44 +226,43 @@ const PostComment: React.FC<PostCommentProps> = ({
                         </p>
 
                         <p className=" text-medium  text-start">
-                          {/* {isExpanded ? comment?.comment : truncatedText}
+                          {isExpanded ? item?.comment : truncatedText}
                           {shouldShowSeeMore && (
                             <button
-                              onClick={() => toggleExpandComment(comment._id)}
+                              onClick={() => toggleExpandComment(item._id)}
                               className="text-blue-500 hover:text-blue-600 ml-1"
                             >
                               {isExpanded ? " See less" : " ...See more"}
                             </button>
-                          )} */}
-                          {updateCommentLoading
-                            ? editingComment?.comment
-                            : comment?.comment}
+                          )}
                         </p>
                       </Card>
                       <div>
-                        {!updateCommentLoading ? (
-                          <div className=" flex items-center gap-4">
-                            <span className="text-gray-400 text-xs ">
-                              {formatTime(comment?.createdAt)}
-                            </span>
-                            <button className="text-gray-500 hover:text-gray-700 text-xs">
-                              Like
-                            </button>
+                        <div className=" flex items-center gap-4">
+                          <span className="text-gray-400 text-xs ">
+                            {formatCommentDate(item?.createdAt)}
+                          </span>
+                          <button
+                            disabled
+                            className="text-gray-500 hover:text-gray-700 text-xs"
+                          >
+                            Like
+                          </button>
 
-                            <button className="text-gray-500 hover:text-gray-700 text-xs">
-                              Reply
-                            </button>
-                          </div>
-                        ) : (
-                          "Updating..."
-                        )}
+                          <button
+                            disabled
+                            className="text-gray-500 hover:text-gray-700 text-xs"
+                          >
+                            Reply
+                          </button>
+                        </div>
                       </div>
                     </div>
-                    {user?._id === comment?.userId?._id && (
+                    {user?._id === item?.userId?._id && (
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <ActionButton
-                          onEdit={() => handleEditComment(comment)}
-                          onDelete={() => handleDeleteComment(comment._id)}
+                          onEdit={() => handleEditComment(item)}
+                          onDelete={() => handleDeleteComment(item._id)}
                         />
                       </div>
                     )}
@@ -296,13 +285,14 @@ const PostComment: React.FC<PostCommentProps> = ({
                       onSubmit={(data, reset) =>
                         handleUpdateComment(data, reset)
                       }
-                      defaultValues={{ comment: editingComment?.comment }}
+                      // defaultValues={{ comment: editingComment?.comment }}
+                      defaultValues={{ comment: item?.comment }}
                     >
                       <LinkUpTextarea
                         name="comment"
                         size="sm"
                         focusRef={(el) =>
-                          (editCommentRef.current[comment?._id] = el)
+                          (editCommentRef.current[item?._id] = el)
                         }
                         placeholder="Edit your comment"
                         endContent={<SendHorizontal />}
@@ -323,7 +313,7 @@ const PostComment: React.FC<PostCommentProps> = ({
         })}
 
         {/* Form for adding new comments */}
-        {!hideComments && !post && showAllComments && commentTextarea}
+        {!hideComments && !post && showAllComments && addComment}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ export default function LinkUpSelect({
 }: IProps) {
   const {
     register,
-    formState: { errors },
+    // formState: { errors },
   } = useFormContext();
 
   return (

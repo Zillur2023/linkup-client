@@ -1,4 +1,5 @@
 "use client";
+import { useUser } from "@/context/UserProvider";
 import { IUser } from "@/type";
 import { Button, Spinner, Tooltip } from "@heroui/react";
 import { ReactNode, useState } from "react";
@@ -20,6 +21,7 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
   className,
   startContent,
 }) => {
+  const { user } = useUser();
   const [loadingStates, setLoadingStates] = useState<{
     [key: string]: boolean;
   }>({});
@@ -41,7 +43,9 @@ const LinkUpButton: React.FC<LinkUpButtonProps> = ({
         <Tooltip
           content={
             <div className="whitespace-pre-wrap">
-              {data?.map((item) => item?.name).join("\n")}
+              {data
+                ?.map((item) => (item?._id === user?._id ? "You" : item?.name))
+                .join("\n")}
             </div>
           }
           closeDelay={0}

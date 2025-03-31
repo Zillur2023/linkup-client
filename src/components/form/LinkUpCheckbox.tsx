@@ -10,7 +10,7 @@ interface LinkUpCheckboxProps {
 const LinkUpCheckbox: React.FC<LinkUpCheckboxProps> = ({ name, label }) => {
   const {
     register,
-    formState: { errors },
+    // formState: { errors },
   } = useFormContext();
 
   return (

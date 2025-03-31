@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useState, KeyboardEvent, useRef } from "react";
+import { ReactNode, useEffect, KeyboardEvent, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { Button, Card, Textarea } from "@heroui/react";
@@ -7,6 +7,8 @@ import { Button, Card, Textarea } from "@heroui/react";
 interface LinkUpTextareaProps {
   name: string;
   label?: string;
+  minRows?: number;
+  maxRows?: number;
   labelPlacement?: "outside" | "outside-left" | "inside" | undefined;
   placeholder?: string;
   required?: boolean;
@@ -22,6 +24,8 @@ interface LinkUpTextareaProps {
 export default function LinkUpTextarea({
   name,
   label,
+  minRows,
+  maxRows,
   labelPlacement,
   placeholder,
   required = false,
@@ -56,20 +60,19 @@ export default function LinkUpTextarea({
     }
   };
 
-  console.log("watch(name)", watch(name));
-  console.log({ name });
-
   return (
     <Card
-      shadow={name === "content" ? "none" : "md"}
+      shadow={minRows === 4 ? "none" : "md"}
       className={`${endContent ? "relative" : ""} w-full rounded-lg   `}
     >
       <Textarea
         {...register(name)}
         label={label}
         // minRows={!watch(name) ? 1 : 2}
-        minRows={name === "content" ? 4 : 1}
-        maxRows={name === "content" ? 12 : 8}
+        // minRows={name === "content" ? 4 : 1}
+        // maxRows={name === "content" ? 12 : 8}
+        minRows={minRows}
+        maxRows={maxRows}
         labelPlacement={labelPlacement}
         placeholder={placeholder}
         required={required}

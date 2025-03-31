@@ -84,7 +84,6 @@ const MarketplacePage = () => {
       <div className="  md:block  w-full md:w-[75%]   ">
         <div className="gap-2 grid md:grid-cols-3 lg:grid-cols-4 px-10 md:px-0 ">
           {list.map((item, index) => (
-            /* eslint-disable no-console */
             <Card
               key={index}
               isPressable

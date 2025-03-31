@@ -1,16 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { SubmitHandler } from "react-hook-form";
 import Link from "next/link";
-import { ChangeEvent, useState } from "react";
 import { registerValidationSchema } from "@/schemas";
 import { useCreateUserMutation } from "@/redux/features/user/userApi";
-import { Avatar, Badge, Button } from "@heroui/react";
+import { Button } from "@heroui/react";
 import LinkUpForm from "@/components/form/LinkUpForm";
 import LinkUpInput from "@/components/form/LinkUpInput";
 import LinkUpInputFile from "@/components/form/LinkUpInputFile";
@@ -26,7 +22,7 @@ const RegisterPage: React.FC = () => {
   const [createUser] = useCreateUserMutation();
 
   // const onSubmit: SubmitHandler<IRegisterUser> = async (data) => {
-  const onSubmit = async (data: any, reset?: () => void) => {
+  const onSubmit = async (data: any) => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     formData.append("profileImage", data?.profileImage);

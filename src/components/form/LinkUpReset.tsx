@@ -1,20 +1,11 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@heroui/react";
-import { Editor } from "@tiptap/react";
 
-interface LinkUpResetProps {
-  editor?: Editor | null;
-}
-
-const LinkUpReset: React.FC<LinkUpResetProps> = ({ editor }) => {
+const LinkUpReset = () => {
   const { reset } = useFormContext(); // Access the reset method
 
   const handleReset = () => {
-    if (editor) {
-      // editor.commands.setContent(""); // Reset the editor content
-      editor?.commands.clearContent();
-    }
     reset(); // Resets the form to default values
   };
 
