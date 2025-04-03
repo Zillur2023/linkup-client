@@ -75,7 +75,7 @@ export default function LinkUpModal({
     <>
       {openButtonIcon
         ? openButtonIcon && (
-            <Button isIconOnly size="sm" variant={variant} onPress={onOpen}>
+            <Button isIconOnly size="sm" variant={variant} onClick={onOpen}>
               {openButtonIcon}
             </Button>
           )
@@ -89,7 +89,7 @@ export default function LinkUpModal({
               startContent={startContent}
               fullWidth={fullWidth}
               className={`${className} `}
-              onPress={onOpen}
+              onClick={onOpen}
             >
               {openButtonText}
             </Button>
@@ -108,7 +108,7 @@ export default function LinkUpModal({
           }
           isIconOnly={!!openButtonIcon}
           startContent={startContent}
-          onPress={onOpen}
+          onClick={onOpen}
         >
           {openButtonIcon || openButtonText}
         </Button> */}
@@ -133,14 +133,14 @@ export default function LinkUpModal({
 
               {footerButton && (
                 <ModalFooter>
-                  <Button color="danger" size="sm" onPress={onClose}>
+                  <Button color="danger" size="sm" onClick={onClose}>
                     Close
                   </Button>
 
                   <Button
                     color="primary"
                     size="sm"
-                    onPress={() => {
+                    onClick={() => {
                       if (onUpdate) onUpdate();
                       // onClose();
                     }}

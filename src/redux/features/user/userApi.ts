@@ -1,3 +1,4 @@
+import { IUserApiResponse, IUsersApiResponse } from "@/type";
 import { baseApi } from "../../api/baseApi";
 
 const userApi = baseApi.injectEndpoints({
@@ -11,14 +12,14 @@ const userApi = baseApi.injectEndpoints({
       invalidatesTags: ["User"],
     }),
 
-    getAllUser: builder.query({
-      query: ({
-        searchQuery,
-        userId,
-      }: {
+    getAllUser: builder.query<
+      IUsersApiResponse,
+      {
         searchQuery?: string;
         userId?: string;
-      }) => {
+      }
+    >({
+      query: ({ searchQuery, userId }) => {
         let url = `/user/all-user${userId ? `/${userId}` : ""}`;
 
         const params = new URLSearchParams();
@@ -33,7 +34,7 @@ const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["User", "Post", "Comment"],
+      providesTags: ["User", "Post", "Comment", "Chat"],
     }),
 
     getUserByEmail: builder.query({
@@ -44,12 +45,12 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
 
-    getUserById: builder.query({
-      query: (id: any) => ({
+    getUserById: builder.query<IUserApiResponse, string>({
+      query: (id) => ({
         url: `/user/${id}`,
         method: "GET",
       }),
-      providesTags: ["User", "Post", "Comment"],
+      providesTags: ["User", "Post", "Comment", "Chat"],
     }),
 
     updateUser: builder.mutation({
@@ -58,7 +59,7 @@ const userApi = baseApi.injectEndpoints({
         method: "PUT",
         body: formData,
       }),
-      invalidatesTags: ["User", "Post"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
 
     updateFollowUnfollow: builder.mutation({

@@ -1,3 +1,4 @@
+import { IPostApiResponse } from "@/type";
 import { baseApi } from "../../api/baseApi";
 
 export const postApi = baseApi.injectEndpoints({
@@ -8,17 +9,12 @@ export const postApi = baseApi.injectEndpoints({
         method: "POST",
         body: postData,
       }),
-      invalidatesTags: ["Post", "User", "Comment"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
 
-    getAllPost: builder.query({
-      query: ({
-        postId,
-        userId,
-        searchQuery,
-        sortBy,
-        isPremium,
-      }: {
+    getAllPost: builder.query<
+      IPostApiResponse,
+      {
         postId?: string;
         userId?: string;
         searchQuery?: string;
@@ -28,30 +24,26 @@ export const postApi = baseApi.injectEndpoints({
           | "highestDownvotes"
           | "lowestDownvotes";
         isPremium?: boolean;
-      }) => {
+      }
+    >({
+      query: ({ postId, userId, searchQuery, sortBy, isPremium }) => {
         const params = new URLSearchParams();
 
         if (postId) params.append("postId", postId);
         if (userId) params.append("userId", userId);
         if (searchQuery) params.append("searchQuery", searchQuery);
         if (sortBy) params.append("sortBy", sortBy);
-        if (isPremium !== undefined)
+        if (isPremium !== undefined) {
           params.append("isPremium", isPremium.toString());
-        // console.log(
-        //   "getAllPosts params:",
-        //   Object.fromEntries(params.entries())
-        // );
+        }
 
         const url = `/post/all-post${
           params.toString() ? `?${params.toString()}` : ""
         }`;
 
-        return {
-          url,
-          method: "GET",
-        };
+        return { url, method: "GET" };
       },
-      providesTags: ["User", "Post", "Comment"],
+      providesTags: ["User", "Post", "Comment", "Chat"],
     }),
     updateLikes: builder.mutation({
       query: (postData) => ({
@@ -59,7 +51,7 @@ export const postApi = baseApi.injectEndpoints({
         method: "PUT",
         body: postData,
       }),
-      invalidatesTags: ["Post", "User"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
     updateDislikes: builder.mutation({
       query: (postData) => ({
@@ -67,7 +59,7 @@ export const postApi = baseApi.injectEndpoints({
         method: "PUT",
         body: postData,
       }),
-      invalidatesTags: ["Post", "User"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
     updatePost: builder.mutation({
       query: (postData) => ({
@@ -75,21 +67,21 @@ export const postApi = baseApi.injectEndpoints({
         method: "PUT",
         body: postData,
       }),
-      invalidatesTags: ["Post", "User"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
     deletePost: builder.mutation({
       query: (postId) => ({
         url: `/post/delete/${postId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Post", "User"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
     isAvailableForVeried: builder.query({
       query: (id) => ({
         url: `/post/isAvailable-verified/${id}`,
         method: "GET",
       }),
-      providesTags: ["Post"],
+      providesTags: ["User", "Post", "Comment", "Chat"],
     }),
   }),
 });

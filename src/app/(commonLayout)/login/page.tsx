@@ -19,7 +19,6 @@ export type ILoginUser = {
 
 const LoginPage = () => {
   const router = useRouter();
-  // const dispatch = useAppDispatch();
   const [login] = useLoginMutation();
   const { setIsLoading: userLoading } = useUser();
 
@@ -28,6 +27,7 @@ const LoginPage = () => {
 
     try {
       const res = await login(formData).unwrap();
+      console.log({ res });
 
       if (res?.success) {
         userLoading(true);

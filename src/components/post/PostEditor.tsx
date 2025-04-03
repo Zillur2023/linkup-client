@@ -8,7 +8,7 @@ import {
 } from "@/redux/features/post/postApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/react";
-import { IPost, IUserData } from "@/type";
+import { IPost } from "@/type";
 import { useUser } from "@/context/UserProvider";
 import LinkUpModal from "../shared/LinkUpModal";
 import { postEditorValidationSchema } from "@/schemas";
@@ -39,7 +39,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
 }) => {
   const clickSubmitRef = useRef<HTMLButtonElement | null>(null);
   const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
+  const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
 

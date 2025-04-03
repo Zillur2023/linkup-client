@@ -39,14 +39,16 @@ const TabsMenu: React.FC<TabsMenuProps> = ({
                   // size={isIconOnly ? "lg" : "md"}
                   size={"lg"}
                   isIconOnly={isIconOnly}
+                  startContent={item?.label}
                   className={`${
-                    selectedKey === item.href ? "text-blue-500" : ""
+                    // selectedKey === item.href ? "text-blue-500" : ""
+                    selectedKey === item.href ? "text-blue-500 " : ""
                   }   `}
                   href={item.href}
                   as={Link}
                   variant="light"
                 >
-                  {item?.label}
+                  {/* {item?.label} */}
                 </Button>
               </Tooltip>
             ) : (

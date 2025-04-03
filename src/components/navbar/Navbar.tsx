@@ -8,7 +8,10 @@ import {
   NavbarMenu,
   NavbarMenuItem,
 } from "@heroui/react";
-import { House, Users, Store, Group } from "lucide-react";
+import { FiHome } from "react-icons/fi";
+import { LiaUserFriendsSolid } from "react-icons/lia";
+import { AiTwotoneShop } from "react-icons/ai";
+import { GrGroup } from "react-icons/gr";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserProvider";
@@ -19,6 +22,7 @@ import {
 import TabsMenu from "../shared/TabsMenu";
 import { ChatDropdown, UserDropdown } from "./Dropdowns";
 import SearchBar from "./SearchBar";
+import { CiShop } from "react-icons/ci";
 
 // Define types for better type safety
 interface MenuItem {
@@ -28,10 +32,18 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { href: "/", label: <House />, icon: "home" },
-  { href: "/friends", label: <Users />, icon: "friends" },
-  { href: "/marketplace", label: <Store />, icon: "marketplace" },
-  { href: "#group", label: <Group />, icon: "group" },
+  { href: "/", label: <FiHome size={24} />, icon: "home" },
+  {
+    href: "/friends",
+    label: <LiaUserFriendsSolid size={24} />,
+    icon: "friends",
+  },
+  {
+    href: "/marketplace",
+    label: <CiShop strokeWidth={0.5} size={24} />,
+    icon: "marketplace",
+  },
+  { href: "#group", label: <GrGroup size={24} />, icon: "group" },
   // { href: "#menu", label: <Menu />, icon: "menu" },
 ];
 
@@ -44,10 +56,11 @@ const Navbar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery(user?._id, {
+  const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
   const { data: allUserData } = useGetAllUserQuery({ searchQuery: search });
+  console.log({ allUserData });
 
   const handleSearchSubmit = () => {
     router.push(`/search/top?q=${search}`);
@@ -76,15 +89,21 @@ const Navbar: React.FC = () => {
                 onSearchChange={setSearch}
                 onFocusChange={setIsFocused}
                 onSearchSubmit={handleSearchSubmit}
-                searchResults={allUserData?.data || []}
+                searchResults={
+                  Array.isArray(allUserData?.data)
+                    ? allUserData?.data
+                    : allUserData?.data
+                    ? [allUserData?.data]
+                    : []
+                }
                 inputRef={inputRef}
               />
             </div>
           </NavbarContent>
 
           <NavbarContent className="w-[20%]  " as={"div"} justify="end">
-            <ChatDropdown userData={userData?.data || null} />
-            <UserDropdown userData={userData?.data || null} />
+            {userData?.data && <ChatDropdown user={userData?.data} />}
+            <UserDropdown user={userData?.data || null} />
           </NavbarContent>
           <NavbarMenu>
             {menuItems.map((item, index) => (
@@ -139,7 +158,13 @@ const Navbar: React.FC = () => {
             onSearchChange={setSearch}
             onFocusChange={setIsFocused}
             onSearchSubmit={handleSearchSubmit}
-            searchResults={allUserData?.data || []}
+            searchResults={
+              Array.isArray(allUserData?.data)
+                ? allUserData?.data
+                : allUserData?.data
+                ? [allUserData?.data]
+                : []
+            }
             inputRef={inputRef}
           />
         </NavbarContent>
@@ -147,8 +172,8 @@ const Navbar: React.FC = () => {
           <TabsMenu selectedKey={pathname} items={menuItems} tooltip={true} />
         </NavbarContent>
         <NavbarContent className="-mr-6 " as={"div"} justify="end">
-          <ChatDropdown userData={userData?.data || null} />
-          <UserDropdown userData={userData?.data || null} />
+          {userData?.data && <ChatDropdown user={userData?.data || null} />}
+          <UserDropdown user={userData?.data || null} />
         </NavbarContent>
       </HeroUiNavbar>
     </>

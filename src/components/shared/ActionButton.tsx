@@ -6,7 +6,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/react";
-import { Ellipsis, EllipsisVertical } from "lucide-react";
+import { VscEllipsis } from "react-icons/vsc";
 import { useRef } from "react";
 import PostEditor from "../post/PostEditor";
 import LinkUpModal from "./LinkUpModal";
@@ -32,7 +32,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       <Dropdown>
         <DropdownTrigger>
           <Button isIconOnly size="sm" radius="full" variant="light">
-            {post ? <EllipsisVertical /> : <Ellipsis />}
+            <VscEllipsis size={24} />
           </Button>
         </DropdownTrigger>
         <DropdownMenu>

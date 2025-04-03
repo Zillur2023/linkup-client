@@ -1,6 +1,6 @@
 import { IUser } from "@/type";
 import { Avatar, Button, Card, AvatarGroup, Divider } from "@heroui/react";
-import { Camera } from "lucide-react";
+import { FaCamera } from "react-icons/fa";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpInputFile from "../form/LinkUpInputFile";
 import LinkUpReset from "../form/LinkUpReset";
@@ -35,8 +35,6 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
     } else if (data?.profileImage) {
       formData.append("profileImage", data?.profileImage);
     }
-
-    // console.log("formDatA editCOver", [...formData.entries()]);
 
     const toastId = toast.loading("loading..");
 
@@ -73,7 +71,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
                   {user?.coverImage ? "Update cover image" : "Add cover image"}
                 </span>
               }
-              startContent={<Camera />}
+              startContent={<FaCamera size={24} />}
               header={`${
                 user?.coverImage ? "Update cover image" : "Add cover image"
               }`}
@@ -118,7 +116,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
               <div className="absolute bottom-5 right-0 ">
                 <LinkUpModal
                   radius="full"
-                  openButtonIcon={<Camera />}
+                  openButtonIcon={<FaCamera size={24} />}
                   header={`${
                     user?.profileImage
                       ? "Update profile image"

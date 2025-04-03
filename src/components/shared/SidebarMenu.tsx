@@ -2,10 +2,12 @@
 
 import { useUser } from "@/context/UserProvider";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
-import { IUserData } from "@/type";
 import { Avatar, Tab, Tabs } from "@heroui/react";
 import Link from "next/link";
-import { Group, House, Store, Users } from "lucide-react";
+import { FiHome } from "react-icons/fi";
+import { LiaUserFriendsSolid } from "react-icons/lia";
+import { AiTwotoneShop } from "react-icons/ai";
+import { GrGroup } from "react-icons/gr";
 import { usePathname } from "next/navigation";
 
 interface MenuItem {
@@ -24,10 +26,9 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
   // const query = searchParams.get("q");
   // const id = searchParams.get("id");
   // const url = query ? `${pathname}?q=${query}` : `${pathname}?id=${id}`;
-  // console.log({ url });
 
   const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
+  const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
 
@@ -40,10 +41,18 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
       label: userName,
       icon: <Avatar className="w-6 h-6" src={profileImage} />,
     },
-    { href: "/", label: "Home", icon: <House /> },
-    { href: "/friends", label: "Friends", icon: <Users /> },
-    { href: "/marketplace", label: "Marketplace", icon: <Store /> },
-    { href: "#group", label: "Group", icon: <Group /> },
+    { href: "/", label: "Home", icon: <FiHome size={24} /> },
+    {
+      href: "/friends",
+      label: "Friends",
+      icon: <LiaUserFriendsSolid size={24} />,
+    },
+    {
+      href: "/marketplace",
+      label: "Marketplace",
+      icon: <AiTwotoneShop size={24} />,
+    },
+    { href: "#group", label: "Group", icon: <GrGroup size={24} /> },
   ];
 
   const menuItems = items ? items : defaultItems;

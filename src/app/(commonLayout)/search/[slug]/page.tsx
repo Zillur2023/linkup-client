@@ -3,7 +3,8 @@ import Posts from "@/components/post/Posts";
 import SidebarMenu from "@/components/shared/SidebarMenu";
 import TabsMenu from "@/components/shared/TabsMenu";
 import TopSearch from "@/components/common/TopSearch";
-import { FileText, Newspaper } from "lucide-react";
+import { BsPostcard } from "react-icons/bs";
+import { HiOutlineNewspaper } from "react-icons/hi2";
 import { useParams, usePathname, useSearchParams } from "next/navigation";
 
 const SearchPage = () => {
@@ -15,11 +16,15 @@ const SearchPage = () => {
   const url = query ? `${pathname}?q=${query}` : pathname;
 
   const items = [
-    { href: `/search/top?q=${query}`, label: "All", icon: <Newspaper /> },
+    {
+      href: `/search/top?q=${query}`,
+      label: "All",
+      icon: <HiOutlineNewspaper />,
+    },
     {
       href: `/search/posts?q=${query}`,
       label: "Posts",
-      icon: <FileText />,
+      icon: <BsPostcard />,
     },
   ];
 

@@ -1,6 +1,6 @@
 import { IUser } from "@/type";
 import { User } from "@heroui/react";
-import { VerifiedIcon } from "lucide-react";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 import Link from "next/link";
 import { ReactNode } from "react";
 
@@ -24,7 +24,7 @@ export default function Author({
               {author?.name}
             </span>
             {author?.isVerified && (
-              <VerifiedIcon className="w-5 h-5 text-blue-500" />
+              <RiVerifiedBadgeFill className="w-5 h-5 text-blue-500" />
             )}
           </span>
         </Link>

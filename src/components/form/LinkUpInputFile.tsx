@@ -1,4 +1,4 @@
-import { ImageUp } from "lucide-react";
+import { IoMdImages } from "react-icons/io";
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Button } from "@heroui/react";
@@ -79,7 +79,7 @@ const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
               // }
               onClick={openFileDialog}
               fullWidth
-              startContent={<ImageUp />}
+              startContent={<IoMdImages size={24} />}
             >
               {label}
             </Button>

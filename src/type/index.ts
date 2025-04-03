@@ -43,8 +43,17 @@ export interface IUser {
   updatedAt: string;
 }
 
-export interface IUserData {
-  data: { data: IUser };
+export interface IUserApiResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: IUser;
+}
+export interface IUsersApiResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: IUser[];
 }
 
 export interface IPost {
@@ -60,8 +69,11 @@ export interface IPost {
   updatedAt: string;
 }
 
-export interface IPostData {
-  data: { data: IPost[] };
+export interface IPostApiResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: IPost[];
 }
 
 export interface IComment {

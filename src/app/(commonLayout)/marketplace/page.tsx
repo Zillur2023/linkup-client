@@ -88,7 +88,7 @@ const MarketplacePage = () => {
               key={index}
               isPressable
               shadow="sm"
-              onPress={() => console.log("item pressed")}
+              onClick={() => console.log("item pressed")}
             >
               <CardBody className="overflow-visible p-0">
                 <Image

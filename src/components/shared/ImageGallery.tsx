@@ -1,5 +1,6 @@
 import { Button, Card, Image } from "@heroui/react";
-import { ImageUp, X } from "lucide-react";
+import { GrClose } from "react-icons/gr";
+import { BsImages } from "react-icons/bs";
 import LinkUpModal from "./LinkUpModal";
 import { useRef } from "react";
 
@@ -69,7 +70,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           onClick={addImage}
           className=" z-50 top-2 left-2 absolute "
           radius="full"
-          startContent={<ImageUp size={15} />}
+          startContent={<BsImages size={24} />}
           size="sm"
         >
           Add images
@@ -88,7 +89,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           className="  z-50 top-2 right-2 absolute  "
           size="sm"
         >
-          <X size={20} />
+          <GrClose size={24} />
         </Button>
       )}
       {imageGallery.length === 1 && (
@@ -183,50 +184,46 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           </div>
         </div>
       )}
-      {field && (
-        <div className=" hidden">
-          {" "}
-          <LinkUpModal
-            clickRef={clickRef}
-            openButtonText={"show all image"}
-            modalSize="3xl"
-            scrollBehavior="inside"
-            header={"Remove image"}
-            backdrop="transparent"
-          >
-            <div className="gap-2 grid md:grid-cols-3 lg:grid-cols-4 ">
-              {field?.value.map((file, index) => (
-                <Card key={index} className=" relative" shadow="sm">
-                  <Button
-                    onClick={() => handleImageRemove(index)}
-                    className=" z-20 top-2 right-2 absolute"
-                    isIconOnly
-                    radius="full"
-                    size="sm"
-                  >
-                    <X size={20} />
-                  </Button>
-                  <Image
-                    // alt={image}
-                    alt={`preview-${index}`}
-                    className="w-[240px] object-cover h-[140px]"
-                    radius="lg"
-                    shadow="sm"
-                    // src={image}
-                    // src={URL.createObjectURL(file)}
-                    src={
-                      typeof file === "string"
-                        ? file
-                        : URL.createObjectURL(file)
-                    }
-                    width="100%"
-                  />
-                </Card>
-              ))}
-            </div>
-          </LinkUpModal>
-        </div>
-      )}
+      <div className=" hidden">
+        {" "}
+        <LinkUpModal
+          clickRef={clickRef}
+          openButtonText={"show all image"}
+          modalSize="3xl"
+          scrollBehavior="inside"
+          header={"Remove image"}
+          backdrop="transparent"
+        >
+          <div className="gap-2 grid md:grid-cols-3 lg:grid-cols-4 ">
+            {imageGallery?.map((file, index) => (
+              <Card key={index} className=" relative" shadow="sm">
+                <Button
+                  onClick={() => handleImageRemove(index)}
+                  className=" z-20 top-2 right-2 absolute"
+                  isIconOnly
+                  radius="full"
+                  size="sm"
+                >
+                  <GrClose size={24} />
+                </Button>
+                <Image
+                  // alt={image}
+                  alt={`preview-${index}`}
+                  className="w-[240px] object-cover h-[140px]"
+                  radius="lg"
+                  shadow="sm"
+                  // src={image}
+                  // src={URL.createObjectURL(file)}
+                  src={
+                    typeof file === "string" ? file : URL.createObjectURL(file)
+                  }
+                  width="100%"
+                />
+              </Card>
+            ))}
+          </div>
+        </LinkUpModal>
+      </div>
     </div>
   );
 };

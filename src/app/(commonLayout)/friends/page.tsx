@@ -8,7 +8,7 @@ import {
   useRejectFriendRequestMutation,
   useSendFriendRequestMutation,
 } from "@/redux/features/user/userApi";
-import { IUser, IUserData } from "@/type";
+import { IUser } from "@/type";
 import {
   Button,
   Card,
@@ -78,15 +78,7 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
   );
 };
 
-const SuggestedFriends = () => {
-  const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
-    skip: !user?._id,
-  });
-
-  // const { data: allUserData } = useGetAllUserQuery<IUserData[]>({
-  //   searchQuery: "",
-  // });
+const SuggestedFriends = ({ user }: { user: IUser }) => {
   const { data: allUserData } = useGetAllUserQuery({
     searchQuery: "",
   });
@@ -97,10 +89,8 @@ const SuggestedFriends = () => {
   const filteredUsers = allUserData?.data?.filter(
     (usr: any) =>
       usr._id !== user?._id &&
-      !userData?.data?.friendRequestsReceived?.some(
-        (item) => item?._id === usr?._id
-      ) &&
-      !userData?.data?.friendRequestsSent?.includes(usr?._id)
+      !user?.friendRequestsReceived?.some((item) => item?._id === usr?._id) &&
+      !user?.friendRequestsSent?.includes(usr?._id)
   );
 
   const SendFriendRequest = async (receiverId: string) => {
@@ -145,7 +135,7 @@ const SuggestedFriends = () => {
 
 const FriendsPage = () => {
   const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
+  const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
 
@@ -155,9 +145,9 @@ const FriendsPage = () => {
         <SidebarMenu />
       </div>
       <div className=" md:block  w-full md:w-[75%]    ">
-        <FriendRequestsReceived user={userData?.data} />
+        {userData?.data && <FriendRequestsReceived user={userData.data} />}
         <Divider className=" my-8" />
-        <SuggestedFriends />
+        {userData?.data && <SuggestedFriends user={userData.data} />}
       </div>
     </div>
   );

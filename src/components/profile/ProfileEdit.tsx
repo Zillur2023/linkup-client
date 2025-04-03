@@ -5,7 +5,8 @@ import LinkUpForm from "../form/LinkUpForm";
 import LinkUpInputFile from "../form/LinkUpInputFile";
 import { Button } from "@heroui/react";
 import LinkUpReset from "../form/LinkUpReset";
-import { Edit } from "lucide-react";
+import { MdEdit } from "react-icons/md";
+
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import { useUpdateUserMutation } from "@/redux/features/user/userApi";
 import { toast } from "sonner";
@@ -25,8 +26,6 @@ const ProfileEdit = (user: IUser) => {
         _id: user?._id,
       })
     );
-
-    // console.log("formDatA profileEdiT", [...formData.entries()]);
 
     const toastId = toast.loading("loading...");
     try {
@@ -48,7 +47,7 @@ const ProfileEdit = (user: IUser) => {
 
   return (
     <LinkUpModal
-      startContent={<Edit />}
+      startContent={<MdEdit size={24} />}
       openButtonText={"Edit Profile"}
       header={` Edit Profile`}
       variant="solid"

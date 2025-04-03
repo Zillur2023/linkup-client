@@ -4,7 +4,7 @@ import {
   useGetAllUserQuery,
   useGetUserByIdQuery,
 } from "@/redux/features/user/userApi";
-import { IUser, IUserData } from "@/type";
+import { IUser } from "@/type";
 import { Avatar, Listbox, ListboxItem, User } from "@heroui/react";
 
 import { useUser } from "@/context/UserProvider";
@@ -22,7 +22,7 @@ export type TItems = ISelectedUser[];
 
 const UsersList = () => {
   const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery<IUserData>(user?._id, {
+  const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
   const {
@@ -66,7 +66,7 @@ const UsersList = () => {
           {(item: ISelectedUser) => (
             <ListboxItem
               key={item._id}
-              onPress={() => setSelectedUser(item)}
+              onClick={() => setSelectedUser(item)}
               startContent={item.icon}
             >
               {item.label}
@@ -75,7 +75,9 @@ const UsersList = () => {
         </Listbox>
       )}
       <div className="hidden md:block">
-        <ChatDrawer selectedUser={selectedUser} userData={userData?.data} />
+        {userData?.data && (
+          <ChatDrawer selectedUser={selectedUser} user={userData?.data} />
+        )}
       </div>
     </>
   );

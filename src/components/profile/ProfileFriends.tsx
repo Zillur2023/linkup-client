@@ -9,7 +9,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/react";
-import { Ellipsis } from "lucide-react";
+import { VscEllipsis } from "react-icons/vsc";
 
 const ProfileFriends = ({ user }: { user: IUser }) => {
   const [removeFriend] = useRemoveFriendMutation();
@@ -47,7 +47,7 @@ const ProfileFriends = ({ user }: { user: IUser }) => {
           <Dropdown>
             <DropdownTrigger>
               <Button isIconOnly size="sm" variant="light">
-                <Ellipsis />
+                <VscEllipsis size={24} />
               </Button>
             </DropdownTrigger>
             <DropdownMenu>

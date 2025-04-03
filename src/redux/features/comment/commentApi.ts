@@ -8,14 +8,14 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: commentData,
       }),
-      invalidatesTags: ["Comment", "Post", "User"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
     getAllComment: builder.query({
       query: (postId) => ({
         url: `/comment/all-comment/${postId}`,
         method: "GET",
       }),
-      providesTags: ["Comment", "Post", "User"],
+      providesTags: ["User", "Post", "Comment", "Chat"],
     }),
     updateComment: builder.mutation({
       query: (comment) => ({
@@ -23,14 +23,14 @@ export const authApi = baseApi.injectEndpoints({
         method: "PUT",
         body: comment,
       }),
-      invalidatesTags: ["Comment", "Post", "User", "Chat"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
     deleteComment: builder.mutation({
       query: (commentId) => ({
         url: `/comment/delete/${commentId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Comment", "Post", "User"],
+      invalidatesTags: ["User", "Post", "Comment", "Chat"],
     }),
   }),
 });

@@ -14,7 +14,9 @@ import Posts from "./Posts";
 import LinkUpForm from "../form/LinkUpForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { commentValidationSchema } from "@/schemas";
-import { MessageCircle, SendHorizontal } from "lucide-react";
+import { FiMessageCircle } from "react-icons/fi";
+import { IoSend } from "react-icons/io5";
+
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import ActionButton from "../shared/ActionButton";
 import { Avatar, Button, Card } from "@heroui/react";
@@ -41,8 +43,9 @@ const PostComment: React.FC<PostCommentProps> = ({
   focusRef,
   clickRef,
 }) => {
-  console.log({ post });
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  console.log({ editingComment });
   const [expandedComments, setExpandedComments] = useState<{
     [key: string]: boolean;
   }>({});
@@ -58,10 +61,12 @@ const PostComment: React.FC<PostCommentProps> = ({
 
   const [deleteComment] = useDeleteCommentMutation();
   const [createComment] = useCreateCommentMutation();
-  const [updateComment] = useUpdateCommentMutation();
-  const { data: allCommentData } = useGetAllCommentQuery(post?._id, {
-    skip: !post?._id,
-  });
+  const [updateComment, { isLoading: updateCommentIsLoading }] =
+    useUpdateCommentMutation();
+  const { data: allCommentData, isFetching: allCommentDataIsFetching } =
+    useGetAllCommentQuery(post?._id, {
+      skip: !post?._id,
+    });
 
   const commentData = hideComments
     ? []
@@ -89,6 +94,15 @@ const PostComment: React.FC<PostCommentProps> = ({
     data: any,
     reset?: (values?: any) => void
   ) => {
+    console.log("handleUpdateComment data", data);
+    setEditingComment((prev) => {
+      if (!prev) return null; // Ensure `prev` is not null
+
+      return {
+        ...prev,
+        comment: data.comment, // Update only the comment field
+      };
+    });
     if (!editingComment || !user?._id) {
       return;
     }
@@ -100,10 +114,10 @@ const PostComment: React.FC<PostCommentProps> = ({
         postId: post?._id,
         userId: user?._id,
       };
+      // reset?.();
+      setEditingCommentId(null); // Reset editing state
       const res = await updateComment(updatedComment).unwrap();
       console.log({ res });
-      reset?.({ comment: res?.data?.comment }); // Reset the form
-      setEditingComment(null); // Reset editing state
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update comment");
     }
@@ -122,6 +136,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   };
 
   const handleEditComment = (comment: IComment) => {
+    setEditingCommentId(comment?._id);
     setEditingComment(comment); // Set the comment being edited
   };
 
@@ -148,6 +163,7 @@ const PostComment: React.FC<PostCommentProps> = ({
         <LinkUpTextarea
           name="comment"
           size="sm"
+          minRows={1}
           // focusRef={focusRef}
           focusRef={
             modalCommentRef
@@ -155,7 +171,7 @@ const PostComment: React.FC<PostCommentProps> = ({
               : focusRef
           }
           placeholder="Add a comment"
-          endContent={<SendHorizontal />}
+          endContent={<IoSend size={24} />}
           onSubmit={handleCreateComment}
         />
       </LinkUpForm>
@@ -187,7 +203,7 @@ const PostComment: React.FC<PostCommentProps> = ({
                 onClick={() => {
                   modalCommentRef?.current[post?._id]?.focus();
                 }}
-                startContent={<MessageCircle />}
+                startContent={<FiMessageCircle size={24} />}
               >
                 <span>{post?.comments?.length}</span>
               </Button>
@@ -206,7 +222,7 @@ const PostComment: React.FC<PostCommentProps> = ({
 
           return (
             <div key={item?._id} className="   ">
-              {editingComment?._id !== item?._id ? (
+              {editingCommentId !== item?._id ? (
                 <>
                   <div className=" flex gap-1 relative group ">
                     <div>
@@ -226,36 +242,48 @@ const PostComment: React.FC<PostCommentProps> = ({
                         </p>
 
                         <p className=" text-medium  text-start">
-                          {isExpanded ? item?.comment : truncatedText}
-                          {shouldShowSeeMore && (
-                            <button
-                              onClick={() => toggleExpandComment(item._id)}
-                              className="text-blue-500 hover:text-blue-600 ml-1"
-                            >
-                              {isExpanded ? " See less" : " ...See more"}
-                            </button>
+                          {(allCommentDataIsFetching ||
+                            updateCommentIsLoading) &&
+                          editingComment?._id === item?._id ? (
+                            editingComment.comment
+                          ) : (
+                            <>
+                              {isExpanded ? item?.comment : truncatedText}
+                              {shouldShowSeeMore && (
+                                <button
+                                  onClick={() => toggleExpandComment(item._id)}
+                                  className=" text-sm text-blue-500 hover:text-blue-600 ml-1"
+                                >
+                                  {isExpanded ? " See less" : " ...See more"}
+                                </button>
+                              )}
+                            </>
                           )}
                         </p>
                       </Card>
                       <div>
-                        <div className=" flex items-center gap-4">
-                          <span className="text-gray-400 text-xs ">
-                            {formatCommentDate(item?.createdAt)}
-                          </span>
-                          <button
-                            disabled
-                            className="text-gray-500 hover:text-gray-700 text-xs"
-                          >
-                            Like
-                          </button>
+                        {allCommentDataIsFetching || updateCommentIsLoading ? (
+                          <p className=" text-xs">posting...</p>
+                        ) : (
+                          <div className=" flex items-center gap-4">
+                            <span className="text-gray-400 text-xs ">
+                              {formatCommentDate(item?.createdAt)}
+                            </span>
+                            <button
+                              disabled
+                              className="text-gray-500 hover:text-gray-700 text-xs"
+                            >
+                              Like
+                            </button>
 
-                          <button
-                            disabled
-                            className="text-gray-500 hover:text-gray-700 text-xs"
-                          >
-                            Reply
-                          </button>
-                        </div>
+                            <button
+                              disabled
+                              className="text-gray-500 hover:text-gray-700 text-xs"
+                            >
+                              Reply
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                     {user?._id === item?.userId?._id && (
@@ -285,26 +313,27 @@ const PostComment: React.FC<PostCommentProps> = ({
                       onSubmit={(data, reset) =>
                         handleUpdateComment(data, reset)
                       }
-                      // defaultValues={{ comment: editingComment?.comment }}
-                      defaultValues={{ comment: item?.comment }}
+                      defaultValues={{ comment: editingComment?.comment }}
+                      // defaultValues={{ comment: item?.comment }}
                     >
                       <LinkUpTextarea
                         name="comment"
                         size="sm"
+                        minRows={1}
                         focusRef={(el) =>
                           (editCommentRef.current[item?._id] = el)
                         }
-                        placeholder="Edit your comment"
-                        endContent={<SendHorizontal />}
+                        // placeholder="Update comment"
+                        endContent={<IoSend />}
                         onSubmit={handleUpdateComment}
                       />
                     </LinkUpForm>
-                    <div
-                      onClick={() => setEditingComment(null)}
-                      className="flex justify-start text-xs text-blue-500 hover:text-blue-600 hover:underline"
+                    <button
+                      onClick={() => setEditingCommentId(null)}
+                      className=" text-xs  text-blue-500 hover:text-blue-600 hover:underline"
                     >
                       Edit Cancel
-                    </div>
+                    </button>
                   </div>
                 </div>
               )}

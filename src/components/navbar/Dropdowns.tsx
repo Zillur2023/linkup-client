@@ -8,15 +8,13 @@ import {
   Button,
   User,
 } from "@heroui/react";
-import { MessageCircleMore } from "lucide-react";
+import { RiMessengerLine } from "react-icons/ri";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import ChatDrawer from "../shared/ChatDrawer";
 
-export const UserDropdown: React.FC<{ userData: IUser | null }> = ({
-  userData,
-}) => {
-  if (!userData) {
+export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
+  if (!user) {
     return (
       <Button as={Link} color="warning" href="login" variant="flat">
         Sign Up
@@ -31,24 +29,24 @@ export const UserDropdown: React.FC<{ userData: IUser | null }> = ({
           isBordered
           as="button"
           className="transition-transform"
-          name={userData.name}
+          name={user.name}
           size="sm"
-          src={userData.profileImage}
+          src={user.profileImage}
         />
       </DropdownTrigger>
       <DropdownMenu aria-label="Profile Actions" variant="flat">
         <DropdownItem key="profile" className="h-14 gap-2">
           <p className="font-semibold">Signed in as</p>
-          <p className="font-semibold">{userData.email}</p>
+          <p className="font-semibold">{user.email}</p>
         </DropdownItem>
         <DropdownItem
           key="settings"
           as={Link}
-          href={`/profile?id=${userData?._id}`}
+          href={`/profile?id=${user?._id}`}
         >
           <div className="flex items-center space-x-2">
-            <Avatar radius="full" size="sm" src={userData.profileImage} />
-            <span>{userData.name}</span>
+            <Avatar radius="full" size="sm" src={user.profileImage} />
+            <span>{user.name}</span>
           </div>
         </DropdownItem>
         <DropdownItem key="logout" color="danger">
@@ -59,7 +57,7 @@ export const UserDropdown: React.FC<{ userData: IUser | null }> = ({
   );
 };
 
-export const ChatDropdown: React.FC<{ userData: IUser }> = ({ userData }) => {
+export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
   const [selectedUser, setSelectedUser] = useState<{
     _id: string;
     user: ReactNode;
@@ -67,7 +65,7 @@ export const ChatDropdown: React.FC<{ userData: IUser }> = ({ userData }) => {
   // Use a Map to store the last chat for each unique senderId-receiverId pair
   const lastChatsMap = new Map();
 
-  userData?.chats?.forEach((chat) => {
+  user?.chats?.forEach((chat) => {
     // Create a sorted key to handle reverse pairs (e.g., user1-user2 and user2-user1)
     const key = [chat.senderId._id, chat.receiverId._id].sort().join("-");
 
@@ -88,7 +86,7 @@ export const ChatDropdown: React.FC<{ userData: IUser }> = ({ userData }) => {
     <>
       <Dropdown>
         <DropdownTrigger>
-          <MessageCircleMore size={36} />
+          <RiMessengerLine size={36} />
         </DropdownTrigger>
         <DropdownMenu aria-label="Profile Actions" variant="flat">
           {lastChatsArray.map((item) => {
@@ -96,19 +94,19 @@ export const ChatDropdown: React.FC<{ userData: IUser }> = ({ userData }) => {
               <User
                 avatarProps={{
                   src:
-                    item.senderId._id === userData?._id
+                    item.senderId._id === user?._id
                       ? item.receiverId.profileImage
                       : item.senderId.profileImage,
                 }}
                 description={
                   showContent && item.content
-                    ? item.senderId._id === userData?._id
+                    ? item.senderId._id === user?._id
                       ? `You: ${item.content}`
                       : item.content
                     : "Active now"
                 }
                 name={
-                  item.senderId._id === userData?._id
+                  item.senderId._id === user?._id
                     ? item.receiverId.name
                     : item.senderId.name
                 }
@@ -117,10 +115,10 @@ export const ChatDropdown: React.FC<{ userData: IUser }> = ({ userData }) => {
             return (
               <DropdownItem
                 key={item._id}
-                onPress={() =>
+                onClick={() =>
                   setSelectedUser({
                     _id:
-                      item.senderId._id === userData?._id
+                      item.senderId._id === user?._id
                         ? item.receiverId._id
                         : item.senderId._id,
                     user: getUserComponent(),
@@ -134,7 +132,7 @@ export const ChatDropdown: React.FC<{ userData: IUser }> = ({ userData }) => {
           })}
         </DropdownMenu>
       </Dropdown>
-      <ChatDrawer selectedUser={selectedUser} userData={userData} />
+      <ChatDrawer selectedUser={selectedUser} user={user} />
     </>
   );
 };

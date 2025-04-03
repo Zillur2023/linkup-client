@@ -5,7 +5,6 @@ import ProfileFriends from "@/components/profile/ProfileFriends";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import ProfileHome from "@/components/profile/ProfileHome";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
-import { IUserData } from "@/type";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const ProfilePageContent = () => {
@@ -14,7 +13,7 @@ const ProfilePageContent = () => {
   const id = searchParams.get("id");
   const sk = searchParams.get("sk");
 
-  const { data: userData } = useGetUserByIdQuery<IUserData>(id);
+  const { data: userData } = useGetUserByIdQuery({ id: id as string });
 
   const profileRoute = [
     { href: `${pathname}?id=${id}`, label: "posts" },
@@ -22,15 +21,19 @@ const ProfilePageContent = () => {
   ];
 
   const renderSection = () => {
-    if (sk === "friends") {
-      return <ProfileFriends user={userData?.data} />;
+    if (userData?.data) {
+      if (sk === "friends") {
+        return <ProfileFriends user={userData?.data} />;
+      }
+      return <ProfileHome {...userData?.data} />;
     }
-    return <ProfileHome {...userData?.data} />;
   };
 
   return (
     <div>
-      <ProfileHeader user={userData?.data} profileRoute={profileRoute} />
+      {userData?.data && (
+        <ProfileHeader user={userData?.data} profileRoute={profileRoute} />
+      )}
       <div className="px-5">{renderSection()}</div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { IUser } from "@/type";
 import { Card, Input, Listbox, ListboxItem } from "@heroui/react";
-import { Search } from "lucide-react";
+import { GoSearch } from "react-icons/go";
+
 import Link from "next/link";
 
 interface SearchBarProps {
@@ -52,7 +53,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           }}
           placeholder="Type to search..."
           size="sm"
-          startContent={!isFocused && <Search strokeWidth={1} />}
+          startContent={!isFocused && <GoSearch size={24} />}
           type="search"
           onFocus={() => onFocusChange(true)}
           onBlur={() => onFocusChange(false)}

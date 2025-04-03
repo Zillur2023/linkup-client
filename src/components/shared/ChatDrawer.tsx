@@ -15,7 +15,7 @@ import { ReactNode, useEffect } from "react";
 import { toast } from "sonner";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpTextarea from "../form/LinkUpTextarea";
-import { SendHorizontal } from "lucide-react";
+import { IoSend } from "react-icons/io5";
 import { formatChatTooltipDate } from "@/uitls/formatDate";
 
 export interface ISelectedUser {
@@ -73,10 +73,10 @@ const ChatMessages = ({
 
 const ChatDrawer = ({
   selectedUser,
-  userData,
+  user,
 }: {
   selectedUser: ISelectedUser | null;
-  userData: IUser;
+  user: IUser;
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [createChat] = useCreateChatMutation();
@@ -91,7 +91,7 @@ const ChatDrawer = ({
     try {
       const newChat = {
         ...data,
-        senderId: userData?._id,
+        senderId: user?._id,
         receiverId: selectedUser?._id,
         content: data.content,
       };
@@ -102,11 +102,11 @@ const ChatDrawer = ({
     }
   };
 
-  const filteredChats = userData?.chats?.filter(
+  const filteredChats = user?.chats?.filter(
     (msg) =>
-      (msg.senderId?._id === userData?._id &&
+      (msg.senderId?._id === user?._id &&
         msg.receiverId?._id === selectedUser?._id) ||
-      (msg.receiverId?._id === userData?._id &&
+      (msg.receiverId?._id === user?._id &&
         msg.senderId?._id === selectedUser?._id)
   );
 
@@ -132,7 +132,7 @@ const ChatDrawer = ({
             <DrawerBody>
               <ChatMessages
                 messages={filteredChats || []}
-                currentUserId={userData?._id || ""}
+                currentUserId={user?._id || ""}
               />
             </DrawerBody>
             <DrawerFooter>
@@ -145,7 +145,7 @@ const ChatDrawer = ({
                     size="sm"
                     placeholder="Aa"
                     minRows={1}
-                    endContent={<SendHorizontal />}
+                    endContent={<IoSend />}
                     onSubmit={handleCreateChat}
                   />
                 </LinkUpForm>
