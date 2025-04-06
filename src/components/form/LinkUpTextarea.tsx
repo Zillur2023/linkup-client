@@ -63,7 +63,9 @@ export default function LinkUpTextarea({
   return (
     <Card
       shadow={minRows === 4 ? "none" : "md"}
-      className={`${endContent ? "relative" : ""} w-full rounded-lg   `}
+      className={`${
+        endContent ? "relative" : ""
+      } w-full rounded-lg bg-default-200`}
     >
       <Textarea
         {...register(name)}

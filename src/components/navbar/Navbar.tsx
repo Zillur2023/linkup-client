@@ -10,7 +10,6 @@ import {
 } from "@heroui/react";
 import { FiHome } from "react-icons/fi";
 import { LiaUserFriendsSolid } from "react-icons/lia";
-import { AiTwotoneShop } from "react-icons/ai";
 import { GrGroup } from "react-icons/gr";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -60,7 +59,6 @@ const Navbar: React.FC = () => {
     skip: !user?._id,
   });
   const { data: allUserData } = useGetAllUserQuery({ searchQuery: search });
-  console.log({ allUserData });
 
   const handleSearchSubmit = () => {
     router.push(`/search/top?q=${search}`);

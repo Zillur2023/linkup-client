@@ -19,7 +19,8 @@ export type IRegisterUser = {
 
 const RegisterPage: React.FC = () => {
   const router = useRouter();
-  const [createUser] = useCreateUserMutation();
+  const [createUser, { isLoading: createUserIsLoading }] =
+    useCreateUserMutation();
 
   // const onSubmit: SubmitHandler<IRegisterUser> = async (data) => {
   const onSubmit = async (data: any) => {
@@ -27,17 +28,14 @@ const RegisterPage: React.FC = () => {
     formData.append("data", JSON.stringify(data));
     formData.append("profileImage", data?.profileImage);
 
-    const toastId = toast.loading("loading..");
-
     try {
       const res = await createUser(formData).unwrap();
 
       if (res?.success) {
-        toast.success(res?.message, { id: toastId });
         router.push("/login");
       }
     } catch (error: any) {
-      toast.error(error?.data?.message, { id: toastId });
+      toast.error(error?.data?.message);
     }
   };
 
@@ -73,8 +71,8 @@ const RegisterPage: React.FC = () => {
               <LinkUpInputFile name="profileImage" label="Upload image" />
             </div>
           </div>
-          <Button className="my-3 w-full rounded-md " size="md" type="submit">
-            Register
+          <Button className={`my-3 w-full rounded-md `} size="md" type="submit">
+            {createUserIsLoading ? "Registering..." : "Register"}
           </Button>
         </LinkUpForm>
         <div className="text-center">

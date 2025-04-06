@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
+
+import { useEffect, useRef } from "react";
 import {
   Avatar,
   Button,
@@ -19,8 +20,6 @@ import { IPost } from "@/type";
 import {
   useDeletePostMutation,
   useGetAllPostQuery,
-  useUpdateDislikesMutation,
-  useUpdateLikesMutation,
 } from "@/redux/features/post/postApi";
 import { toast } from "sonner";
 import { PostSkeleton } from "../shared/Skeleton";
@@ -32,11 +31,14 @@ import PostEditor from "./PostEditor";
 import PostComment from "./PostComment";
 import ActionButton from "../shared/ActionButton";
 import { formatPostDate, formatPostTooltipDate } from "@/uitls/formatDate";
-import { BiLike } from "react-icons/bi";
-import { BiDislike } from "react-icons/bi";
 import { PiShareFat } from "react-icons/pi";
 import { FiMessageCircle } from "react-icons/fi";
 import { PiCrown } from "react-icons/pi";
+import { useAppDispatch } from "@/redux/hooks";
+import { setReactions } from "@/redux/features/post/reactionSlice";
+
+import LikeButton from "../reactions/LikeButton";
+import DislikeButton from "../reactions/DislikeButton";
 
 interface PostsProps {
   postId?: string;
@@ -53,9 +55,7 @@ const Posts: React.FC<PostsProps> = ({
   searchQuery,
   modalCommentRef,
 }) => {
-  const [updateLike] = useUpdateLikesMutation();
-  const [updateDislike, { isLoading: updateDislikeIsLoading }] =
-    useUpdateDislikesMutation();
+  const dispatch = useAppDispatch();
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
   const [deletePost] = useDeletePostMutation();
   const modalRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
@@ -80,56 +80,27 @@ const Posts: React.FC<PostsProps> = ({
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
 
-  const { data: postData, isFetching: postIsFetching } =
-    useGetAllPostQuery(queryPost);
+  const { data: postData } = useGetAllPostQuery(queryPost);
   // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
 
-  const [optimisticLikes, setOptimisticLikes] = useState<
-    Record<string, boolean>
-  >({});
-  const [optimisticDislikes, setOptimisticDislikes] = useState<
-    Record<string, boolean>
-  >({});
-
-  const handleLike = async (postId: string) => {
-    if (!userData?.data?._id) {
-      router.push("/login");
-      return;
+  useEffect(() => {
+    if (postData?.data) {
+      postData.data.forEach((post) => {
+        dispatch(
+          setReactions({
+            postId: post._id,
+            likes: post.likes
+              .map((user) => user._id)
+              .filter(Boolean) as string[],
+            dislikes: post.dislikes
+              .map((user) => user._id)
+              .filter(Boolean) as string[],
+          })
+        );
+      });
     }
+  }, [postData, dispatch]);
 
-    setOptimisticLikes((prev) => ({ ...prev, [postId]: true }));
-
-    if (optimisticDislikes[postId]) {
-      setOptimisticDislikes((prev) => ({ ...prev, [postId]: false }));
-    }
-
-    try {
-      await updateLike({ userId: userData.data._id, postId }).unwrap();
-    } catch (error) {
-      setOptimisticLikes((prev) => ({ ...prev, [postId]: false }));
-      toast.error("Failed to like post");
-    }
-  };
-
-  const handleDislike = async (postId: string) => {
-    if (!userData?.data?._id) {
-      router.push("/login");
-      return;
-    }
-
-    setOptimisticDislikes((prev) => ({ ...prev, [postId]: true }));
-
-    if (optimisticLikes[postId]) {
-      setOptimisticLikes((prev) => ({ ...prev, [postId]: false }));
-    }
-
-    try {
-      await updateDislike({ userId: userData.data._id, postId }).unwrap();
-    } catch (error) {
-      setOptimisticDislikes((prev) => ({ ...prev, [postId]: false }));
-      toast.error("Failed to dislike post");
-    }
-  };
   const handleUpdateFollowUnfollow = async (id: string) => {
     if (!userData?.data?._id) {
       router.push("/login");
@@ -145,14 +116,10 @@ const Posts: React.FC<PostsProps> = ({
   };
 
   const handleDelete = async (postId: string) => {
-    const toastId = toast.loading("loading...");
     try {
-      const res = await deletePost(postId).unwrap();
-      if (res) {
-        toast.success(res?.message, { id: toastId });
-      }
+      await deletePost(postId).unwrap();
     } catch (error: any) {
-      toast.error(error?.data?.message, { id: toastId });
+      toast.error(error?.data?.message);
     }
   };
 
@@ -176,47 +143,18 @@ const Posts: React.FC<PostsProps> = ({
             />
           </Card>
         )}
-      {!postData && <PostSkeleton />}
+      {!postData && <PostSkeleton length={postId ? 1 : 4} />}
 
       {postData?.data?.map((post: IPost) => {
-        const isLiked =
-          optimisticLikes[post._id] ||
-          post.likes.some((item) => item._id === userData?.data?._id);
-        const isDisliked =
-          optimisticDislikes[post._id] ||
-          post.dislikes.some((item) => item._id === userData?.data?._id);
-
-        let likesLength;
-        let disLikesLength;
-
-        const zillur = () => {
-          if (optimisticLikes[post._id] && !optimisticDislikes[post._id]) {
-            return (likesLength = post.likes.length + 1);
-          } else if (
-            optimisticLikes[post._id] &&
-            optimisticDislikes[post._id]
-          ) {
-            return (disLikesLength = post.dislikes.length - 1);
-          }
-        };
-        const zillur2 = () => {
-          if (optimisticDislikes[post._id] && !optimisticLikes[post._id]) {
-            return (disLikesLength = post.dislikes.length + 1);
-          } else if (
-            optimisticDislikes[post._id] &&
-            optimisticLikes[post._id]
-          ) {
-            return (likesLength = post.likes.length - 1);
-          }
-        };
-        zillur();
-        zillur2();
         return (
           <Card
+            radius="none"
             ref={postRef}
             key={post._id}
             shadow={postId ? "none" : "md"}
-            className={` ${postId ? "!px-0" : ""} `}
+            className={` ${
+              postId ? "!px-0" : ""
+            } sm:rounded-none md:rounded-md `}
           >
             {/* Author Info */}
             <CardHeader
@@ -244,6 +182,7 @@ const Posts: React.FC<PostsProps> = ({
                 <div className="flex items-center gap-3">
                   {post?.author?._id !== userData?.data?._id && (
                     <LinkUpButton
+                      buttonId="followUnfollow"
                       onClick={() =>
                         handleUpdateFollowUnfollow(post?.author?._id as string)
                       }
@@ -266,54 +205,25 @@ const Posts: React.FC<PostsProps> = ({
               </div>
               <div className=" w-full flex justify-end items-center "></div>
             </CardHeader>
-            <CardBody className={` ${postId ? "!px-0" : ""}`}>
-              <p className="mb-3 text-medium ">{post?.content}</p>
+            <CardBody className={"!px-0"}>
+              <p className="mb-3 px-4 text-medium ">{post?.content}</p>
 
               {post?.images && <ImageGallery images={post?.images} />}
             </CardBody>
 
-            <CardFooter className={` ${postId ? "!px-0" : ""} flex flex-col `}>
+            <CardFooter className={` ${postId ? "!px-0" : ""}  flex flex-col `}>
               {/* <Divider /> */}
-              <div className=" w-full flex justify-between pl-[10%] pr-[10%]   ">
-                <LinkUpButton
-                  onClick={() => handleLike(post._id)}
-                  buttonId="like"
-                  data={post?.likes}
-                  startContent={
-                    <BiLike
-                      size={24}
-                      className={`${
-                        post?.likes?.some(
-                          (item) => item?._id === userData?.data?._id
-                        )
-                          ? "text-blue-600 fill-current"
-                          : "text-gray-600"
-                      }`}
-                    />
-                  }
-                >
-                  <span>{post.likes.length}</span>
-                </LinkUpButton>
+              <div className=" w-full flex justify-between lg:pl-[10%] lg:pr-[10%]   ">
+                <LikeButton post={post} />
 
-                <LinkUpButton
-                  onClick={() => handleDislike(post._id)}
-                  buttonId="dislike"
-                  data={post?.dislikes}
-                  startContent={
-                    <BiDislike
-                      size={24}
-                      className={`${
-                        post?.dislikes?.some(
-                          (item) => item?._id === userData?.data?._id
-                        )
-                          ? "text-blue-600 fill-current"
-                          : "text-gray-600"
-                      }`}
-                    />
-                  }
-                >
-                  <span>{post.dislikes.length}</span>
-                </LinkUpButton>
+                <DislikeButton post={post} />
+                {/* <Button onClick={() => handleReaction(post._id, "like")}>
+                  Like
+                </Button>
+
+                <Button onClick={() => handleReaction(post._id, "dislike")}>
+                  Dislike
+                </Button> */}
 
                 {!modalCommentRef ? (
                   <Button
@@ -347,6 +257,7 @@ const Posts: React.FC<PostsProps> = ({
                 </div>
 
                 <Button
+                  disabled
                   fullWidth
                   size="sm"
                   variant="light"

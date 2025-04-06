@@ -1,10 +1,9 @@
 import { IUser } from "@/type";
-import React from "react";
+import React, { useRef } from "react";
 import LinkUpModal from "../shared/LinkUpModal";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpInputFile from "../form/LinkUpInputFile";
 import { Button } from "@heroui/react";
-import LinkUpReset from "../form/LinkUpReset";
 import { MdEdit } from "react-icons/md";
 
 import LinkUpTextarea from "../form/LinkUpTextarea";
@@ -12,7 +11,9 @@ import { useUpdateUserMutation } from "@/redux/features/user/userApi";
 import { toast } from "sonner";
 
 const ProfileEdit = (user: IUser) => {
-  const [updateUser] = useUpdateUserMutation();
+  const clickSubmitRef = useRef<HTMLButtonElement | null>(null);
+  const [updateUser, { isLoading: updateUserIsLoading }] =
+    useUpdateUserMutation();
   const onSubmit = async (data: any, reset?: (values?: any) => void) => {
     const formData = new FormData();
 
@@ -27,11 +28,9 @@ const ProfileEdit = (user: IUser) => {
       })
     );
 
-    const toastId = toast.loading("loading...");
     try {
       const res = await updateUser(formData).unwrap();
       if (res.success) {
-        toast.success(res.message, { id: toastId });
         // reset?.();
         reset?.({
           bio: res.data?.bio, // Use updated bio
@@ -41,7 +40,7 @@ const ProfileEdit = (user: IUser) => {
       }
     } catch (error: any) {
       console.log({ error });
-      toast.error(error?.data?.message, { id: toastId });
+      toast.error(error?.data?.message);
     }
   };
 
@@ -50,7 +49,20 @@ const ProfileEdit = (user: IUser) => {
       startContent={<MdEdit size={24} />}
       openButtonText={"Edit Profile"}
       header={` Edit Profile`}
+      scrollBehavior={"inside"}
       variant="solid"
+      footer={
+        <div className=" w-full ">
+          <Button
+            fullWidth
+            size="sm"
+            color="primary"
+            onClick={() => clickSubmitRef?.current?.click()}
+          >
+            {"Submit"}
+          </Button>
+        </div>
+      }
     >
       <LinkUpForm
         //   resolver={zodResolver(postEditorValidationSchema)}
@@ -85,15 +97,15 @@ const ProfileEdit = (user: IUser) => {
           />
         </div>
 
-        <div className="flex gap-4">
-          <Button className="w-full" size="sm" color="primary" type="submit">
-            Submit
-          </Button>
-          {/* <Button type="reset" size="sm" variant="bordered">
-          Reset
-        </Button> */}
-          <LinkUpReset />
-        </div>
+        <Button
+          ref={clickSubmitRef}
+          className="w-full hidden"
+          size="sm"
+          color="primary"
+          type="submit"
+        >
+          {updateUserIsLoading ? "Updating..." : "Update"}
+        </Button>
       </LinkUpForm>
     </LinkUpModal>
   );

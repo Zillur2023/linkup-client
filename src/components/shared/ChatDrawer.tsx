@@ -11,12 +11,14 @@ import {
   Avatar,
   Card,
 } from "@heroui/react";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import LinkUpForm from "../form/LinkUpForm";
 import LinkUpTextarea from "../form/LinkUpTextarea";
 import { IoSend } from "react-icons/io5";
 import { formatChatTooltipDate } from "@/uitls/formatDate";
+import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
+import { useUser } from "@/context/UserProvider";
 
 export interface ISelectedUser {
   _id: string;
@@ -28,10 +30,27 @@ export interface ISelectedUser {
 const ChatMessages = ({
   messages,
   currentUserId,
+  createChatIsLoading,
+  messageText,
 }: {
   messages: IChat[];
   currentUserId: string;
+  createChatIsLoading: any;
+  messageText: string;
 }) => {
+  const { user } = useUser();
+  const { isFetching } = useGetUserByIdQuery(user?._id as string, {
+    skip: !user?._id,
+  });
+  // Create a ref for the messages container
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to the bottom whenever the messages array changes
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]); // Trigger on messages update;
   return (
     <div className="space-y-1">
       {messages.map((msg: IChat, index, chatArray) => {
@@ -60,13 +79,34 @@ const ChatMessages = ({
               content={formatChatTooltipDate(msg?.createdAt)}
               closeDelay={0}
             >
-              <Card className={`p-3 max-w-xs rounded-xl shadow-md break-words`}>
-                <p className="text-sm">{msg.content}</p>
+              <Card
+                className={`p-3  break-words ${
+                  msg.senderId?._id === currentUserId
+                    ? "bg-blue-600 text-white"
+                    : "bg-default-200 text-black"
+                }`}
+              >
+                <p className="text-sm">{msg?.content}</p>
               </Card>
             </Tooltip>
           </div>
         );
       })}
+      {/* 👇 Show the current typing message as a preview */}
+      {messageText && (createChatIsLoading || isFetching) && (
+        <div className="flex items-start justify-end ">
+          <div>
+            <Card className="p-3 bg-blue-600 text-white break-words ">
+              <p className="text-sm ">{messageText}</p>
+            </Card>
+            {(createChatIsLoading || isFetching) && (
+              <p className=" text-xs">Sending...</p>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Invisible div to trigger scrolling to the bottom */}
+      <div ref={messagesEndRef} />
     </div>
   );
 };
@@ -78,8 +118,10 @@ const ChatDrawer = ({
   selectedUser: ISelectedUser | null;
   user: IUser;
 }) => {
+  const [messageText, setMessageText] = useState<string>("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [createChat] = useCreateChatMutation();
+  const [createChat, { isLoading: createChatIsLoading }] =
+    useCreateChatMutation();
 
   useEffect(() => {
     if (selectedUser) {
@@ -88,6 +130,7 @@ const ChatDrawer = ({
   }, [selectedUser, onOpen]);
 
   const handleCreateChat = async (data: any, reset?: () => void) => {
+    setMessageText(data?.content);
     try {
       const newChat = {
         ...data,
@@ -133,6 +176,8 @@ const ChatDrawer = ({
               <ChatMessages
                 messages={filteredChats || []}
                 currentUserId={user?._id || ""}
+                createChatIsLoading={createChatIsLoading}
+                messageText={messageText}
               />
             </DrawerBody>
             <DrawerFooter>

@@ -50,7 +50,7 @@ const NotAvailablePage: React.FC = () => {
           </button>
           <button
             onClick={handleGoHome}
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white px-6 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className=" bg-default-200 dark:bg-gray-700 text-gray-700 dark:text-white px-6 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
             Go Home
           </button>

@@ -1,10 +1,14 @@
 import { Card, Skeleton } from "@heroui/react";
 
-export function PostSkeleton() {
+export function PostSkeleton({ length }: { length: number }) {
   return (
     <>
-      {[...new Array(4)].map((_, index) => (
-        <Card key={index} className="w-full space-y-5 p-4" radius="lg">
+      {[...new Array(length)].map((_, index) => (
+        <Card
+          key={index}
+          className="w-full space-y-5 p-4 sm:rounded-none md:rounded-md"
+          radius="none"
+        >
           <div className=" w-full flex  items-center gap-3">
             <Skeleton className="flex rounded-full w-10 h-8" />
             <div className="w-full flex flex-col gap-2">

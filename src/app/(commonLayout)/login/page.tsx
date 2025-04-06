@@ -19,24 +19,20 @@ export type ILoginUser = {
 
 const LoginPage = () => {
   const router = useRouter();
-  const [login] = useLoginMutation();
+  const [login, { isLoading: loginIsLoading }] = useLoginMutation();
   const { setIsLoading: userLoading } = useUser();
 
   const onSubmit = async (formData: ILoginUser) => {
-    const toastId = toast.loading("Logging in...");
-
     try {
       const res = await login(formData).unwrap();
-      console.log({ res });
 
       if (res?.success) {
         userLoading(true);
         setToken(res?.data);
         router.push("/");
-        toast.success(res?.message, { id: toastId });
       }
     } catch (error: any) {
-      toast.error(error?.data?.message, { id: toastId });
+      toast.error(error?.data?.message);
     }
   };
 
@@ -81,7 +77,7 @@ const LoginPage = () => {
           </div>
 
           <Button className="my-3 w-full rounded-md " size="md" type="submit">
-            Login
+            {loginIsLoading ? "Logging in..." : "Login"}
           </Button>
         </LinkUpForm>
         <div className="text-center">

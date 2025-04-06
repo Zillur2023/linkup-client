@@ -38,9 +38,16 @@ export default function Author({
       }
       avatarProps={{
         src: `${author?.profileImage}`,
-        // as: Link,
         // href: `/profile?id=${author?._id}`,
+        // as: Link,
       }}
+      // avatarProps={{
+      //   children: (
+      //     <Link href={`/profile?id=${author?._id}`}>
+      //       <Avatar radius="full" src={`${author?.profileImage}`} />
+      //     </Link>
+      //   ),
+      // }}
     ></User>
   );
 }

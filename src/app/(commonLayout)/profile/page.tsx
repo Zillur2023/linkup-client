@@ -13,7 +13,7 @@ const ProfilePageContent = () => {
   const id = searchParams.get("id");
   const sk = searchParams.get("sk");
 
-  const { data: userData } = useGetUserByIdQuery({ id: id as string });
+  const { data: userData } = useGetUserByIdQuery(id as string);
 
   const profileRoute = [
     { href: `${pathname}?id=${id}`, label: "posts" },

@@ -6,7 +6,7 @@ import { Avatar, Tab, Tabs } from "@heroui/react";
 import Link from "next/link";
 import { FiHome } from "react-icons/fi";
 import { LiaUserFriendsSolid } from "react-icons/lia";
-import { AiTwotoneShop } from "react-icons/ai";
+import { CiShop } from "react-icons/ci";
 import { GrGroup } from "react-icons/gr";
 import { usePathname } from "next/navigation";
 
@@ -50,7 +50,7 @@ export default function SidebarMenu({ items }: SidebarMenuProps) {
     {
       href: "/marketplace",
       label: "Marketplace",
-      icon: <AiTwotoneShop size={24} />,
+      icon: <CiShop strokeWidth={0.5} size={24} />,
     },
     { href: "#group", label: "Group", icon: <GrGroup size={24} /> },
   ];

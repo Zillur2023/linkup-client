@@ -25,7 +25,8 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
   const sk = searchParams.get("sk");
   const url = sk ? `${pathname}?id=${id}&sk=${sk}` : `${pathname}?id=${id}`;
   // const url = query ? `${pathname}?id=${query}` : pathname;
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUser, { isLoading: updateUserIsLoading }] =
+    useUpdateUserMutation();
 
   const handleEditImage = async (data: any, reset?: () => void) => {
     const formData = new FormData();
@@ -36,17 +37,14 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
       formData.append("profileImage", data?.profileImage);
     }
 
-    const toastId = toast.loading("loading..");
-
     try {
       const res = await updateUser(formData).unwrap();
 
       if (res?.success) {
-        toast.success(res?.message, { id: toastId });
         reset?.();
       }
     } catch (error: any) {
-      toast.error(error?.data?.message, { id: toastId });
+      toast.error(error?.data?.message);
     }
   };
 
@@ -147,7 +145,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
                         color="primary"
                         type="submit"
                       >
-                        Submit
+                        {updateUserIsLoading ? "Updating" : "Update"}
                       </Button>
                       <LinkUpReset />
                     </div>

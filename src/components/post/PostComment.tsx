@@ -21,6 +21,8 @@ import LinkUpTextarea from "../form/LinkUpTextarea";
 import ActionButton from "../shared/ActionButton";
 import { Avatar, Button, Card } from "@heroui/react";
 import { formatCommentDate } from "@/uitls/formatDate";
+import Link from "next/link";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 interface PostCommentProps {
   user: IUser;
@@ -43,9 +45,10 @@ const PostComment: React.FC<PostCommentProps> = ({
   focusRef,
   clickRef,
 }) => {
+  const [commentText, setCommentText] = useState<string | null>(null);
+  console.log({ commentText });
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  console.log({ editingComment });
   const [expandedComments, setExpandedComments] = useState<{
     [key: string]: boolean;
   }>({});
@@ -60,7 +63,9 @@ const PostComment: React.FC<PostCommentProps> = ({
   // const router = useRouter();
 
   const [deleteComment] = useDeleteCommentMutation();
-  const [createComment] = useCreateCommentMutation();
+  const [createComment, { isLoading: createCommentIsLoading }] =
+    useCreateCommentMutation();
+  console.log({ createCommentIsLoading });
   const [updateComment, { isLoading: updateCommentIsLoading }] =
     useUpdateCommentMutation();
   const { data: allCommentData, isFetching: allCommentDataIsFetching } =
@@ -75,7 +80,8 @@ const PostComment: React.FC<PostCommentProps> = ({
     : allCommentData?.data?.slice(0, 2);
 
   // Handle creating a new comment
-  const handleCreateComment = async (data: any, reset?: () => void) => {
+  const handleCreateComment = async (data: IComment, reset?: () => void) => {
+    setCommentText(data?.comment);
     try {
       const newComment = {
         ...data,
@@ -91,10 +97,9 @@ const PostComment: React.FC<PostCommentProps> = ({
 
   // Handle updating an existing comment
   const handleUpdateComment = async (
-    data: any,
-    reset?: (values?: any) => void
+    data: any
+    // reset?: (values?: any) => void
   ) => {
-    console.log("handleUpdateComment data", data);
     setEditingComment((prev) => {
       if (!prev) return null; // Ensure `prev` is not null
 
@@ -116,22 +121,17 @@ const PostComment: React.FC<PostCommentProps> = ({
       };
       // reset?.();
       setEditingCommentId(null); // Reset editing state
-      const res = await updateComment(updatedComment).unwrap();
-      console.log({ res });
+      await updateComment(updatedComment).unwrap();
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update comment");
     }
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    const toastId = toast.loading("");
     try {
-      const res = await deleteComment(commentId).unwrap();
-      if (res) {
-        toast.success(res?.message, { id: toastId });
-      }
+      await deleteComment(commentId).unwrap();
     } catch (error: any) {
-      toast.error(error?.data?.message, { id: toastId });
+      toast.error(error?.data?.message);
     }
   };
 
@@ -213,6 +213,24 @@ const PostComment: React.FC<PostCommentProps> = ({
       </LinkUpModal>
 
       <div className="flex-1 overflow-y-auto space-y-2 ">
+        {createCommentIsLoading && commentText && (
+          <div className="flex items-start gap-2">
+            <Avatar
+              src={user.profileImage || "/default-avatar.png"}
+              className="w-8 h-8"
+            />
+            <div>
+              <Card
+                shadow="none"
+                radius="lg"
+                className=" bg-default-100 p-3 break-words "
+              >
+                <p className="text-sm">{"zillur"}</p>
+              </Card>
+              <p className="text-xs text-gray-500">Sending...</p>
+            </div>
+          </div>
+        )}
         {commentData?.map((item: IComment) => {
           const maxWords = 20;
           const words = item?.comment.split(" ");
@@ -225,21 +243,36 @@ const PostComment: React.FC<PostCommentProps> = ({
               {editingCommentId !== item?._id ? (
                 <>
                   <div className=" flex gap-1 relative group ">
-                    <div>
-                      {/* {user && ( */}
+                    <Link
+                      className=" hover:underline"
+                      href={`/profile?id=${item?.userId?._id}`}
+                    >
                       <Avatar
                         size="sm"
                         radius="full"
                         // src={user?.profileImage}
                         src={item?.userId?.profileImage}
                       />
-                      {/* )} */}
-                    </div>
+                    </Link>
                     <div className=" ">
-                      <Card className="  p-3 break-words ">
-                        <p className="text-gray-800 text-start text-medium font-semibold  ">
-                          {user?.name}
-                        </p>
+                      <Card
+                        shadow="none"
+                        radius="lg"
+                        className=" bg-default-100 p-3 break-words "
+                      >
+                        <div className=" flex justify-start gap-1">
+                          <Link
+                            className=" hover:underline"
+                            href={`/profile?id=${item?.userId?._id}`}
+                          >
+                            <p className="text-gray-800 text-start text-medium font-semibold  ">
+                              {user?.name}
+                            </p>
+                          </Link>
+                          {item?.userId?.isVerified && (
+                            <RiVerifiedBadgeFill className="w-5 h-5 text-blue-500" />
+                          )}
+                        </div>
 
                         <p className=" text-medium  text-start">
                           {(allCommentDataIsFetching ||
@@ -262,7 +295,8 @@ const PostComment: React.FC<PostCommentProps> = ({
                         </p>
                       </Card>
                       <div>
-                        {allCommentDataIsFetching || updateCommentIsLoading ? (
+                        {updateCommentIsLoading &&
+                        editingComment?._id === item?._id ? (
                           <p className=" text-xs">posting...</p>
                         ) : (
                           <div className=" flex items-center gap-4">
@@ -310,9 +344,7 @@ const PostComment: React.FC<PostCommentProps> = ({
                   <div className=" w-full">
                     <LinkUpForm
                       resolver={zodResolver(commentValidationSchema)}
-                      onSubmit={(data, reset) =>
-                        handleUpdateComment(data, reset)
-                      }
+                      onSubmit={(data) => handleUpdateComment(data)}
                       defaultValues={{ comment: editingComment?.comment }}
                       // defaultValues={{ comment: item?.comment }}
                     >

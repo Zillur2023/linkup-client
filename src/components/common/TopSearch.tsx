@@ -10,19 +10,21 @@ const TopSearch = ({ query }: { query: string }) => {
 
   return (
     <div>
-      <Listbox aria-label="Search Results">
-        {allUserData?.data?.map((user: IUser) => (
-          <ListboxItem
-            key={user._id}
-            as={Link}
-            href={`/profile?id=${user._id}`}
-            //   onClick={() => onSearchChange("")}
-            color="default"
-          >
-            {user.name}
-          </ListboxItem>
-        ))}
-      </Listbox>
+      {allUserData?.data && (
+        <Listbox aria-label="Search Results">
+          {allUserData?.data?.map((user: IUser) => (
+            <ListboxItem
+              key={user._id}
+              as={Link}
+              href={`/profile?id=${user._id}`}
+              //   onClick={() => onSearchChange("")}
+              color="default"
+            >
+              {user.name}
+            </ListboxItem>
+          ))}
+        </Listbox>
+      )}
       <Posts searchQuery={query} />
     </div>
   );

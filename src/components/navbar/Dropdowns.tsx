@@ -12,6 +12,7 @@ import { RiMessengerLine } from "react-icons/ri";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import ChatDrawer from "../shared/ChatDrawer";
+import { logout } from "@/service/AuthService";
 
 export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
   if (!user) {
@@ -49,7 +50,14 @@ export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
             <span>{user.name}</span>
           </div>
         </DropdownItem>
-        <DropdownItem key="logout" color="danger">
+        <DropdownItem
+          onClick={() => {
+            logout();
+            window.location.reload();
+          }}
+          key="logout"
+          color="danger"
+        >
           Log Out
         </DropdownItem>
       </DropdownMenu>

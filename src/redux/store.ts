@@ -1,8 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { baseApi } from "./api/baseApi";
+// import reactionReducer from "./reactionSlice";
+import reactionReducer from "./features/post/reactionSlice";
 
 export const store = configureStore({
   reducer: {
+    reactions: reactionReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddlewares) =>

@@ -9,6 +9,7 @@ import { Avatar, Listbox, ListboxItem, User } from "@heroui/react";
 
 import { useUser } from "@/context/UserProvider";
 import ChatDrawer from "../shared/ChatDrawer";
+import Author from "../shared/Author";
 
 // Define types
 export interface ISelectedUser {
@@ -25,18 +26,14 @@ const UsersList = () => {
   const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
-  const {
-    data: allUserData,
-    isLoading,
-    isError,
-  } = useGetAllUserQuery({ searchQuery: "" });
+  const { data: allUserData, isLoading } = useGetAllUserQuery({
+    searchQuery: "",
+  });
   const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
 
   if (isLoading) return <div>Loading users...</div>;
-  if (isError || !allUserData?.data)
-    return <div>Failed to load users. Please try again later.</div>;
 
-  const items = allUserData?.data
+  const items: any = allUserData?.data
     ?.filter((usr: IUser) => usr._id !== user?._id)
     ?.map((user: IUser) => ({
       _id: user._id,
@@ -44,18 +41,12 @@ const UsersList = () => {
       icon: (
         <Avatar className="w-6 h-6" src={user.profileImage} alt={user.name} />
       ),
-      user: (
-        <User
-          avatarProps={{ src: `${user.profileImage}` }}
-          description="Active now"
-          name={user.name}
-        />
-      ),
+      user: <Author author={user} description="Active now" />,
     }));
 
   return (
     <>
-      {allUserData?.data?.length - 1 === items.length && (
+      {allUserData && allUserData?.data?.length - 1 === items.length && (
         <Listbox
           items={items}
           aria-label="User List"

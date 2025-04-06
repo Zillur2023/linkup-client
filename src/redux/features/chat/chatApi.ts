@@ -8,7 +8,7 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: chatData,
       }),
-      invalidatesTags: ["User", "Post", "Comment", "Chat"],
+      invalidatesTags: ["User"],
     }),
   }),
 });

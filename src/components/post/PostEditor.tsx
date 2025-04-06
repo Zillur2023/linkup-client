@@ -83,14 +83,12 @@ const PostEditor: React.FC<PostEditorProps> = ({
       );
     }
 
-    const toastId = toast.loading("loading...");
     try {
       const res = post
         ? await updatePost(formData).unwrap()
         : await createPost(formData).unwrap();
       // const res =  await createPost(formData).unwrap()
       if (res.success) {
-        toast.success(res.message, { id: toastId });
         // reset?.();
         reset?.({
           isPremium: res?.data?.isPremium,
@@ -101,7 +99,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
       }
     } catch (error: any) {
       console.log({ error });
-      toast.error(error?.data?.message, { id: toastId });
+      toast.error(error?.data?.message);
     }
   };
 
@@ -137,7 +135,9 @@ const PostEditor: React.FC<PostEditorProps> = ({
       clickRef={clickRef}
     >
       <div className=" text-start">
-        <Author author={userData?.data} description="Public" />
+        {userData?.data && (
+          <Author author={userData.data} description="Public" />
+        )}
       </div>
       <LinkUpForm
         resolver={zodResolver(postEditorValidationSchema)}
