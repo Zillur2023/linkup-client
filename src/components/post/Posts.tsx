@@ -10,7 +10,6 @@ import {
   CardHeader,
   Tooltip,
 } from "@heroui/react";
-
 import { useUser } from "@/context/UserProvider";
 import {
   useGetUserByIdQuery,
@@ -36,7 +35,6 @@ import { FiMessageCircle } from "react-icons/fi";
 import { PiCrown } from "react-icons/pi";
 import { useAppDispatch } from "@/redux/hooks";
 import { setReactions } from "@/redux/features/post/reactionSlice";
-
 import LikeButton from "../reactions/LikeButton";
 import DislikeButton from "../reactions/DislikeButton";
 

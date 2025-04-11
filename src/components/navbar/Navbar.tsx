@@ -170,7 +170,7 @@ const Navbar: React.FC = () => {
           <TabsMenu selectedKey={pathname} items={menuItems} tooltip={true} />
         </NavbarContent>
         <NavbarContent className="-mr-6 " as={"div"} justify="end">
-          {userData?.data && <ChatDropdown user={userData?.data || null} />}
+          {userData?.data && <ChatDropdown user={userData?.data} />}
           <UserDropdown user={userData?.data || null} />
         </NavbarContent>
       </HeroUiNavbar>

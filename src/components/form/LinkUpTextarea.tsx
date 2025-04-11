@@ -16,6 +16,7 @@ interface LinkUpTextareaProps {
   size?: "sm" | "md" | "lg";
   value?: string;
   isReadOnly?: boolean;
+  className?: any;
   focusRef?: (el: HTMLTextAreaElement | null) => void;
   endContent?: ReactNode;
   onSubmit?: (data: any, reset?: () => void) => void; // Updated type
@@ -33,6 +34,7 @@ export default function LinkUpTextarea({
   size = "md",
   value,
   isReadOnly = false,
+  className = "bg-default-200",
   focusRef,
   endContent,
   onSubmit,
@@ -65,7 +67,7 @@ export default function LinkUpTextarea({
       shadow={minRows === 4 ? "none" : "md"}
       className={`${
         endContent ? "relative" : ""
-      } w-full rounded-lg bg-default-200`}
+      } w-full rounded-lg ${className}`}
     >
       <Textarea
         {...register(name)}

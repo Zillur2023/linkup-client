@@ -38,7 +38,6 @@ const reactionSlice = createSlice({
 
       const isLiked = state.likes[postId].includes(userId);
       const isDisliked = state.dislikes[postId].includes(userId);
-      console.log({ isLiked, isDisliked });
 
       if (isDisliked) {
         state.dislikes[postId] = state.dislikes[postId].filter(

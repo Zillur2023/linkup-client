@@ -1,14 +1,47 @@
 import { SVGProps } from "react";
 
-export interface IChat {
-  _id?: string;
-  senderId: IUser;
+export interface IChatItem {
+  _id: string;
+  lastMsg: IMessage;
   receiverId: IUser;
-  content: string;
-  isRead?: boolean;
+  senderId: IUser;
+}
+
+export interface IMessage {
+  text: string;
+  imageUrl: string;
+  videoUrl: string;
+  isSeen: boolean;
+  senderId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IChat {
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  messages: IMessage[];
   createdAt: string;
   updatedAt: string;
 }
+
+export interface IChatApiResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: IChatItem[];
+}
+
+// export interface IChat {
+//   _id?: string;
+//   senderId: IUser;
+//   receiverId: IUser;
+//   content: string;
+//   isRead?: boolean;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 export interface IUser {
   _id?: string;

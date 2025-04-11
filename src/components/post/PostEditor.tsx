@@ -151,12 +151,13 @@ const PostEditor: React.FC<PostEditorProps> = ({
         {userData?.data?.isVerified && (
           <LinkUpCheckbox name="isPremium" label="Premium Post" />
         )}
-        <div className="py-3">
+        <div className="">
           <LinkUpTextarea
             name="content"
             placeholder={`What's on your mind, ${userData?.data?.name}`}
             minRows={4}
             maxRows={12}
+            className=" "
           />
         </div>
 

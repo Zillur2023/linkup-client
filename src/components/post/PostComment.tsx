@@ -46,7 +46,6 @@ const PostComment: React.FC<PostCommentProps> = ({
   clickRef,
 }) => {
   const [commentText, setCommentText] = useState<string | null>(null);
-  console.log({ commentText });
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [expandedComments, setExpandedComments] = useState<{
@@ -65,7 +64,6 @@ const PostComment: React.FC<PostCommentProps> = ({
   const [deleteComment] = useDeleteCommentMutation();
   const [createComment, { isLoading: createCommentIsLoading }] =
     useCreateCommentMutation();
-  console.log({ createCommentIsLoading });
   const [updateComment, { isLoading: updateCommentIsLoading }] =
     useUpdateCommentMutation();
   const { data: allCommentData, isFetching: allCommentDataIsFetching } =

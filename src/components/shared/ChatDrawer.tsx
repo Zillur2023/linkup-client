@@ -1,4 +1,7 @@
-import { useCreateChatMutation } from "@/redux/features/chat/chatApi";
+import {
+  useCreateChatMutation,
+  useGetChatbyUserIdQuery,
+} from "@/redux/features/chat/chatApi";
 import { IChat, IUser } from "@/type";
 import {
   Drawer,
@@ -19,6 +22,7 @@ import { IoSend } from "react-icons/io5";
 import { formatChatTooltipDate } from "@/uitls/formatDate";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { useUser } from "@/context/UserProvider";
+import { useSocketContext } from "@/context/socketContext";
 
 export interface ISelectedUser {
   _id: string;
@@ -33,18 +37,62 @@ const ChatMessages = ({
   createChatIsLoading,
   messageText,
 }: {
-  messages: IChat[];
+  messages: any;
   currentUserId: string;
   createChatIsLoading: any;
   messageText: string;
 }) => {
+  console.log({ messages });
+  const { socket } = useSocketContext();
   const { user } = useUser();
-  const { isFetching } = useGetUserByIdQuery(user?._id as string, {
-    skip: !user?._id,
-  });
+  const { data: userData, isFetching } = useGetUserByIdQuery(
+    user?._id as string,
+    {
+      skip: !user?._id,
+    }
+  );
+  console.log({ userData });
+  console.log({ isFetching });
+  console.log({ messages });
   // Create a ref for the messages container
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const [lastReceivedMessage, setlastReceivedMessage] = useState([]);
+  console.log({ lastReceivedMessage });
+
+  // const zillurMessage = lastReceivedMessage?.messages?.length
+  //   ? lastReceivedMessage?.messages
+  //   : messages?.messages;
+  const zillurMessage = lastReceivedMessage?.messages;
+
+  console.log({ zillurMessage });
+
+  // ✅ Listen for new messages from the server
+  useEffect(() => {
+    if (!socket) return;
+
+    // const handleNewMessage = (newMessage: any) => {
+    //   console.log("📩 New message received:", newMessage);
+    //   // setlastReceivedMessage ((prev) => [...prev, newMessage]);
+    //   setlastReceivedMessage(newMessage);
+    // };
+    // const handleNewMessage = (messages: any) => {
+    //   console.log("📩 New message received:", messages);
+    //   // setlastReceivedMessage ((prev) => [...prev, newMessage]);
+    //   setlastReceivedMessage(messages);
+    // };
+
+    // socket.on("newMessage", handleNewMessage);
+    socket.on("newMessage", (newMessage) => {
+      console.log("message data", newMessage);
+      setlastReceivedMessage(newMessage);
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [socket, lastReceivedMessage, setlastReceivedMessage]);
   // Scroll to the bottom whenever the messages array changes
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -53,45 +101,55 @@ const ChatMessages = ({
   }, [messages]); // Trigger on messages update;
   return (
     <div className="space-y-1">
-      {messages.map((msg: IChat, index, chatArray) => {
-        const isLastFromSender =
-          index === chatArray.length - 1 ||
-          chatArray[index + 1]?.senderId?._id !== msg.senderId?._id;
+      {/* {messages?.map((msg) => { */}
+      {zillurMessage?.map((msg) => {
         return (
           <div
             key={msg._id}
-            className={`flex items-start ${
-              msg.senderId?._id === currentUserId
-                ? "justify-end"
-                : "justify-start"
-            }`}
+            className={`flex items-start 
+              ${msg?.senderId === user?._id ? "justify-end" : "justify-start"}
+            `}
           >
-            {isLastFromSender && msg.senderId?._id !== currentUserId && (
-              <Tooltip content={msg?.senderId?.name} closeDelay={0}>
+            {msg.senderId !== user?._id && (
+              <Tooltip content={msg?.name} closeDelay={0}>
                 <Avatar
                   className="w-10 h-10 mr-2"
-                  src={msg.senderId.profileImage || "/default-avatar.png"}
+                  src={msg?.profileImage || "/default-avatar.png"}
                 />
               </Tooltip>
             )}
-            {!isLastFromSender && <div className="w-10 h-10 mr-2"></div>}
+            {/* {<div className="w-10 h-10 mr-2"></div>} */}
             <Tooltip
-              content={formatChatTooltipDate(msg?.createdAt)}
+              // content={formatChatTooltipDate(msg?.createdAt)}
+              content={"zillur"}
               closeDelay={0}
             >
               <Card
-                className={`p-3  break-words ${
-                  msg.senderId?._id === currentUserId
-                    ? "bg-blue-600 text-white"
-                    : "bg-default-200 text-black"
-                }`}
+                className={`p-3  break-words
+                   ${
+                     msg?.senderId === user?._id
+                       ? "bg-blue-600 text-white"
+                       : "bg-default-200 text-black"
+                   }
+                `}
               >
-                <p className="text-sm">{msg?.content}</p>
+                {/* <p className="text-sm">{msg?.messages}</p> */}
+                {/* <p className="text-sm">{msg?.lastMsg?.text}</p> */}
+                <p className="text-sm">{msg?.text}</p>
               </Card>
             </Tooltip>
           </div>
         );
       })}
+      {lastReceivedMessage && (
+        <div className="flex items-start justify-start ">
+          <div>
+            <Card className="p-3 bg-default-200 text-white break-words ">
+              <p className="text-sm ">{lastReceivedMessage ? "zillur" : ""}</p>
+            </Card>
+          </div>
+        </div>
+      )}
       {/* 👇 Show the current typing message as a preview */}
       {messageText && (createChatIsLoading || isFetching) && (
         <div className="flex items-start justify-end ">
@@ -118,25 +176,45 @@ const ChatDrawer = ({
   selectedUser: ISelectedUser | null;
   user: IUser;
 }) => {
+  console.log({ selectedUser });
   const [messageText, setMessageText] = useState<string>("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [createChat, { isLoading: createChatIsLoading }] =
     useCreateChatMutation();
+  const { data: chatData, refetch: refetchChatData } = useGetChatbyUserIdQuery(
+    {
+      senderId: user?._id as string,
+      receiverId: selectedUser?._id as string,
+    },
+    { skip: !user?._id || !selectedUser?._id }
+  );
+
+  console.log({ chatData });
 
   useEffect(() => {
     if (selectedUser) {
       onOpen();
+      refetchChatData();
     }
   }, [selectedUser, onOpen]);
 
   const handleCreateChat = async (data: any, reset?: () => void) => {
-    setMessageText(data?.content);
+    setMessageText(data?.text);
+
     try {
+      // const newChat = {
+      //   ...data,
+      //   senderId: user?._id,
+      //   receiverId: selectedUser?._id,
+      //   content: data.content,
+      // };
       const newChat = {
-        ...data,
         senderId: user?._id,
         receiverId: selectedUser?._id,
-        content: data.content,
+        text: data?.text,
+        imageUrl: "",
+        videoUrl: "",
+        isSeen: false,
       };
       await createChat(newChat).unwrap();
       reset?.();
@@ -144,14 +222,6 @@ const ChatDrawer = ({
       toast.error(error?.data?.message || "Failed to create chat");
     }
   };
-
-  const filteredChats = user?.chats?.filter(
-    (msg) =>
-      (msg.senderId?._id === user?._id &&
-        msg.receiverId?._id === selectedUser?._id) ||
-      (msg.receiverId?._id === user?._id &&
-        msg.senderId?._id === selectedUser?._id)
-  );
 
   return (
     <Drawer
@@ -174,7 +244,9 @@ const ChatDrawer = ({
             </DrawerHeader>
             <DrawerBody>
               <ChatMessages
-                messages={filteredChats || []}
+                messages={chatData?.data || []}
+                // messages={[]}
+                // selectedUser={selectedUser}
                 currentUserId={user?._id || ""}
                 createChatIsLoading={createChatIsLoading}
                 messageText={messageText}
@@ -186,7 +258,7 @@ const ChatDrawer = ({
                   onSubmit={(data, reset) => handleCreateChat(data, reset)}
                 >
                   <LinkUpTextarea
-                    name="content"
+                    name="text"
                     size="sm"
                     placeholder="Aa"
                     minRows={1}

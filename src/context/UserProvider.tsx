@@ -1,3 +1,4 @@
+"use client";
 import { getUser } from "@/service/AuthService";
 import { IUser } from "@/type";
 import {

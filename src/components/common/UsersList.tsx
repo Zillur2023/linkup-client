@@ -5,7 +5,7 @@ import {
   useGetUserByIdQuery,
 } from "@/redux/features/user/userApi";
 import { IUser } from "@/type";
-import { Avatar, Listbox, ListboxItem, User } from "@heroui/react";
+import { Avatar, Listbox, ListboxItem } from "@heroui/react";
 
 import { useUser } from "@/context/UserProvider";
 import ChatDrawer from "../shared/ChatDrawer";
