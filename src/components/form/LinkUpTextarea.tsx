@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { Button, Card, Textarea } from "@heroui/react";
 
 interface LinkUpTextareaProps {
+  onChange?: any;
   name: string;
   label?: string;
   minRows?: number;
@@ -23,6 +24,7 @@ interface LinkUpTextareaProps {
 }
 
 export default function LinkUpTextarea({
+  onChange,
   name,
   label,
   minRows,
@@ -43,9 +45,11 @@ export default function LinkUpTextarea({
     register,
     watch,
     reset,
+    handleSubmit,
     formState: { errors },
   } = useFormContext();
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  // console.log("watch(name)", watch(name));
 
   // Focus textarea when modal opens
   useEffect(() => {
@@ -54,11 +58,21 @@ export default function LinkUpTextarea({
     }
   }, [focusRef]);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const onValid = (data: any) => {
+    console.log("Submitted data:", data);
+    reset();
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault(); // Prevent default behavior (e.g., new line)
-      onSubmit?.({ [name]: watch(name) }); // Pass form data to onSubmit
-      reset();
+      event.preventDefault(); // Prevent default (like new line)
+
+      const nameValue = watch(name);
+
+      if (nameValue?.trim()) {
+        // Call form submit programmatically
+        handleSubmit(onValid)();
+      }
     }
   };
 
@@ -104,8 +118,8 @@ export default function LinkUpTextarea({
           inputWrapper: "!bg-transparent shadow-none", // Added shadow-none here
           input: "!bg-transparent",
         }}
-
         // color="default"
+        // onChange={onChange}
       />
       {endContent && (
         <Button

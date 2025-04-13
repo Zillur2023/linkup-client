@@ -8,13 +8,15 @@ export interface IChatItem {
 }
 
 export interface IMessage {
+  _id: string;
   text: string;
   imageUrl: string;
   videoUrl: string;
   isSeen: boolean;
-  senderId: string;
-  createdAt?: string;
-  updatedAt?: string;
+  // senderId: string;
+  senderId: { _id: string; name: string; profileImage?: string };;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IChat {
@@ -30,7 +32,7 @@ export interface IChatApiResponse {
   statusCode: number;
   success: boolean;
   message: string;
-  data: IChatItem[];
+  data: IChat;
 }
 
 // export interface IChat {

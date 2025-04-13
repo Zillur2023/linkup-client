@@ -8,15 +8,15 @@ import { IUser } from "@/type";
 import { Avatar, Listbox, ListboxItem } from "@heroui/react";
 
 import { useUser } from "@/context/UserProvider";
-import ChatDrawer from "../shared/ChatDrawer";
+import ChatDrawer from "../chat/ChatDrawer";
 import Author from "../shared/Author";
 
 // Define types
 export interface ISelectedUser {
   _id: string;
-  label: string;
-  icon: ReactNode;
-  user: ReactNode;
+  label?: string;
+  icon?: ReactNode;
+  user?: ReactNode;
 }
 
 export type TItems = ISelectedUser[];
@@ -66,9 +66,7 @@ const UsersList = () => {
         </Listbox>
       )}
       <div className="hidden md:block">
-        {userData?.data && (
-          <ChatDrawer selectedUser={selectedUser} user={userData?.data} />
-        )}
+        {userData?.data && <ChatDrawer selectedUser={selectedUser} />}
       </div>
     </>
   );
