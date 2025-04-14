@@ -32,15 +32,11 @@ const ChatDrawer = ({
   const { reset, watch } = methods;
   const [chat, setChat] = useState<IChat | null>(null);
   const [messageText, setMessageText] = useState("");
-  console.log({ messageText });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isTypingState, setIsTypingState] = useState(false); // Renamed to avoid confusion
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
+
   const [createChat, { isLoading: createChatIsLoading }] =
     useCreateChatMutation();
-  // const [currentText, setCurrentText] = useState()
 
   const currentText = watch("text");
   useEffect(() => {
@@ -70,10 +66,11 @@ const ChatDrawer = ({
       //     ? { ...prevChat, messages: [...(prevChat.messages || []), newMessage] }
       //     : { _id: 'temp', senderId: { _id: newMessage.senderId._id } as any, receiverId: { _id: user?._id } as any, messages: [newMessage] } as IChat
       // );
-      setChat(newMessage);
       if (!isOpen) {
         onOpen();
+        setChat(null);
       }
+      setChat(newMessage);
     };
 
     const handleUserTyping = ({ senderId }: { senderId: string }) => {
@@ -124,6 +121,8 @@ const ChatDrawer = ({
   useEffect(() => {
     if (!selectedUser?._id || !socket) return;
 
+    let timeout: NodeJS.Timeout | null = null;
+
     const startTyping = () => {
       if (!isTypingState) {
         emitTypingStart();
@@ -138,37 +137,27 @@ const ChatDrawer = ({
       }
     };
 
-    const handleInputChange = () => {
-      if (currentText?.length > 0) {
-        startTyping();
-        // Clear any existing timeout to prevent premature stopping
-        if (typingTimeout) {
-          clearTimeout(typingTimeout);
-        }
-        // Set a new timeout to stop typing after 2 seconds of inactivity
-        setTypingTimeout(
-          setTimeout(() => {
-            stopTyping();
-          }, 2000)
-        );
-      } else {
-        // If the text is empty, immediately stop typing
+    const resetTimer = () => {
+      if (timeout) clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
         stopTyping();
-        if (typingTimeout) {
-          clearTimeout(typingTimeout);
-          setTypingTimeout(null);
-        }
-      }
+      }, 2000);
     };
 
-    handleInputChange(); // Call it whenever currentText changes
+    if (currentText && currentText.trim().length > 0) {
+      startTyping();
+      resetTimer();
+    } else {
+      stopTyping();
+      if (timeout) clearTimeout(timeout);
+    }
 
     return () => {
-      if (typingTimeout) {
-        clearTimeout(typingTimeout);
-      }
+      if (timeout) clearTimeout(timeout);
     };
   }, [currentText, selectedUser?._id, socket]);
+
   // const onSubmit = (data) => console.log(data);
   // const handleCreateChat = async (
   const onSubmit = async (data) => {
@@ -189,10 +178,8 @@ const ChatDrawer = ({
         videoUrl: "",
         isSeen: false,
       };
-      console.log({ newChat });
 
-      const result = await createChat(newChat).unwrap();
-      console.log({ result });
+      await createChat(newChat).unwrap();
       reset();
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create chat");
@@ -212,26 +199,28 @@ const ChatDrawer = ({
       <DrawerContent>
         {(onClose) => (
           <>
-            <DrawerHeader className="flex flex-col gap-1">
+            <DrawerHeader className=" !pt-2 !pb-1 ">
               <div className="text-start">{selectedUser?.user}</div>
             </DrawerHeader>
 
             <DrawerBody>
-              {chat && (
-                <ChatMessage
-                  chat={chat}
-                  currentUserId={user?._id as string}
-                  isLoading={createChatIsLoading}
-                  messageText={messageText}
-                  isTypingState={isTypingState}
-                />
-              )}
-              {isTypingState && (
-                <div className="text-gray-500 text-sm italic">Typing...</div>
-              )}
+              <ChatMessage
+                chat={chat as IChat}
+                currentUserId={user?._id as string}
+                isLoading={createChatIsLoading}
+                messageText={messageText}
+                isTypingState={isTypingState}
+              />
             </DrawerBody>
 
-            <DrawerFooter>
+            <DrawerFooter className=" !pt-1 !pb-2 relative ">
+              <div>
+                {isTypingState && !currentText && (
+                  <div className="absolute -mt-5  text-gray-500 text-sm italic z-50 ">
+                    Typing...
+                  </div>
+                )}
+              </div>
               <div className="w-full">
                 <FormProvider {...methods}>
                   <form onSubmit={methods.handleSubmit(onSubmit)}>

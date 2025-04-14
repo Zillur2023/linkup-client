@@ -73,16 +73,8 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
     { senderId: user?._id as string },
     { skip: !user?._id }
   );
-  console.log({ chatData });
   const { socket } = useSocketContext();
   const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
-  console.log({ selectedUser });
-  console.log({ user });
-
-  console.log({ selectedUser });
-
-  const toggleMap = selectedUser ? selectedUser : chatData?.data;
-  console.log({ toggleMap });
 
   const getUser = (item) => {
     return (
@@ -114,7 +106,6 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
     if (!socket) return;
 
     socket.on("chat", (lastMessage) => {
-      console.log("message data", lastMessage);
       setLastMessage(lastMessage);
     });
 
@@ -123,8 +114,6 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
       socket.off("chat");
     };
   }, [socket, lastMessage, setLastMessage]);
-
-  console.log({ lastMessage });
 
   return (
     <>
@@ -153,7 +142,6 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
         {chatData?.data && (
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             {chatData?.data?.map((item, index) => {
-              console.log({ item });
               return (
                 <DropdownItem
                   key={index}

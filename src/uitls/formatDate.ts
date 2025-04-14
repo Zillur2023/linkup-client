@@ -69,3 +69,16 @@ export const formatChatTooltipDate = (timestamp: string) => {
     return format(date, "MMMM d, yyyy, h:mm "); // April 22, 2025, 10:23 AM
   }
 };
+
+export const formatLastActive = (timestamp: number) => {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
+  if (seconds < 60) return "Active now";
+  if (seconds < 3600) return `Active ${Math.floor(seconds / 60)} min ago`;
+  if (seconds < 86400) return `Active ${Math.floor(seconds / 3600)} hours ago`;
+  if (seconds < 2592000)
+    return `Active ${Math.floor(seconds / 86400)} days ago`;
+  if (seconds < 31536000)
+    return `Active ${Math.floor(seconds / 2592000)} months ago`;
+  return `Active ${Math.floor(seconds / 31536000)} years ago`;
+};
