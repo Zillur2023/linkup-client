@@ -58,8 +58,8 @@ export interface IUser {
   chats?: IChat[];
   followers: string[]; // Array of ObjectIds referencing 'User'
   following: string[]; // Array of ObjectIds referencing 'User'
-  friendRequestsSent: string[];
-  friendRequestsReceived: IUser[];
+  friendRequestsSent: [IUser];
+  friendRequestsReceived: [IUser];
   friends: IUser[];
   isVerified: boolean;
   role: "admin" | "user";

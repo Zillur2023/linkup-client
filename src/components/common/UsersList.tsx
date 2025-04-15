@@ -10,7 +10,7 @@ import { Avatar, Listbox, ListboxItem } from "@heroui/react";
 import { useUser } from "@/context/UserProvider";
 import ChatDrawer from "../chat/ChatDrawer";
 import Author from "../shared/Author";
-import { useSocketContext, useUserStatus } from "@/context/socketContext";
+import { useSocketContext } from "@/context/socketContext";
 
 // Define types
 export interface ISelectedUser {
@@ -24,20 +24,15 @@ export type TItems = ISelectedUser[];
 
 const UsersList = () => {
   const { user } = useUser();
-  const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
   const { onlineUsers } = useSocketContext();
-  const { status, formattedLastActive } = useUserStatus(
-    selectedUser?._id as string
-  );
   console.log({ onlineUsers });
-  console.log({ formattedLastActive });
-  console.log({ status });
   const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
   const { data: allUserData, isLoading } = useGetAllUserQuery({
     searchQuery: "",
   });
+  const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
 
   if (isLoading) return <div>Loading users...</div>;
 
@@ -55,16 +50,7 @@ const UsersList = () => {
                 src={user.profileImage}
                 alt={user.name}
               />
-              <span
-                className={`absolute bottom-1 right-0 transform translate-x-1/2 translate-y-1/2  rounded-full w-2 h-2 border border-white
-        ${
-          status === "online"
-            ? "bg-green-500"
-            : status === "idle"
-            ? "bg-yellow-500"
-            : "bg-gray-400"
-        }`}
-              ></span>
+              <span className="absolute bottom-1 right-0 transform translate-x-1/2 translate-y-1/2 bg-green-500 rounded-full w-2 h-2 border border-white"></span>
             </div>
           ) : (
             <Avatar
@@ -79,21 +65,11 @@ const UsersList = () => {
         <>
           {onlineUsers?.includes(user?._id as string) ? (
             <div className="relative inline-block">
-              <Author author={user} description={`${formattedLastActive}`} />
-              <span
-                className={`absolute bottom-4 left-6 transform translate-x-1/2 translate-y-1/2 rounded-full w-3 h-3 border border-white
-                    ${
-                      status === "online"
-                        ? "bg-green-500"
-                        : status === "idle"
-                        ? "bg-yellow-500"
-                        : "bg-gray-400"
-                    } `}
-              ></span>
+              <Author author={user} description="Active now" />
+              <span className="absolute bottom-4 left-6 transform translate-x-1/2 translate-y-1/2 bg-green-500 rounded-full w-3 h-3 border border-white"></span>
             </div>
           ) : (
-            // {status === 'offline' ? formattedLastActive : 'Online'}
-            <Author author={user} description={`${formattedLastActive}`} />
+            <Author author={user} description="Ofline" />
           )}
         </>
       ),

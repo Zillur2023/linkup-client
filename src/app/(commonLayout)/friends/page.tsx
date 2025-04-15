@@ -1,5 +1,6 @@
 "use client";
 import SidebarMenu from "@/components/shared/SidebarMenu";
+import { useSocketContext } from "@/context/socketContext";
 import { useUser } from "@/context/UserProvider";
 import {
   useAcceptFriendRequestMutation,
@@ -17,23 +18,92 @@ import {
   Divider,
   Image,
 } from "@heroui/react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const FriendRequestsReceived = ({ user }: { user: IUser }) => {
+  const { socket } = useSocketContext();
+  const [localUserData, setLocalUserData] = useState<IUser | null>(null);
+  console.log({ localUserData });
   const [rejectFriendRequest] = useRejectFriendRequestMutation();
   const [acceptFriendRequest] = useAcceptFriendRequestMutation();
 
-  const RejectFriendRequest = async (requesterId: string) => {
+  useEffect(() => {
+    if (user) {
+      setLocalUserData(user);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUserAcceptFriendRequest = (user: IUser) => {
+      console.log("You sent a friend request:", user);
+      setLocalUserData(user);
+    };
+
+    const handleUserAcceptFriendRequestUpdateRequester = (user: IUser) => {
+      console.log("You received a friend request:", user);
+      setLocalUserData(user);
+    };
+
+    const handleUserRejectFriendRequest = (user: IUser) => {
+      console.log("You reject friend request:", user);
+      setLocalUserData(user);
+    };
+
+    const handleUserRejectFriendRequestUpdateRequester = (user: IUser) => {
+      console.log("You reject friend request and upate in requester", user);
+      setLocalUserData(user);
+    };
+
+    socket.on("userAcceptFriendRequest", handleUserAcceptFriendRequest);
+    socket.on(
+      "userAcceptFriendRequestUpdateRequester",
+      handleUserAcceptFriendRequestUpdateRequester
+    );
+    socket.on("userRejectFriendRequest", handleUserRejectFriendRequest);
+    socket.on(
+      "userRejectFriendRequestUpdateRequester",
+      handleUserRejectFriendRequestUpdateRequester
+    );
+
+    return () => {
+      socket.off("userAcceptFriendRequest", handleUserAcceptFriendRequest);
+      socket.off(
+        "userAcceptFriendRequestUpdateRequester",
+        handleUserAcceptFriendRequestUpdateRequester
+      );
+      socket.off("userRejectFriendRequest", handleUserRejectFriendRequest);
+      socket.off(
+        "userRejectFriendRequestUpdateRequester",
+        handleUserRejectFriendRequestUpdateRequester
+      );
+    };
+  }, [socket]);
+
+  const handleRejectFriendRequest = async (requesterId: IUser) => {
+    console.log({ requesterId });
     try {
-      await rejectFriendRequest({ userId: user?._id, requesterId });
+      if (requesterId) {
+        await rejectFriendRequest({
+          userId: user?._id,
+          requesterId: requesterId?._id,
+        });
+      }
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to  reject friend request");
     }
   };
 
-  const AcceptFriendRequest = async (requesterId: string) => {
+  const handleAcceptFriendRequest = async (requesterId: IUser) => {
     try {
-      await acceptFriendRequest({ userId: user?._id, requesterId });
+      if (requesterId) {
+        await acceptFriendRequest({
+          userId: user?._id,
+          requesterId: requesterId?._id,
+        });
+      }
     } catch (error: any) {
       console.log(error);
     }
@@ -41,39 +111,49 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
 
   return (
     <div>
-      <h3 className=" mb-2 font-semibold text-xl"> Friend Requests </h3>
-      <div className="  gap-2 grid grid-cols-1 md:grid-cols-3  ">
-        {user?.friendRequestsReceived?.map((item, index) => (
-          <Card key={index} shadow="sm">
-            <CardBody className="overflow-visible p-0">
-              <Image
-                alt={item?.name}
-                className="w-full object-cover h-[140px]"
-                radius="lg"
-                shadow="sm"
-                src={item.profileImage}
-                width="100%"
-              />
-            </CardBody>
-            <CardFooter className=" flex flex-col gap-1">
-              <Button
-                fullWidth
-                onClick={() => AcceptFriendRequest(item?._id as string)}
-              >
-                {" "}
-                Confirm{" "}
-              </Button>
-              <Button
-                fullWidth
-                onClick={() => RejectFriendRequest(item?._id as string)}
-              >
-                {" "}
-                Delete{" "}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+      <div>
+        <h3 className=" mb-2 font-semibold text-xl"> Friend Requests </h3>
+
+        {Array.isArray(localUserData?.friendRequestsReceived) &&
+          localUserData.friendRequestsReceived.length > 0 && (
+            <div className="gap-2 grid grid-cols-1 md:grid-cols-3">
+              {localUserData.friendRequestsReceived.map((item, index) => {
+                console.log({ item });
+                console.log("item?._id", item?._id);
+                return (
+                  <Card key={index} shadow="sm">
+                    <CardBody className="overflow-visible p-0">
+                      <Image
+                        alt={item?.name}
+                        className="w-full object-cover h-[140px]"
+                        radius="lg"
+                        shadow="sm"
+                        src={item.profileImage}
+                        width="100%"
+                      />
+                    </CardBody>
+                    <CardFooter className="flex flex-col gap-1">
+                      <Button
+                        fullWidth
+                        onClick={() => handleAcceptFriendRequest(item)}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        fullWidth
+                        onClick={() => handleRejectFriendRequest(item)}
+                      >
+                        Delete
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
       </div>
+      <Divider className=" my-8" />
+      <SuggestedFriends user={localUserData as IUser} />
     </div>
   );
 };
@@ -138,6 +218,45 @@ const FriendsPage = () => {
   const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
+  const { socket } = useSocketContext();
+  const [localUserData, setLocalUserData] = useState<IUser | null>(null);
+  const [sendFriendRequest, setSendFriendRequest] = useState<IUser | null>(
+    null
+  );
+  const [receiverFriendRequest, setReceiverFriendRequest] =
+    useState<IUser | null>(null);
+  console.log({ sendFriendRequest });
+  console.log({ receiverFriendRequest });
+
+  useEffect(() => {
+    if (!socket || !user?._id) return;
+
+    const handleSendFriendRequest = (user: IUser) => {
+      console.log("You sent a friend request:", user);
+      setSendFriendRequest(user);
+      setLocalUserData(user);
+    };
+
+    const handleReceiveFriendRequest = (user: IUser) => {
+      console.log("You received a friend request:", user);
+      setReceiverFriendRequest(user);
+      setLocalUserData(user);
+    };
+
+    socket.on("friendRequestSent", handleSendFriendRequest);
+    socket.on("friendRequestReceived", handleReceiveFriendRequest);
+
+    return () => {
+      socket.off("friendRequestSent", handleSendFriendRequest);
+      socket.off("friendRequestReceived", handleReceiveFriendRequest);
+    };
+  }, [socket, user?._id]);
+
+  useEffect(() => {
+    if (userData?.data) {
+      setLocalUserData(userData.data);
+    }
+  }, [userData]);
 
   return (
     <div className="flex  justify-center gap-2 my-5 ">
@@ -145,9 +264,9 @@ const FriendsPage = () => {
         <SidebarMenu />
       </div>
       <div className=" md:block  w-full md:w-[75%]    ">
-        {userData?.data && <FriendRequestsReceived user={userData.data} />}
-        <Divider className=" my-8" />
-        {userData?.data && <SuggestedFriends user={userData.data} />}
+        <FriendRequestsReceived user={localUserData as IUser} />
+        {/* <Divider className=" my-8" />
+         <SuggestedFriends user={userData?.data as IUser} /> */}
       </div>
     </div>
   );
