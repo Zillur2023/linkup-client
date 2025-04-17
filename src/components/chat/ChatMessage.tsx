@@ -8,13 +8,11 @@ const ChatMessage = ({
   currentUserId,
   isLoading,
   messageText,
-  isTypingState,
 }: {
   chat: IChat;
   currentUserId: string;
   isLoading: boolean;
   messageText: string;
-  isTypingState: boolean;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

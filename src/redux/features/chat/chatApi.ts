@@ -1,4 +1,4 @@
-import { IChat, IChatApiResponse } from "@/type";
+import { IChatApiResponse } from "@/type";
 import { baseApi } from "../../api/baseApi";
 
 interface ChatParams {

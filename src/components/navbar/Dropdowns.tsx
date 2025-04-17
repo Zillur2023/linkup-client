@@ -1,4 +1,4 @@
-import { IChat, IUser } from "@/type";
+import { IUser } from "@/type";
 import {
   Avatar,
   Dropdown,
@@ -76,7 +76,7 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
   const { socket } = useSocketContext();
   const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
 
-  const getUser = (item) => {
+  const getUser = (item: any) => {
     return (
       <User
         name={
@@ -139,29 +139,23 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
             })}
           </DropdownMenu>
         )} */}
-        {chatData?.data && (
-          <DropdownMenu aria-label="Profile Actions" variant="flat">
-            {chatData?.data?.map((item, index) => {
-              return (
-                <DropdownItem
-                  key={index}
-                  className=" gap-2"
-                  onClick={() =>
-                    setSelectedUser({
-                      _id:
-                        user?._id === item?.senderId?._id
-                          ? (item?.receiverId?._id as string)
-                          : (item?.senderId?._id as string),
-                      user: getUser(item),
-                    })
-                  }
-                >
-                  {getUser(item)}
-                </DropdownItem>
-              );
-            })}
-          </DropdownMenu>
-        )}
+        <DropdownMenu aria-label="Profile Actions" variant="flat">
+          <DropdownItem
+            key={"index"}
+            className=" gap-2"
+            onClick={() =>
+              setSelectedUser({
+                _id:
+                  user?._id === chatData?.data?.senderId
+                    ? (chatData?.data?.receiverId as string)
+                    : (chatData?.data?.senderId as string),
+                user: getUser(chatData?.data),
+              })
+            }
+          >
+            {getUser(chatData?.data)}
+          </DropdownItem>
+        </DropdownMenu>
       </Dropdown>
       <ChatDrawer selectedUser={selectedUser} />
     </>

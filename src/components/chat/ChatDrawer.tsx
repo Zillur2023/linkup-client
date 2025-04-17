@@ -70,6 +70,7 @@ const ChatDrawer = ({
         onOpen();
         setChat(null);
       }
+      setMessageText("");
       setChat(newMessage);
     };
 
@@ -142,7 +143,7 @@ const ChatDrawer = ({
 
       timeout = setTimeout(() => {
         stopTyping();
-      }, 2000);
+      }, 1000);
     };
 
     if (currentText && currentText.trim().length > 0) {
@@ -160,7 +161,7 @@ const ChatDrawer = ({
 
   // const onSubmit = (data) => console.log(data);
   // const handleCreateChat = async (
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: any) => {
     if (!selectedUser) return;
     setMessageText(data.text);
 
@@ -197,7 +198,8 @@ const ChatDrawer = ({
       className="w-[80%] md:w-[40%] lg:w-[23%] bottom-0 left-[10%] md:left-[50%] lg:left-[70%]"
     >
       <DrawerContent>
-        {(onClose) => (
+        {/* {(onClose) => ( */}
+        {() => (
           <>
             <DrawerHeader className=" !pt-2 !pb-1 ">
               <div className="text-start">{selectedUser?.user}</div>
@@ -209,7 +211,6 @@ const ChatDrawer = ({
                 currentUserId={user?._id as string}
                 isLoading={createChatIsLoading}
                 messageText={messageText}
-                isTypingState={isTypingState}
               />
             </DrawerBody>
 
@@ -230,6 +231,7 @@ const ChatDrawer = ({
                       placeholder="Aa"
                       minRows={1}
                       endContent={<IoSend />}
+                      onSubmit={methods.handleSubmit(onSubmit)}
                     />
                   </form>
                 </FormProvider>

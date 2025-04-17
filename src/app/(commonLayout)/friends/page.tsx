@@ -82,13 +82,13 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
     };
   }, [socket]);
 
-  const handleRejectFriendRequest = async (requesterId: IUser) => {
+  const handleRejectFriendRequest = async (requesterId: string) => {
     console.log({ requesterId });
     try {
       if (requesterId) {
         await rejectFriendRequest({
           userId: user?._id,
-          requesterId: requesterId?._id,
+          requesterId,
         });
       }
     } catch (error: any) {
@@ -96,12 +96,12 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
     }
   };
 
-  const handleAcceptFriendRequest = async (requesterId: IUser) => {
+  const handleAcceptFriendRequest = async (requesterId: string) => {
     try {
       if (requesterId) {
         await acceptFriendRequest({
           userId: user?._id,
-          requesterId: requesterId?._id,
+          requesterId,
         });
       }
     } catch (error: any) {
@@ -114,43 +114,46 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
       <div>
         <h3 className=" mb-2 font-semibold text-xl"> Friend Requests </h3>
 
-        {Array.isArray(localUserData?.friendRequestsReceived) &&
-          localUserData.friendRequestsReceived.length > 0 && (
-            <div className="gap-2 grid grid-cols-1 md:grid-cols-3">
-              {localUserData.friendRequestsReceived.map((item, index) => {
-                console.log({ item });
-                console.log("item?._id", item?._id);
-                return (
-                  <Card key={index} shadow="sm">
-                    <CardBody className="overflow-visible p-0">
-                      <Image
-                        alt={item?.name}
-                        className="w-full object-cover h-[140px]"
-                        radius="lg"
-                        shadow="sm"
-                        src={item.profileImage}
-                        width="100%"
-                      />
-                    </CardBody>
-                    <CardFooter className="flex flex-col gap-1">
-                      <Button
-                        fullWidth
-                        onClick={() => handleAcceptFriendRequest(item)}
-                      >
-                        Confirm
-                      </Button>
-                      <Button
-                        fullWidth
-                        onClick={() => handleRejectFriendRequest(item)}
-                      >
-                        Delete
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+        {localUserData && (
+          <div className="gap-2 grid grid-cols-1 md:grid-cols-3">
+            {localUserData.friendRequestsReceived.map((item, index) => {
+              console.log({ item });
+              console.log("item?._id", item?._id);
+              return (
+                <Card key={index} shadow="sm">
+                  <CardBody className="overflow-visible p-0">
+                    <Image
+                      alt={item?.name}
+                      className="w-full object-cover h-[140px]"
+                      radius="lg"
+                      shadow="sm"
+                      src={item.profileImage}
+                      width="100%"
+                    />
+                  </CardBody>
+                  <CardFooter className="flex flex-col gap-1">
+                    <Button
+                      fullWidth
+                      onClick={() =>
+                        handleAcceptFriendRequest(item?._id as string)
+                      }
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      fullWidth
+                      onClick={() =>
+                        handleRejectFriendRequest(item?._id as string)
+                      }
+                    >
+                      Delete
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
       <Divider className=" my-8" />
       <SuggestedFriends user={localUserData as IUser} />
@@ -164,13 +167,13 @@ const SuggestedFriends = ({ user }: { user: IUser }) => {
   });
   const [sendFriendRequest] = useSendFriendRequestMutation();
 
-  // const items = allUserData?.data?.filter((usr) => usr?._id !== user?._id);
-
   const filteredUsers = allUserData?.data?.filter(
     (usr: any) =>
       usr._id !== user?._id &&
       !user?.friendRequestsReceived?.some((item) => item?._id === usr?._id) &&
-      !user?.friendRequestsSent?.includes(usr?._id)
+      !user?.friendRequestsSent?.some((item) => item?._id === usr?._id) &&
+      !user?.friends?.some((item) => item?._id === usr?._id)
+    // !user?.friendRequestsSent?.includes(usr?._id)
   );
 
   const SendFriendRequest = async (receiverId: string) => {
@@ -204,7 +207,10 @@ const SuggestedFriends = ({ user }: { user: IUser }) => {
               >
                 Add friend
               </Button>
-              <Button fullWidth> Remove </Button>
+              <Button fullWidth isDisabled>
+                {" "}
+                Remove{" "}
+              </Button>
             </CardFooter>
           </Card>
         ))}
@@ -215,32 +221,31 @@ const SuggestedFriends = ({ user }: { user: IUser }) => {
 
 const FriendsPage = () => {
   const { user } = useUser();
-  const { data: userData } = useGetUserByIdQuery(user?._id as string, {
+  const { data: userData, refetch } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
   const { socket } = useSocketContext();
   const [localUserData, setLocalUserData] = useState<IUser | null>(null);
-  const [sendFriendRequest, setSendFriendRequest] = useState<IUser | null>(
-    null
-  );
-  const [receiverFriendRequest, setReceiverFriendRequest] =
-    useState<IUser | null>(null);
-  console.log({ sendFriendRequest });
-  console.log({ receiverFriendRequest });
 
   useEffect(() => {
-    if (!socket || !user?._id) return;
+    if (userData?.data) {
+      setLocalUserData(userData.data);
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (!socket) return;
 
     const handleSendFriendRequest = (user: IUser) => {
       console.log("You sent a friend request:", user);
-      setSendFriendRequest(user);
       setLocalUserData(user);
+      refetch();
     };
 
     const handleReceiveFriendRequest = (user: IUser) => {
       console.log("You received a friend request:", user);
-      setReceiverFriendRequest(user);
       setLocalUserData(user);
+      refetch();
     };
 
     socket.on("friendRequestSent", handleSendFriendRequest);
@@ -250,13 +255,7 @@ const FriendsPage = () => {
       socket.off("friendRequestSent", handleSendFriendRequest);
       socket.off("friendRequestReceived", handleReceiveFriendRequest);
     };
-  }, [socket, user?._id]);
-
-  useEffect(() => {
-    if (userData?.data) {
-      setLocalUserData(userData.data);
-    }
-  }, [userData]);
+  }, [socket, refetch]);
 
   return (
     <div className="flex  justify-center gap-2 my-5 ">

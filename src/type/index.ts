@@ -14,7 +14,7 @@ export interface IMessage {
   videoUrl: string;
   isSeen: boolean;
   // senderId: string;
-  senderId: { _id: string; name: string; profileImage?: string };;
+  senderId: { _id: string; name: string; profileImage?: string };
   createdAt: string;
   updatedAt: string;
 }
@@ -58,8 +58,8 @@ export interface IUser {
   chats?: IChat[];
   followers: string[]; // Array of ObjectIds referencing 'User'
   following: string[]; // Array of ObjectIds referencing 'User'
-  friendRequestsSent: [IUser];
-  friendRequestsReceived: [IUser];
+  friendRequestsSent: IUser[];
+  friendRequestsReceived: IUser[];
   friends: IUser[];
   isVerified: boolean;
   role: "admin" | "user";
@@ -115,7 +115,7 @@ export interface IComment {
   _id: string;
   postId: IPost;
   userId: IUser;
-  comment: string;
+  content: string;
   // parentCommentId?: Types.ObjectId | null;
   createdAt: string; // Automatically managed by Mongoose
   updatedAt: string; // Automatically managed by Mongoose

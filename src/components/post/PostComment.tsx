@@ -23,6 +23,7 @@ import { Avatar, Button, Card } from "@heroui/react";
 import { formatCommentDate } from "@/uitls/formatDate";
 import Link from "next/link";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
+import { useSocketContext } from "@/context/socketContext";
 
 interface PostCommentProps {
   user: IUser;
@@ -45,6 +46,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   focusRef,
   clickRef,
 }) => {
+  const { socket } = useSocketContext();
   const [commentText, setCommentText] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
@@ -62,31 +64,56 @@ const PostComment: React.FC<PostCommentProps> = ({
   // const router = useRouter();
 
   const [deleteComment] = useDeleteCommentMutation();
-  const [createComment, { isLoading: createCommentIsLoading }] =
-    useCreateCommentMutation();
+  useCreateCommentMutation();
   const [updateComment, { isLoading: updateCommentIsLoading }] =
     useUpdateCommentMutation();
-  const { data: allCommentData, isFetching: allCommentDataIsFetching } =
-    useGetAllCommentQuery(post?._id, {
-      skip: !post?._id,
-    });
+  const {
+    data: allCommentData,
+    refetch,
+    isFetching: allCommentDataIsFetching,
+  } = useGetAllCommentQuery(post?._id, {
+    skip: !post?._id,
+  });
+
+  const [comments, setComments] = useState<IComment[]>([]);
+
+  useEffect(() => {
+    if (allCommentData) {
+      setComments(allCommentData?.data);
+    }
+  }, [allCommentData]);
 
   const commentData = hideComments
     ? []
     : showAllComments
-    ? allCommentData?.data
-    : allCommentData?.data?.slice(0, 2);
+    ? comments
+    : comments?.slice(0, 2);
+
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    const handleAddedComment = () => {
+      refetch();
+    };
+
+    socket.on("addedComment", handleAddedComment);
+
+    return () => {
+      socket.off("addedComment", handleAddedComment);
+    };
+  }, [socket, user, refetch]);
 
   // Handle creating a new comment
   const handleCreateComment = async (data: IComment, reset?: () => void) => {
-    setCommentText(data?.comment);
+    setCommentText(data?.content);
     try {
       const newComment = {
         ...data,
         userId: user?._id,
         postId: post?._id,
       };
-      await createComment(newComment).unwrap();
+      socket?.emit("addComment", newComment);
+      // await createComment(newComment).unwrap();
       reset?.(); // Reset the form
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create comment");
@@ -103,7 +130,7 @@ const PostComment: React.FC<PostCommentProps> = ({
 
       return {
         ...prev,
-        comment: data.comment, // Update only the comment field
+        content: data.content, // Update only the comment field
       };
     });
     if (!editingComment || !user?._id) {
@@ -159,7 +186,7 @@ const PostComment: React.FC<PostCommentProps> = ({
         onSubmit={handleCreateComment}
       >
         <LinkUpTextarea
-          name="comment"
+          name="content"
           size="sm"
           minRows={1}
           // focusRef={focusRef}
@@ -211,7 +238,7 @@ const PostComment: React.FC<PostCommentProps> = ({
       </LinkUpModal>
 
       <div className="flex-1 overflow-y-auto space-y-2 ">
-        {createCommentIsLoading && commentText && (
+        {commentText && (
           <div className="flex items-start gap-2">
             <Avatar
               src={user.profileImage || "/default-avatar.png"}
@@ -231,7 +258,7 @@ const PostComment: React.FC<PostCommentProps> = ({
         )}
         {commentData?.map((item: IComment) => {
           const maxWords = 20;
-          const words = item?.comment.split(" ");
+          const words = item?.content.split(" ");
           const truncatedText = words.slice(0, maxWords).join(" ");
           const shouldShowSeeMore = words.length > maxWords;
           const isExpanded = expandedComments[item._id] || false;
@@ -276,10 +303,10 @@ const PostComment: React.FC<PostCommentProps> = ({
                           {(allCommentDataIsFetching ||
                             updateCommentIsLoading) &&
                           editingComment?._id === item?._id ? (
-                            editingComment.comment
+                            editingComment.content
                           ) : (
                             <>
-                              {isExpanded ? item?.comment : truncatedText}
+                              {isExpanded ? item?.content : truncatedText}
                               {shouldShowSeeMore && (
                                 <button
                                   onClick={() => toggleExpandComment(item._id)}
@@ -343,11 +370,11 @@ const PostComment: React.FC<PostCommentProps> = ({
                     <LinkUpForm
                       resolver={zodResolver(commentValidationSchema)}
                       onSubmit={(data) => handleUpdateComment(data)}
-                      defaultValues={{ comment: editingComment?.comment }}
+                      defaultValues={{ content: editingComment?.content }}
                       // defaultValues={{ comment: item?.comment }}
                     >
                       <LinkUpTextarea
-                        name="comment"
+                        name="content"
                         size="sm"
                         minRows={1}
                         focusRef={(el) =>

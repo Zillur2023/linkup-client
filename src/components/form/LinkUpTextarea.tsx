@@ -24,7 +24,6 @@ interface LinkUpTextareaProps {
 }
 
 export default function LinkUpTextarea({
-  onChange,
   name,
   label,
   minRows,
@@ -45,7 +44,6 @@ export default function LinkUpTextarea({
     register,
     watch,
     reset,
-    handleSubmit,
     formState: { errors },
   } = useFormContext();
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -57,22 +55,19 @@ export default function LinkUpTextarea({
       textAreaRef.current.focus();
     }
   }, [focusRef]);
+  // const onValid = (data: any) => {
+  //   console.log("Submitted data:", data);
+  //   reset();
+  // };
 
-  const onValid = (data: any) => {
-    console.log("Submitted data:", data);
-    reset();
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault(); // Prevent default (like new line)
+      event.preventDefault(); // Prevent default behavior (e.g., new line)
+      onSubmit?.({ [name]: watch(name) }); // Pass form data to onSubmit
+      // const nameValue = watch(name)
+      // if(nameValue) handleSubmit()();
 
-      const nameValue = watch(name);
-
-      if (nameValue?.trim()) {
-        // Call form submit programmatically
-        handleSubmit(onValid)();
-      }
+      reset();
     }
   };
 
@@ -119,7 +114,6 @@ export default function LinkUpTextarea({
           input: "!bg-transparent",
         }}
         // color="default"
-        // onChange={onChange}
       />
       {endContent && (
         <Button

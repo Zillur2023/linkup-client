@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Button,
@@ -37,6 +37,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { setReactions } from "@/redux/features/post/reactionSlice";
 import LikeButton from "../reactions/LikeButton";
 import DislikeButton from "../reactions/DislikeButton";
+import { useSocketContext } from "@/context/socketContext";
 
 interface PostsProps {
   postId?: string;
@@ -54,6 +55,7 @@ const Posts: React.FC<PostsProps> = ({
   modalCommentRef,
 }) => {
   const dispatch = useAppDispatch();
+  const { socket } = useSocketContext();
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
   const [deletePost] = useDeletePostMutation();
   const modalRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
@@ -77,12 +79,49 @@ const Posts: React.FC<PostsProps> = ({
         // sortBy,
         isPremium: userData?.data?.isVerified ? true : undefined,
       };
+  const { data: postData, refetch } = useGetAllPostQuery(queryPost);
 
-  const { data: postData } = useGetAllPostQuery(queryPost);
+  const [posts, setPosts] = useState<IPost[]>([]);
+  console.log({ posts });
+  console.log({ postData });
   // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
 
   useEffect(() => {
     if (postData?.data) {
+      setPosts(postData?.data);
+    }
+  }, [postData]);
+
+  // Listen for events from the server and update posts accordingly
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    const handleUpdatedLikeDislike = () => {
+      // setPosts((prevPosts) =>
+      //   prevPosts.map((post) =>
+      //     post._id === updatedPost._id
+      //       ? {
+      //           ...post,
+      //           likes: updatedPost.likes,
+      //           dislikes: updatedPost.dislikes,
+      //         }
+      //       : post
+      //   )
+      // );
+      refetch();
+    };
+
+    socket.on("updated-like-dislike", handleUpdatedLikeDislike);
+
+    return () => {
+      socket.off("updated-like-dislike", handleUpdatedLikeDislike);
+    };
+  }, [socket, user, refetch]);
+
+  useEffect(() => {
+    if (!postData?.data) return;
+
+    const timeout = setTimeout(() => {
       postData.data.forEach((post) => {
         dispatch(
           setReactions({
@@ -96,8 +135,10 @@ const Posts: React.FC<PostsProps> = ({
           })
         );
       });
-    }
-  }, [postData, dispatch]);
+    }, 3000); // wait 5 seconds after postData changes
+
+    return () => clearTimeout(timeout); // clear if postData changes again within 5 sec
+  }, [postData?.data, refetch, dispatch]);
 
   const handleUpdateFollowUnfollow = async (id: string) => {
     if (!userData?.data?._id) {
@@ -123,27 +164,27 @@ const Posts: React.FC<PostsProps> = ({
 
   return (
     <div className=" space-y-5 ">
-      {userData &&
+      {/* {userData &&
         postData?.data &&
         postData.data.length > 0 &&
         !searchQuery &&
-        !postId && (
-          <Card className=" flex flex-row items-center justify-center gap-2 p-3 ">
-            <Avatar
-              radius="full"
-              src={userData?.data?.profileImage}
-              // size="md"
-            />
-            <PostEditor
-              openButtonText={`What's on your mind, ${userData?.data?.name}`}
-              size="md"
-              radius="full"
-            />
-          </Card>
-        )}
+        !postId && ( */}
+      <Card className=" flex flex-row items-center justify-center gap-2 p-3 ">
+        <Avatar
+          radius="full"
+          src={userData?.data?.profileImage}
+          // size="md"
+        />
+        <PostEditor
+          openButtonText={`What's on your mind, ${userData?.data?.name}`}
+          size="md"
+          radius="full"
+        />
+      </Card>
+      {/* )} */}
       {!postData && <PostSkeleton length={postId ? 1 : 4} />}
 
-      {postData?.data?.map((post: IPost) => {
+      {posts?.map((post: IPost) => {
         return (
           <Card
             radius="none"
