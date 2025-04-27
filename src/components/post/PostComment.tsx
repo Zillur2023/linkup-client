@@ -6,9 +6,7 @@ import LinkUpModal from "../shared/LinkUpModal";
 import { IComment, IPost, IUser } from "@/type";
 import {
   useCreateCommentMutation,
-  useDeleteCommentMutation,
   useGetAllCommentQuery,
-  useUpdateCommentMutation,
 } from "@/redux/features/comment/commentApi";
 import Posts from "./Posts";
 import LinkUpForm from "../form/LinkUpForm";
@@ -63,15 +61,10 @@ const PostComment: React.FC<PostCommentProps> = ({
 
   // const router = useRouter();
 
-  const [deleteComment] = useDeleteCommentMutation();
+  // const [deleteComment] = useDeleteCommentMutation();
   useCreateCommentMutation();
-  const [updateComment, { isLoading: updateCommentIsLoading }] =
-    useUpdateCommentMutation();
-  const {
-    data: allCommentData,
-    refetch,
-    isFetching: allCommentDataIsFetching,
-  } = useGetAllCommentQuery(post?._id, {
+
+  const { data: allCommentData, refetch } = useGetAllCommentQuery(post?._id, {
     skip: !post?._id,
   });
 
@@ -92,14 +85,32 @@ const PostComment: React.FC<PostCommentProps> = ({
   useEffect(() => {
     if (!socket || !user) return;
 
+    // const handleAddedComment = (updateComment: IComment) => {
     const handleAddedComment = () => {
+      // setComments((prev) => {
+      //   // Prevent duplicates and maintain order (newest first)
+      //   const exists = prev.some((c) => c._id === updateComment._id);
+      //   return exists ? prev : [updateComment, ...prev];
+      // });
+      refetch();
+    };
+
+    const handleUpdatedComment = () => {
+      refetch();
+    };
+
+    const handleDeletedComment = () => {
       refetch();
     };
 
     socket.on("addedComment", handleAddedComment);
+    socket.on("updatedComment", handleUpdatedComment);
+    socket.on("deletedComment", handleDeletedComment);
 
     return () => {
       socket.off("addedComment", handleAddedComment);
+      socket.off("updatedComment", handleUpdatedComment);
+      socket.off("deletedComment", handleDeletedComment);
     };
   }, [socket, user, refetch]);
 
@@ -146,7 +157,9 @@ const PostComment: React.FC<PostCommentProps> = ({
       };
       // reset?.();
       setEditingCommentId(null); // Reset editing state
-      await updateComment(updatedComment).unwrap();
+
+      socket?.emit("updateComment", updatedComment);
+      // await updateComment(updatedComment).unwrap();
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update comment");
     }
@@ -154,7 +167,9 @@ const PostComment: React.FC<PostCommentProps> = ({
 
   const handleDeleteComment = async (commentId: string) => {
     try {
-      await deleteComment(commentId).unwrap();
+      // await deleteComment(commentId).unwrap();
+
+      socket?.emit("deleteComment", commentId);
     } catch (error: any) {
       toast.error(error?.data?.message);
     }
@@ -256,27 +271,27 @@ const PostComment: React.FC<PostCommentProps> = ({
             </div>
           </div>
         )}
-        {commentData?.map((item: IComment) => {
+        {commentData?.map((comment: IComment) => {
           const maxWords = 20;
-          const words = item?.content.split(" ");
+          const words = comment?.content.split(" ");
           const truncatedText = words.slice(0, maxWords).join(" ");
           const shouldShowSeeMore = words.length > maxWords;
-          const isExpanded = expandedComments[item._id] || false;
+          const isExpanded = expandedComments[comment._id] || false;
 
           return (
-            <div key={item?._id} className="   ">
-              {editingCommentId !== item?._id ? (
+            <div key={comment?._id} className="   ">
+              {editingCommentId !== comment?._id ? (
                 <>
                   <div className=" flex gap-1 relative group ">
                     <Link
                       className=" hover:underline"
-                      href={`/profile?id=${item?.userId?._id}`}
+                      href={`/profile?id=${comment?.userId?._id}`}
                     >
                       <Avatar
                         size="sm"
                         radius="full"
                         // src={user?.profileImage}
-                        src={item?.userId?.profileImage}
+                        src={comment?.userId?.profileImage}
                       />
                     </Link>
                     <div className=" ">
@@ -288,68 +303,69 @@ const PostComment: React.FC<PostCommentProps> = ({
                         <div className=" flex justify-start gap-1">
                           <Link
                             className=" hover:underline"
-                            href={`/profile?id=${item?.userId?._id}`}
+                            href={`/profile?id=${comment?.userId?._id}`}
                           >
                             <p className="text-gray-800 text-start text-medium font-semibold  ">
                               {user?.name}
                             </p>
                           </Link>
-                          {item?.userId?.isVerified && (
+                          {comment?.userId?.isVerified && (
                             <RiVerifiedBadgeFill className="w-5 h-5 text-blue-500" />
                           )}
                         </div>
 
                         <p className=" text-medium  text-start">
-                          {(allCommentDataIsFetching ||
-                            updateCommentIsLoading) &&
-                          editingComment?._id === item?._id ? (
-                            editingComment.content
-                          ) : (
-                            <>
-                              {isExpanded ? item?.content : truncatedText}
-                              {shouldShowSeeMore && (
-                                <button
-                                  onClick={() => toggleExpandComment(item._id)}
-                                  className=" text-sm text-blue-500 hover:text-blue-600 ml-1"
-                                >
-                                  {isExpanded ? " See less" : " ...See more"}
-                                </button>
-                              )}
-                            </>
-                          )}
+                          {/* {allCommentDataIsFetching ? (
+                            editingComment?.content
+                          ) : ( */}
+                          <>
+                            {isExpanded ? comment?.content : truncatedText}
+                            {shouldShowSeeMore && (
+                              <button
+                                onClick={() => toggleExpandComment(comment._id)}
+                                className=" text-sm text-blue-500 hover:text-blue-600 ml-1"
+                              >
+                                {isExpanded ? " See less" : " ...See more"}
+                              </button>
+                            )}
+                          </>
+                          {/* )} */}
                         </p>
                       </Card>
                       <div>
-                        {updateCommentIsLoading &&
-                        editingComment?._id === item?._id ? (
-                          <p className=" text-xs">posting...</p>
-                        ) : (
-                          <div className=" flex items-center gap-4">
-                            <span className="text-gray-400 text-xs ">
-                              {formatCommentDate(item?.createdAt)}
-                            </span>
-                            <button
-                              disabled
-                              className="text-gray-500 hover:text-gray-700 text-xs"
-                            >
-                              Like
-                            </button>
+                        {/* {
+                          // updateCommentIsLoading &&
+                          // editingComment?._id === comment?._id ? (
+                          editingComment?._id === comment?._id ? (
+                            <p className=" text-xs">posting...</p>
+                          ) : ( */}
+                        <div className=" flex items-center gap-4">
+                          <span className="text-gray-400 text-xs ">
+                            {formatCommentDate(comment?.createdAt)}
+                          </span>
+                          <button
+                            disabled
+                            className="text-gray-500 hover:text-gray-700 text-xs"
+                          >
+                            Like
+                          </button>
 
-                            <button
-                              disabled
-                              className="text-gray-500 hover:text-gray-700 text-xs"
-                            >
-                              Reply
-                            </button>
-                          </div>
-                        )}
+                          <button
+                            disabled
+                            className="text-gray-500 hover:text-gray-700 text-xs"
+                          >
+                            Reply
+                          </button>
+                        </div>
+                        {/* )
+                        } */}
                       </div>
                     </div>
-                    {user?._id === item?.userId?._id && (
+                    {user?._id === comment?.userId?._id && (
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <ActionButton
-                          onEdit={() => handleEditComment(item)}
-                          onDelete={() => handleDeleteComment(item._id)}
+                          onEdit={() => handleEditComment(comment)}
+                          onDelete={() => handleDeleteComment(comment._id)}
                         />
                       </div>
                     )}
@@ -378,7 +394,7 @@ const PostComment: React.FC<PostCommentProps> = ({
                         size="sm"
                         minRows={1}
                         focusRef={(el) =>
-                          (editCommentRef.current[item?._id] = el)
+                          (editCommentRef.current[comment?._id] = el)
                         }
                         // placeholder="Update comment"
                         endContent={<IoSend />}

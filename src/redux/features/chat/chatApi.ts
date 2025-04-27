@@ -1,10 +1,12 @@
 import { IChatApiResponse } from "@/type";
 import { baseApi } from "../../api/baseApi";
 
-interface ChatParams {
+export type ChatParams = {
   senderId: string;
   receiverId?: string;
-}
+  skip?: number;
+  limit?: number;
+};
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -17,12 +19,14 @@ export const authApi = baseApi.injectEndpoints({
       // invalidatesTags: ["Chat"],
     }),
     getChatbyUserId: builder.query<IChatApiResponse, ChatParams>({
-      query: ({ senderId, receiverId }) => ({
-        url: `/chat/getChatbyUserId`,
+      query: ({ senderId, receiverId, skip = 0, limit = 10 }) => ({
+        url: "/chat/getChatbyUserId",
         method: "GET",
         params: {
-          senderId, // Always included (required)
-          ...(receiverId && { receiverId }), // Only included if defined
+          senderId,
+          ...(receiverId && { receiverId }),
+          skip,
+          limit,
         },
       }),
       providesTags: ["Chat"],

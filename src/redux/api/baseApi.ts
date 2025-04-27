@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `http://localhost:5000/api/v1`,
-  // baseUrl: `https://linkup-server-lime.vercel.app/api/v1`,
+  // baseUrl: `https://linkup-server-copy.onrender.com/api/v1`,
   credentials: "include",
   prepareHeaders: async (headers) => {
     try {

@@ -28,16 +28,19 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  console.log({ user });
 
   useEffect(() => {
     if (user?._id) {
       const socketInstance = io("http://localhost:5000", {
+        // const socketInstance = io("https://linkup-server-copy.onrender.com", {
         query: { userId: user._id },
       });
 
       setSocket(socketInstance);
 
       socketInstance.on("getOnlineUsers", (users: string[]) => {
+        console.log({ users });
         setOnlineUsers(users);
       });
 

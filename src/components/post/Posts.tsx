@@ -82,8 +82,6 @@ const Posts: React.FC<PostsProps> = ({
   const { data: postData, refetch } = useGetAllPostQuery(queryPost);
 
   const [posts, setPosts] = useState<IPost[]>([]);
-  console.log({ posts });
-  console.log({ postData });
   // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
 
   useEffect(() => {
@@ -111,10 +109,16 @@ const Posts: React.FC<PostsProps> = ({
       refetch();
     };
 
+    const handleAddedComment = () => {
+      refetch();
+    };
+
     socket.on("updated-like-dislike", handleUpdatedLikeDislike);
+    socket.on("addedComment", handleAddedComment);
 
     return () => {
       socket.off("updated-like-dislike", handleUpdatedLikeDislike);
+      socket.off("addedComment", handleAddedComment);
     };
   }, [socket, user, refetch]);
 
@@ -296,7 +300,7 @@ const Posts: React.FC<PostsProps> = ({
                 </div>
 
                 <Button
-                  disabled
+                  isDisabled
                   fullWidth
                   size="sm"
                   variant="light"

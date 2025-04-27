@@ -8,12 +8,13 @@ import { IUser } from "@/type";
 import { Avatar, Listbox, ListboxItem } from "@heroui/react";
 
 import { useUser } from "@/context/UserProvider";
-import ChatDrawer from "../chat/ChatDrawer";
 import Author from "../shared/Author";
 import { useSocketContext } from "@/context/socketContext";
+import Chat from "../chat/Chat";
 
 // Define types
 export interface ISelectedUser {
+  key?: number;
   _id: string;
   label?: string;
   icon?: ReactNode;
@@ -25,7 +26,6 @@ export type TItems = ISelectedUser[];
 const UsersList = () => {
   const { user } = useUser();
   const { onlineUsers } = useSocketContext();
-  console.log({ onlineUsers });
   const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
@@ -39,6 +39,7 @@ const UsersList = () => {
   const items: any = allUserData?.data
     ?.filter((usr: IUser) => usr._id !== user?._id)
     ?.map((user: IUser) => ({
+      key: Date.now(),
       _id: user._id,
       label: user.name,
       icon: (
@@ -85,19 +86,27 @@ const UsersList = () => {
           hideSelectedIcon
           autoFocus
         >
-          {(item: ISelectedUser) => (
-            <ListboxItem
-              key={item._id}
-              onClick={() => setSelectedUser(item)}
-              startContent={item.icon}
-            >
-              {item.label}
-            </ListboxItem>
-          )}
+          {(item: ISelectedUser) => {
+            return (
+              <ListboxItem
+                key={item._id}
+                onClick={() => {
+                  setSelectedUser(item);
+                  // socket?.emit("fetchMyChats", {
+                  //   senderId: user?._id,
+                  //   receiverId: item?._id,
+                  // });
+                }}
+                startContent={item.icon}
+              >
+                {item.label}
+              </ListboxItem>
+            );
+          }}
         </Listbox>
       )}
       <div className="hidden md:block">
-        {userData?.data && <ChatDrawer selectedUser={selectedUser} />}
+        {userData?.data && <Chat selectedUser={selectedUser} />}
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import { IUser } from "@/type";
+import { IChat, IUser } from "@/type";
 import {
   Avatar,
   Dropdown,
@@ -11,11 +11,11 @@ import {
 import { RiMessengerLine } from "react-icons/ri";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ChatDrawer from "../chat/ChatDrawer";
 import { logout } from "@/service/AuthService";
 import { useSocketContext } from "@/context/socketContext";
 import { useGetChatbyUserIdQuery } from "@/redux/features/chat/chatApi";
 import { ISelectedUser } from "../common/UsersList";
+import Chat from "../chat/Chat";
 
 export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
   if (!user) {
@@ -73,8 +73,29 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
     { senderId: user?._id as string },
     { skip: !user?._id }
   );
+
   const { socket } = useSocketContext();
   const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
+  const [myRecentLastChats, setMyRecentLastChats] = useState<IChat[]>([]);
+
+  useEffect(() => {
+    if (chatData) {
+      setMyRecentLastChats(chatData?.data);
+    }
+  }, [chatData]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleMyRecentLastChats = (LastChats: any) => {
+      setMyRecentLastChats(LastChats);
+    };
+
+    socket?.on("chat", handleMyRecentLastChats);
+
+    return () => {
+      socket?.off("chat", handleMyRecentLastChats);
+    };
+  }, [socket, setMyRecentLastChats]);
 
   const getUser = (item: any) => {
     return (
@@ -100,64 +121,51 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
     );
   };
 
-  const [lastMessage, setLastMessage] = useState();
-
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("chat", (lastMessage) => {
-      setLastMessage(lastMessage);
-    });
-
-    // Cleanup listener on component unmount
-    return () => {
-      socket.off("chat");
-    };
-  }, [socket, lastMessage, setLastMessage]);
-
   return (
     <>
       <Dropdown className=" w-[320px] ">
         <DropdownTrigger>
           <RiMessengerLine size={36} onClick={() => refetchChatData()} />
         </DropdownTrigger>
-        {/* {chatData?.data && (
+
+        {myRecentLastChats && (
           <DropdownMenu aria-label="Profile Actions" variant="flat">
-            {chatData?.data?.map((item, index) => {
+            {myRecentLastChats?.map((item, index) => {
               console.log({ item });
               return (
                 <DropdownItem
                   key={index}
                   className=" gap-2"
-                  onClick={() =>
-                    setSelectedUser({ _id: item?._id, user: getUser(item) })
-                  }
+                  onClick={() => {
+                    setSelectedUser({
+                      key: Date.now(),
+                      _id:
+                        user?._id === item?.senderId?._id
+                          ? (item?.receiverId?._id as string)
+                          : (item?.senderId?._id as string),
+                      label:
+                        user?._id === item?.senderId?._id
+                          ? item?.receiverId?.name
+                          : item?.senderId?.name,
+                      user: getUser(item),
+                    });
+                    // socket?.emit("fetchMyChats", {
+                    //   senderId: user?._id,
+                    //   receiverId:
+                    //     user?._id === item?.senderId?._id
+                    //       ? item?.receiverId?._id
+                    //       : item?.senderId?._id,
+                    // });
+                  }}
                 >
                   {getUser(item)}
                 </DropdownItem>
               );
             })}
           </DropdownMenu>
-        )} */}
-        <DropdownMenu aria-label="Profile Actions" variant="flat">
-          <DropdownItem
-            key={"index"}
-            className=" gap-2"
-            onClick={() =>
-              setSelectedUser({
-                _id:
-                  user?._id === chatData?.data?.senderId
-                    ? (chatData?.data?.receiverId as string)
-                    : (chatData?.data?.senderId as string),
-                user: getUser(chatData?.data),
-              })
-            }
-          >
-            {getUser(chatData?.data)}
-          </DropdownItem>
-        </DropdownMenu>
+        )}
       </Dropdown>
-      <ChatDrawer selectedUser={selectedUser} />
+      <Chat selectedUser={selectedUser} />
     </>
   );
 };

@@ -47,7 +47,6 @@ export default function LinkUpTextarea({
     formState: { errors },
   } = useFormContext();
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-  // console.log("watch(name)", watch(name));
 
   // Focus textarea when modal opens
   useEffect(() => {
@@ -56,7 +55,6 @@ export default function LinkUpTextarea({
     }
   }, [focusRef]);
   // const onValid = (data: any) => {
-  //   console.log("Submitted data:", data);
   //   reset();
   // };
 
@@ -76,7 +74,8 @@ export default function LinkUpTextarea({
       shadow={minRows === 4 ? "none" : "md"}
       className={`${
         endContent ? "relative" : ""
-      } w-full rounded-lg ${className}`}
+      } w-full rounded-lg ${className} border-2 border-red-400  `}
+      // } w-full rounded-lg  border-2 border-red-400  `}
     >
       <Textarea
         {...register(name)}
@@ -90,7 +89,7 @@ export default function LinkUpTextarea({
         placeholder={placeholder}
         required={required}
         size={size}
-        fullWidth
+        // fullWidth
         value={value}
         type={type}
         errorMessage={errors[name]?.message as string}
@@ -107,6 +106,7 @@ export default function LinkUpTextarea({
         // }
         // isClearable
         className={`${watch(name) && endContent ? "pb-8" : ""} `}
+        // className={` mx-auto border-2 border-black w-[85%] `}
         onKeyDown={handleKeyDown} // Add onKeyDown handler
         variant="flat"
         classNames={{
@@ -120,7 +120,8 @@ export default function LinkUpTextarea({
           isDisabled={!watch(name)}
           type="submit"
           isIconOnly
-          className=" z-20 absolute bottom-0 right-1 bg-transparent "
+          // className=" z-20 absolute bottom-0 right-1 bg-transparent "
+          className=" absolute bottom-0  right-1 bg-transparent "
         >
           {endContent}
         </Button>

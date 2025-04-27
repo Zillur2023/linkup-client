@@ -13,17 +13,17 @@ export interface IMessage {
   imageUrl: string;
   videoUrl: string;
   isSeen: boolean;
-  // senderId: string;
-  senderId: { _id: string; name: string; profileImage?: string };
+  senderId: IUser;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface IChat {
   _id: string;
-  senderId: string;
-  receiverId: string;
+  senderId: IUser;
+  receiverId: IUser;
   messages: IMessage[];
+  lastMsg: IMessage;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,7 +32,7 @@ export interface IChatApiResponse {
   statusCode: number;
   success: boolean;
   message: string;
-  data: IChat;
+  data: IChat[];
 }
 
 // export interface IChat {

@@ -25,7 +25,6 @@ const LikeButton = ({ post }: LikeButtonProps) => {
 
   // const requestQueue = useRef<Promise<any>>(Promise.resolve());
 
-  console.log("reactions.likes[post._id]", reactions.likes[post._id]);
   const handlePostLike = () => {
     if (!user?._id) return router.push("/login");
 

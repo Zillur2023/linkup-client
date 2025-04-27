@@ -24,7 +24,6 @@ import { toast } from "sonner";
 const FriendRequestsReceived = ({ user }: { user: IUser }) => {
   const { socket } = useSocketContext();
   const [localUserData, setLocalUserData] = useState<IUser | null>(null);
-  console.log({ localUserData });
   const [rejectFriendRequest] = useRejectFriendRequestMutation();
   const [acceptFriendRequest] = useAcceptFriendRequestMutation();
 
@@ -38,22 +37,18 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
     if (!socket) return;
 
     const handleUserAcceptFriendRequest = (user: IUser) => {
-      console.log("You sent a friend request:", user);
       setLocalUserData(user);
     };
 
     const handleUserAcceptFriendRequestUpdateRequester = (user: IUser) => {
-      console.log("You received a friend request:", user);
       setLocalUserData(user);
     };
 
     const handleUserRejectFriendRequest = (user: IUser) => {
-      console.log("You reject friend request:", user);
       setLocalUserData(user);
     };
 
     const handleUserRejectFriendRequestUpdateRequester = (user: IUser) => {
-      console.log("You reject friend request and upate in requester", user);
       setLocalUserData(user);
     };
 
@@ -83,7 +78,6 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
   }, [socket]);
 
   const handleRejectFriendRequest = async (requesterId: string) => {
-    console.log({ requesterId });
     try {
       if (requesterId) {
         await rejectFriendRequest({
@@ -117,8 +111,6 @@ const FriendRequestsReceived = ({ user }: { user: IUser }) => {
         {localUserData && (
           <div className="gap-2 grid grid-cols-1 md:grid-cols-3">
             {localUserData.friendRequestsReceived.map((item, index) => {
-              console.log({ item });
-              console.log("item?._id", item?._id);
               return (
                 <Card key={index} shadow="sm">
                   <CardBody className="overflow-visible p-0">
@@ -237,13 +229,11 @@ const FriendsPage = () => {
     if (!socket) return;
 
     const handleSendFriendRequest = (user: IUser) => {
-      console.log("You sent a friend request:", user);
       setLocalUserData(user);
       refetch();
     };
 
     const handleReceiveFriendRequest = (user: IUser) => {
-      console.log("You received a friend request:", user);
       setLocalUserData(user);
       refetch();
     };
