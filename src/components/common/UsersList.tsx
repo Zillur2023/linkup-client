@@ -62,18 +62,7 @@ const UsersList = () => {
           )}
         </>
       ),
-      user: (
-        <>
-          {onlineUsers?.includes(user?._id as string) ? (
-            <div className="relative inline-block">
-              <Author author={user} description="Active now" />
-              <span className="absolute bottom-4 left-6 transform translate-x-1/2 translate-y-1/2 bg-green-500 rounded-full w-3 h-3 border border-white"></span>
-            </div>
-          ) : (
-            <Author author={user} description="Ofline" />
-          )}
-        </>
-      ),
+      user: <Author author={user} />,
     }));
 
   return (

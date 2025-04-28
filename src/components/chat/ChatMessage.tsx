@@ -20,22 +20,48 @@ const ChatMessage = ({
   hasMoreMessage: any;
   messageText: string;
 }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages change
+  // When sending a message, scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!scrollContainerRef.current || !messagesEndRef.current) return;
+
+    if (messageText && createChatIsLoading) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messageText, createChatIsLoading]);
-  console.log({ chat });
+
+  // When fetching old messages, adjust scroll
+  useEffect(() => {
+    if (!scrollContainerRef.current || !messagesEndRef.current) return;
+
+    if (!messageText && !createChatIsLoading && chat?.messages?.length > 10) {
+      scrollContainerRef.current.scrollTo({
+        top: 400,
+        behavior: "smooth",
+      });
+    } else if (!messageText && !createChatIsLoading) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+    // }, [chat?.messages?.length]);
+  }, [hasMoreMessage && chatDataIsFetching]);
+
+  // Auto-scroll to bottom when messages change
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messageText, createChatIsLoading, chat]);
+  // console.log({ chat });
 
   return (
     <div
+      ref={scrollContainerRef}
       onScroll={handleNewMessageScroll}
       style={{
         height: "500px",
         overflowY: "auto",
-        border: "1px solid gray",
-        padding: "1rem",
+        // border: "1px solid gray",
+        padding: "3px",
       }}
     >
       <div className="space-y-1">

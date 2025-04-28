@@ -10,10 +10,6 @@ import {
   DrawerBody,
   DrawerFooter,
   useDisclosure,
-  Tooltip,
-  Avatar,
-  Card,
-  Spinner,
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,7 +18,6 @@ import { ISelectedUser } from "../common/UsersList";
 import { useUser } from "@/context/UserProvider";
 import ChatMessage from "./ChatMessage";
 import ChatMessageForm from "./ChatMessageForm";
-import { formatChatTooltipDate } from "@/uitls/formatDate";
 
 type TMessageContent = {
   text?: string;
@@ -64,8 +59,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
 
   const handleNewMessageScroll = async (e: React.UIEvent<HTMLDivElement>) => {
     const element = e.currentTarget;
-    const isAtBottom =
-      element.scrollHeight - element.scrollTop === element.clientHeight;
 
     if (element.scrollTop === 0 && setHasMoreMessage) {
       // if (isAtBottom && setHasMoreMessage) {

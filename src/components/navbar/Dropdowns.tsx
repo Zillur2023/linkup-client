@@ -16,6 +16,7 @@ import { useSocketContext } from "@/context/socketContext";
 import { useGetChatbyUserIdQuery } from "@/redux/features/chat/chatApi";
 import { ISelectedUser } from "../common/UsersList";
 import Chat from "../chat/Chat";
+import Author from "../shared/Author";
 
 export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
   if (!user) {
@@ -74,7 +75,7 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
     { skip: !user?._id }
   );
 
-  const { socket } = useSocketContext();
+  const { socket, onlineUsers } = useSocketContext();
   const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
   const [myRecentLastChats, setMyRecentLastChats] = useState<IChat[]>([]);
 
@@ -97,30 +98,6 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
     };
   }, [socket, setMyRecentLastChats]);
 
-  const getUser = (item: any) => {
-    return (
-      <User
-        name={
-          user?._id === item?.senderId?._id
-            ? item?.receiverId?.name
-            : item?.senderId?.name
-        }
-        description={
-          user?._id === item?.lastMsg?.senderId
-            ? `You: ${item?.lastMsg?.text}`
-            : item?.lastMsg?.text
-        }
-        avatarProps={{
-          src: `${
-            user?._id === item?.senderId?._id
-              ? item?.receiverId?.profileImage
-              : item?.senderId?.profileImage
-          }`,
-        }}
-      />
-    );
-  };
-
   return (
     <>
       <Dropdown className=" w-[320px] ">
@@ -132,6 +109,15 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             {myRecentLastChats?.map((item, index) => {
               console.log({ item });
+              const filterUser =
+                user?._id === item?.senderId?._id
+                  ? item?.receiverId
+                  : item?.senderId;
+
+              const lastMessage =
+                user?._id === item?.senderId?._id
+                  ? `You: ${item?.lastMsg?.text}`
+                  : item?.lastMsg?.text;
               return (
                 <DropdownItem
                   key={index}
@@ -147,7 +133,8 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
                         user?._id === item?.senderId?._id
                           ? item?.receiverId?.name
                           : item?.senderId?.name,
-                      user: getUser(item),
+                      // user: getUser(item, true),
+                      user: <Author author={filterUser} />,
                     });
                     // socket?.emit("fetchMyChats", {
                     //   senderId: user?._id,
@@ -158,7 +145,7 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
                     // });
                   }}
                 >
-                  {getUser(item)}
+                  {<Author author={filterUser} description={lastMessage} />}
                 </DropdownItem>
               );
             })}
