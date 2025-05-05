@@ -27,12 +27,14 @@ const RegisterPage: React.FC = () => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     formData.append("profileImage", data?.profileImage);
+    const toastId = toast.loading("Registering...");
 
     try {
       const res = await createUser(formData).unwrap();
 
       if (res?.success) {
         router.push("/login");
+        toast.success("Register successfully", { id: toastId });
       }
     } catch (error: any) {
       toast.error(error?.data?.message);

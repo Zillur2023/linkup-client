@@ -1,13 +1,22 @@
 import { getAccessToken } from "@/service/AuthService";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+  BaseQueryApi,
+  BaseQueryFn,
+  createApi,
+  DefinitionType,
+  FetchArgs,
+  fetchBaseQuery,
+} from "@reduxjs/toolkit/query/react";
+import { logout, setUpdateAccessToken } from "../features/auth/authSlice";
+import { RootState, store } from "../store";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: `http://localhost:5000/api/v1`,
-  // baseUrl: `https://linkup-server-copy.onrender.com/api/v1`,
+  baseUrl: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1`,
   credentials: "include",
   prepareHeaders: async (headers) => {
     try {
-      const accessToken = await getAccessToken();
+      const state = store.getState() as RootState;
+      const accessToken = state.auth.accessToken;
 
       // console.log("baseApi accessTOken", accessToken)
 
@@ -22,10 +31,87 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+const baseQueryWithRefreshToken: BaseQueryFn<
+  FetchArgs,
+  BaseQueryApi,
+  DefinitionType
+> = async (args, api, extraOptions): Promise<any> => {
+  console.log({ args });
+  console.log({ api });
+  console.log({ extraOptions });
+  let result: any = await baseQuery(args, api, extraOptions);
+  console.log({ result });
+  console.log("result?.error", result?.error);
+
+  // if (result?.error?.data?.err?.statusCode === 401) {
+  // if (result?.error?.status === 404) {
+  //   toast.error('User not found')
+  // }
+  // if (result?.error?.status === 403) {
+  //   toast.error('Password not match')
+  // }
+  console.log(
+    "process.env.NEXT_PUBLIC_SERVER_URL",
+    process.env.NEXT_PUBLIC_SERVER_URL
+  );
+
+  console.log("result?.error?.status === 401", result?.error?.status === 401);
+
+  if (result?.error?.status === 401) {
+    //* Send Refresh
+    console.log("Sending refresh token");
+    const state = store.getState() as RootState;
+    const refreshToken = state.auth.refreshToken;
+
+    console.log({ refreshToken });
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/refresh-token`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json", //  Important:  Tell the server you're sending JSON
+          },
+          body: JSON.stringify({ refreshToken: refreshToken }),
+        }
+      );
+
+      const data = await res.json();
+      console.log({ res });
+      console.log({ data });
+
+      const accessToken = data?.data?.accessToken;
+
+      console.log("baseApi res", accessToken);
+
+      setUpdateAccessToken(accessToken);
+
+      if (res.ok) {
+        // If the refresh was successful, proceed with baseQuery
+        result = await baseQuery(args, api, extraOptions);
+      } else {
+        // If the refresh failed, log the user out
+
+        logout();
+      }
+      // await logout();
+      //      result = await baseQuery(args, api, extraOptions);
+    } catch (error) {
+      console.error("Network or fetch error:", error);
+      // Handle network or fetch errors here, possibly log out as well
+      logout();
+    }
+  }
+
+  return result;
+};
+
 export const baseApi = createApi({
   reducerPath: "baseApi",
   tagTypes: ["User", "Post", "Comment", "Chat"],
-  baseQuery,
-  // baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api/v1" }),
+  // baseQuery,
+  baseQuery: baseQueryWithRefreshToken,
   endpoints: () => ({}),
 });

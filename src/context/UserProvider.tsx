@@ -1,49 +1,28 @@
 "use client";
-import { getUser } from "@/service/AuthService";
-import { IUser } from "@/type";
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
 
-export type ICustomUser = Partial<IUser> & {
-  exp: number;
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { createContext, ReactNode, useContext, useState } from "react";
+
+export type DecodedUser = {
+  _id: string;
+  email: string;
+  role: string;
   iat: number;
+  exp: number;
 };
 
 const UserContext = createContext<IUserProviderValues | undefined>(undefined);
 
 interface IUserProviderValues {
-  user: ICustomUser | null;
-  isLoading: boolean;
-  setUser: (user: ICustomUser | null) => void;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  user: DecodedUser | null;
 }
 
 const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<ICustomUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const handleUser = async () => {
-    const user = await getUser();
-
-    setUser(user);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    handleUser();
-  }, [isLoading]);
+  const user = useAppSelector((state: RootState) => state.auth.user);
 
   return (
-    <UserContext.Provider value={{ user, setUser, isLoading, setIsLoading }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
   );
 };
 

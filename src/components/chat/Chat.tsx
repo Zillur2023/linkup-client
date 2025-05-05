@@ -27,11 +27,9 @@ type TMessageContent = {
 const LIMIT = 10;
 
 const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
-  console.log("selectedUser?._id", selectedUser?._id);
   const { user } = useUser();
   const { socket } = useSocketContext();
   const [chat, setChat] = useState<IChat | null>(null);
-  console.log({ chat });
   const [messageText, setMessageText] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isTypingState, setIsTypingState] = useState(false); // Renamed to avoid confusion
@@ -54,8 +52,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     },
     { skip: !user?._id || !selectedUser?._id }
   );
-  console.log({ chatDataIsFetching });
-  console.log("chatData?.data", chatData?.data);
 
   const handleNewMessageScroll = async (e: React.UIEvent<HTMLDivElement>) => {
     const element = e.currentTarget;
@@ -88,15 +84,12 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   // useEffect(() => {
   //   if (chatData?.data) {
   //     const zillur = chatData?.data?.[0]?.messages;
-  //     console.log({ zillur });
   //     // setChat(null);
   //     setChat(chatData?.data?.[0]);
   //   }
   //   // const zillur = chatData?.data?.[0]?.messages;
   //   // if (chatData?.data) {
   //   //   setChat((prevChat) => {
-  //   //     console.log({ prevChat });
-  //   //     console.log({ zillur });
   //   //     if (!prevChat) return prevChat;
 
   //   //     return {
@@ -133,8 +126,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     if (!socket && !selectedUser?._id) return;
 
     const handleSenderNewMessage = (newMessage: IMessage) => {
-      console.log({ newMessage });
-
       setChat((prevChat) => {
         if (!prevChat) return prevChat;
 
@@ -147,8 +138,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       setMessageText("");
     };
     const handleReceiverNewMessage = (newMessage: IMessage) => {
-      console.log({ newMessage });
-
       const messageAudio = new Audio("/notification.mp3");
       messageAudio.play();
 
@@ -222,7 +211,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
         videoUrl,
         isSeen: false,
       };
-      console.log({ newChat });
 
       socket?.emit("fetchMyChats", { senderId: user?._id });
       reset();

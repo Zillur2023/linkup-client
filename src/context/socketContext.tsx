@@ -28,7 +28,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-  console.log({ user });
 
   useEffect(() => {
     if (user?._id) {
@@ -40,7 +39,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       setSocket(socketInstance);
 
       socketInstance.on("getOnlineUsers", (users: string[]) => {
-        console.log({ users });
         setOnlineUsers(users);
       });
 

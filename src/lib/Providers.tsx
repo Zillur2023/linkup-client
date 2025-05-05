@@ -1,20 +1,23 @@
-'use client'
+"use client";
 
 import UserProvider from "@/context/UserProvider";
-import { store } from "@/redux/store";
-import {HeroUIProvider} from "@heroui/react";
+import { persistor, store } from "@/redux/store";
+import { HeroUIProvider } from "@heroui/react";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
+import { PersistGate } from "redux-persist/integration/react";
 
-export function Providers({children}: { children: React.ReactNode }) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <UserProvider>
     <Provider store={store}>
-    <HeroUIProvider>
-    <Toaster position="top-center" richColors />
-      {children}
-    </HeroUIProvider>
+      <UserProvider>
+        <PersistGate loading={null} persistor={persistor}>
+          <HeroUIProvider>
+            <Toaster position="top-center" richColors />
+            {children}
+          </HeroUIProvider>
+        </PersistGate>
+      </UserProvider>
     </Provider>
-    </UserProvider>
-  )
+  );
 }
