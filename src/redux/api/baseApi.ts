@@ -36,12 +36,7 @@ const baseQueryWithRefreshToken: BaseQueryFn<
   BaseQueryApi,
   DefinitionType
 > = async (args, api, extraOptions): Promise<any> => {
-  console.log({ args });
-  console.log({ api });
-  console.log({ extraOptions });
   let result: any = await baseQuery(args, api, extraOptions);
-  console.log({ result });
-  console.log("result?.error", result?.error);
 
   // if (result?.error?.data?.err?.statusCode === 401) {
   // if (result?.error?.status === 404) {

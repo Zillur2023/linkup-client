@@ -1,10 +1,11 @@
 import { IChat } from "@/type";
 import { formatChatTooltipDate } from "@/uitls/formatDate";
 import { Avatar, Card, Spinner, Tooltip } from "@heroui/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ChatMessage = ({
   chat,
+  selectedUserKey,
   currentUserId,
   createChatIsLoading,
   handleNewMessageScroll,
@@ -13,6 +14,7 @@ const ChatMessage = ({
   messageText,
 }: {
   chat: IChat;
+  selectedUserKey: any;
   currentUserId: string;
   createChatIsLoading: boolean;
   handleNewMessageScroll: any;
@@ -23,12 +25,15 @@ const ChatMessage = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  console.log("chat?.messages?.length", chat?.messages?.length);
+
   // When sending a message, scroll to bottom
   useEffect(() => {
     if (!scrollContainerRef.current || !messagesEndRef.current) return;
 
     if (messageText && createChatIsLoading) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      console.log("ZILLUR 1");
     }
   }, [messageText, createChatIsLoading]);
 
@@ -36,22 +41,33 @@ const ChatMessage = ({
   useEffect(() => {
     if (!scrollContainerRef.current || !messagesEndRef.current) return;
 
-    if (!messageText && !createChatIsLoading && chat?.messages?.length > 10) {
+    if (
+      !messageText &&
+      !createChatIsLoading &&
+      hasMoreMessage &&
+      chat?.messages?.length > 10
+    ) {
       scrollContainerRef.current.scrollTo({
         top: 400,
         behavior: "smooth",
       });
-    } else if (!messageText && !createChatIsLoading) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      console.log("ZILLUR 2");
+    } else if (!messageText && !createChatIsLoading && hasMoreMessage) {
+      // messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 1);
+      console.log("ZILLUR 3");
     }
-    // }, [chat?.messages?.length]);
-  }, [hasMoreMessage && chatDataIsFetching]);
+  }, [hasMoreMessage, chatDataIsFetching, chat?.messages.length]);
 
-  // Auto-scroll to bottom when messages change
-  // useEffect(() => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [messageText, createChatIsLoading, chat]);
-  // console.log({ chat });
+  useEffect(() => {
+    if (!messagesEndRef.current) return;
+    if (selectedUserKey) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      console.log("ZILLUR 4");
+    }
+  }, [selectedUserKey]);
 
   return (
     <div

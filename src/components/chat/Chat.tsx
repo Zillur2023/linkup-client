@@ -18,6 +18,14 @@ import { ISelectedUser } from "../common/UsersList";
 import { useUser } from "@/context/UserProvider";
 import ChatMessage from "./ChatMessage";
 import ChatMessageForm from "./ChatMessageForm";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  appendMessage,
+  prependMessages,
+  selectChatByKey,
+  setChat,
+} from "@/redux/features/chat/chatSlice";
+import { RootState } from "@/redux/store";
 
 type TMessageContent = {
   text?: string;
@@ -28,13 +36,18 @@ const LIMIT = 10;
 
 const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   const { user } = useUser();
+  const dispatch = useAppDispatch();
   const { socket } = useSocketContext();
-  const [chat, setChat] = useState<IChat | null>(null);
+  // const [chat, setChat] = useState<IChat | null>(null);
   const [messageText, setMessageText] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isTypingState, setIsTypingState] = useState(false); // Renamed to avoid confusion
   const [hasMoreMessage, setHasMoreMessage] = useState(true);
   const [skip, setSkip] = useState(0);
+  const key = `${user?._id}_${selectedUser?._id}`;
+  const chat = useAppSelector((state: RootState) =>
+    key ? selectChatByKey(key)(state) : null
+  );
 
   const [createChat, { isLoading: createChatIsLoading }] =
     useCreateChatMutation();
@@ -60,9 +73,20 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       // if (isAtBottom && setHasMoreMessage) {
       const newSkip = skip + LIMIT;
 
-      refetchChatData();
+      // refetchChatData();
+      const { data } = await refetchChatData().unwrap();
 
-      const newMessages = chatData?.data?.[0]?.messages || [];
+      const newMessages = data?.[0]?.messages || [];
+
+      if (newMessages.length > 0) {
+        // Prepend the new messages to the existing chat in Redux
+        dispatch(
+          prependMessages({
+            key,
+            messages: newMessages,
+          })
+        );
+      }
 
       if (newMessages.length < LIMIT) setHasMoreMessage(false);
 
@@ -70,16 +94,48 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (selectedUser?.key) {
+  //     if (!isOpen) {
+  //       onOpen();
+  //       setSkip(0);
+  //     }
+  //     // setChat(null);
+  //     refetchChatData();
+  //   }
+  // }, [selectedUser?.key, onOpen, refetchChatData]);
   useEffect(() => {
-    if (selectedUser?.key) {
-      if (!isOpen) {
-        onOpen();
-        setSkip(0);
+    const fetchChatData = async () => {
+      if (selectedUser?.key && user?._id && selectedUser?._id) {
+        if (!isOpen) {
+          onOpen();
+          setSkip(0);
+        }
+
+        // try {
+        //   const { data } = await refetchChatData().unwrap();
+        //   const messages = data?.[0]?.messages || [];
+        //   console.log({ data });
+
+        //   if (messages.length > 0) {
+        //     dispatch(
+        //       setChat({
+        //         key,
+        //         chat: {
+        //           ...data[0],
+        //           messages, // Ensure we're using the latest messages
+        //         },
+        //       })
+        //     );
+        //   }
+        // } catch (error) {
+        //   console.error("Error fetching chat data:", error);
+        // }
       }
-      setChat(null);
-      refetchChatData();
-    }
-  }, [selectedUser?.key, onOpen, refetchChatData]);
+    };
+
+    fetchChatData();
+  }, [selectedUser?.key, onOpen, refetchChatData, user?._id, dispatch]);
 
   // useEffect(() => {
   //   if (chatData?.data) {
@@ -102,19 +158,26 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   useEffect(() => {
     if (chatData?.data?.[0]?.messages) {
       const fetchedMessages = chatData.data[0].messages;
-      setChat((prevChat) => {
-        if (prevChat) {
-          // Prepend the newly fetched older messages to the existing messages
+      // setChat((prevChat) => {
+      //   if (prevChat) {
+      //     // Prepend the newly fetched older messages to the existing messages
 
-          return {
-            ...prevChat,
-            messages: [...fetchedMessages, ...prevChat.messages],
-          };
-        } else {
-          // If it's the initial load
-          return { ...chatData.data[0] };
-        }
-      });
+      //     return {
+      //       ...prevChat,
+      //       messages: [...fetchedMessages, ...prevChat.messages],
+      //     };
+      //   } else {
+      //     // If it's the initial load
+      //     return { ...chatData.data[0] };
+      //   }
+      // });
+      if (chat) {
+        // Prepend messages to existing chat in Redux
+        dispatch(prependMessages({ key, messages: fetchedMessages }));
+      } else {
+        // Set new chat in Redux
+        dispatch(setChat({ key, chat: chatData.data[0] }));
+      }
       // Check if there are more messages to load
       if (fetchedMessages.length < LIMIT) {
         setHasMoreMessage(false);
@@ -126,14 +189,15 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     if (!socket && !selectedUser?._id) return;
 
     const handleSenderNewMessage = (newMessage: IMessage) => {
-      setChat((prevChat) => {
-        if (!prevChat) return prevChat;
+      // setChat((prevChat) => {
+      //   if (!prevChat) return prevChat;
 
-        return {
-          ...prevChat,
-          messages: [...prevChat.messages, newMessage],
-        };
-      });
+      //   return {
+      //     ...prevChat,
+      //     messages: [...prevChat.messages, newMessage],
+      //   };
+      // });
+      dispatch(appendMessage({ key, message: newMessage }));
 
       setMessageText("");
     };
@@ -141,14 +205,15 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       const messageAudio = new Audio("/notification.mp3");
       messageAudio.play();
 
-      setChat((prevChat) => {
-        if (!prevChat) return prevChat;
+      // setChat((prevChat) => {
+      //   if (!prevChat) return prevChat;
 
-        return {
-          ...prevChat,
-          messages: [...prevChat.messages, newMessage],
-        };
-      });
+      //   return {
+      //     ...prevChat,
+      //     messages: [...prevChat.messages, newMessage],
+      //   };
+      // });
+      dispatch(appendMessage({ key, message: newMessage }));
 
       setMessageText("");
     };
@@ -241,6 +306,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
             <DrawerBody className="!px-2">
               <ChatMessage
                 chat={chat as IChat}
+                selectedUserKey={selectedUser?.key}
                 currentUserId={user?._id as string}
                 createChatIsLoading={createChatIsLoading}
                 handleNewMessageScroll={handleNewMessageScroll}

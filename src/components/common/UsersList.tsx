@@ -38,31 +38,32 @@ const UsersList = () => {
 
   const items: any = allUserData?.data
     ?.filter((usr: IUser) => usr._id !== user?._id)
-    ?.map((user: IUser) => ({
+    ?.map((filterUser: IUser) => ({
       key: Date.now(),
-      _id: user._id,
-      label: user.name,
+      // key: `${user?._id}_${filterUser?._id}`,
+      _id: filterUser._id,
+      label: filterUser.name,
       icon: (
         <>
-          {onlineUsers?.includes(user?._id as string) ? (
+          {onlineUsers?.includes(filterUser?._id as string) ? (
             <div className="relative inline-block">
               <Avatar
                 className="w-6 h-6"
-                src={user.profileImage}
-                alt={user.name}
+                src={filterUser.profileImage}
+                alt={filterUser.name}
               />
               <span className="absolute bottom-1 right-0 transform translate-x-1/2 translate-y-1/2 bg-green-500 rounded-full w-2 h-2 border border-white"></span>
             </div>
           ) : (
             <Avatar
               className="w-6 h-6"
-              src={user.profileImage}
-              alt={user.name}
+              src={filterUser.profileImage}
+              alt={filterUser.name}
             />
           )}
         </>
       ),
-      user: <Author author={user} />,
+      user: <Author author={filterUser} />,
     }));
 
   return (

@@ -3,6 +3,7 @@ import { baseApi } from "./api/baseApi";
 // import reactionReducer from "./reactionSlice";
 import reactionReducer from "./features/post/reactionSlice";
 import authReducer from "./features/auth/authSlice";
+import chatReducer from "./features/chat/chatSlice";
 import storage from "redux-persist/lib/storage";
 import {
   FLUSH,
@@ -27,6 +28,7 @@ export const store = configureStore({
     auth: persistedAuthReducer,
     // auth: authReducer,
     reactions: reactionReducer,
+    chat: chatReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddlewares) =>
