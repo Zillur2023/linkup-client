@@ -1,31 +1,25 @@
 import { IChat } from "@/type";
 import { formatChatTooltipDate } from "@/uitls/formatDate";
 import { Avatar, Card, Spinner, Tooltip } from "@heroui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const ChatMessage = ({
   chat,
-  selectedUserKey,
   currentUserId,
   createChatIsLoading,
   handleNewMessageScroll,
-  chatDataIsFetching,
-  hasMoreMessage,
+  hasMoreMessages,
   messageText,
 }: {
   chat: IChat;
-  selectedUserKey: any;
   currentUserId: string;
   createChatIsLoading: boolean;
   handleNewMessageScroll: any;
-  chatDataIsFetching: any;
-  hasMoreMessage: any;
+  hasMoreMessages: any;
   messageText: string;
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  console.log("chat?.messages?.length", chat?.messages?.length);
 
   // When sending a message, scroll to bottom
   useEffect(() => {
@@ -33,7 +27,6 @@ const ChatMessage = ({
 
     if (messageText && createChatIsLoading) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-      console.log("ZILLUR 1");
     }
   }, [messageText, createChatIsLoading]);
 
@@ -44,30 +37,28 @@ const ChatMessage = ({
     if (
       !messageText &&
       !createChatIsLoading &&
-      hasMoreMessage &&
+      hasMoreMessages &&
       chat?.messages?.length > 10
     ) {
       scrollContainerRef.current.scrollTo({
         top: 400,
         behavior: "smooth",
       });
-      console.log("ZILLUR 2");
-    } else if (!messageText && !createChatIsLoading && hasMoreMessage) {
+    } else if (!messageText && !createChatIsLoading && hasMoreMessages) {
       // messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 1);
-      console.log("ZILLUR 3");
+      }, 0);
     }
-  }, [hasMoreMessage, chatDataIsFetching, chat?.messages.length]);
+    // }, [hasMoreMessages, chatDataIsFetching, chat?.messages.length]);
+  }, [chat?.messages.length]);
 
-  useEffect(() => {
-    if (!messagesEndRef.current) return;
-    if (selectedUserKey) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-      console.log("ZILLUR 4");
-    }
-  }, [selectedUserKey]);
+  // useEffect(() => {
+  //   if (!messagesEndRef.current) return;
+  //   if (selectedUserKey) {
+  //     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [selectedUserKey]);
 
   return (
     <div
@@ -81,9 +72,7 @@ const ChatMessage = ({
       }}
     >
       <div className="space-y-1">
-        {hasMoreMessage && chatDataIsFetching && (
-          <Spinner className=" w-full text-center" />
-        )}
+        {hasMoreMessages && <Spinner className=" w-full text-center" />}
         {chat?.messages?.map((msg, index) => (
           <div
             // key={msg._id}

@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginValidationSchema } from "@/schemas";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import { useUser } from "@/context/UserProvider";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import LinkUpForm from "@/components/form/LinkUpForm";
 import LinkUpInput from "@/components/form/LinkUpInput";
@@ -22,7 +21,6 @@ const LoginPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [login, { isLoading: loginIsLoading }] = useLoginMutation();
-  const { setIsLoading: userLoading } = useUser();
 
   const onSubmit = async (formData: ILoginUser) => {
     const toastId = toast.loading("Logging in...");

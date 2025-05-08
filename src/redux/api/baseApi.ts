@@ -1,4 +1,3 @@
-import { getAccessToken } from "@/service/AuthService";
 import {
   BaseQueryApi,
   BaseQueryFn,

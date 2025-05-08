@@ -2,7 +2,7 @@
 
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext } from "react";
 
 export type DecodedUser = {
   _id: string;

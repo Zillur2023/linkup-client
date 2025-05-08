@@ -4,14 +4,23 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IChat, IMessage } from "@/type";
 import { RootState } from "@/redux/store"; // Adjust the import path as necessary
 
-type ChatState = {
-  chats: {
-    [key: string]: IChat;
-  };
-};
-
+// type ChatState = {
+//   chats: {
+//     [key: string]: IChat;
+//   };
+// };
+// const initialState: ChatState = {
+//   chats: {},
+// };
+interface ChatState {
+  chats: Record<string, IChat>;
+  hasMoreMessages: Record<string, boolean>;
+  skipCounts: Record<string, number>;
+}
 const initialState: ChatState = {
   chats: {},
+  hasMoreMessages: {},
+  skipCounts: {},
 };
 
 const chatSlice = createSlice({
@@ -59,6 +68,29 @@ const chatSlice = createSlice({
         }
       }
     },
+
+    setHasMoreMessages: (
+      state,
+      action: PayloadAction<{ key: string; hasMore: boolean }>
+    ) => {
+      const { key, hasMore } = action.payload;
+      state.hasMoreMessages[key] = hasMore;
+    },
+
+    setSkipCount: (
+      state,
+      action: PayloadAction<{ key: string; skip: number }>
+    ) => {
+      const { key, skip } = action.payload;
+      state.skipCounts[key] = skip;
+    },
+    incrementSkipCount: (
+      state,
+      action: PayloadAction<{ key: string; amount: number }>
+    ) => {
+      const { key, amount } = action.payload;
+      state.skipCounts[key] = (state.skipCounts[key] || 0) + amount;
+    },
   },
 });
 
@@ -69,6 +101,19 @@ export const selectChatByKey = (key: string) => (state: RootState) =>
 export const selectMessagesByKey = (key: string) => (state: RootState) =>
   state.chat.chats[key]?.messages || [];
 
-export const { setChat, prependMessages, appendMessage } = chatSlice.actions;
+export const selectHasMoreMessages = (key: string) => (state: RootState) =>
+  state.chat.hasMoreMessages[key] ?? true;
+
+export const selectSkipCount = (key: string) => (state: RootState) =>
+  state.chat.skipCounts[key] || 0;
+
+export const {
+  setChat,
+  prependMessages,
+  appendMessage,
+  setHasMoreMessages,
+  setSkipCount,
+  incrementSkipCount,
+} = chatSlice.actions;
 
 export default chatSlice.reducer;

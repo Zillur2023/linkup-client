@@ -21,7 +21,7 @@ import { logout } from "@/redux/features/auth/authSlice";
 
 export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
   const dispatch = useAppDispatch();
-  const { user: loginUser, setIsLoading: userLoading } = useUser();
+  const { user: loginUser } = useUser();
   if (!loginUser) {
     return (
       <Button as={Link} color="warning" href="login" variant="flat">
@@ -85,7 +85,7 @@ export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
     { skip: !user?._id }
   );
 
-  const { socket, onlineUsers } = useSocketContext();
+  const { socket } = useSocketContext();
   const [selectedUser, setSelectedUser] = useState<ISelectedUser | null>(null);
   const [myRecentLastChats, setMyRecentLastChats] = useState<IChat[]>([]);
 
