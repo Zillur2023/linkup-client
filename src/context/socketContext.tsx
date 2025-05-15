@@ -31,8 +31,8 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (user?._id) {
-      const socketInstance = io("http://localhost:5000", {
-        // const socketInstance = io("https://linkup-server-copy.onrender.com", {
+      // const socketInstance = io("http://localhost:5000", {
+      const socketInstance = io(`${process.env.NEXT_PUBLIC_SERVER_URL}`, {
         query: { userId: user._id },
       });
 

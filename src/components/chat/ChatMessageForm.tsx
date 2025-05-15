@@ -132,3 +132,43 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
 };
 
 export default ChatMessageForm;
+
+//  const hasScrolledRef = useRef(false);
+
+//   useEffect(() => {
+//     if (isFetchingChatData || hasScrolledRef.current) return;
+
+//     if (!scrollContainerRef.current || !messagesEndRef.current) return;
+
+//     if (
+//       !messageText &&
+//       !createChatIsLoading &&
+//       hasMoreMessages &&
+//       chat?.messages?.length > 10
+//     ) {
+//       scrollContainerRef.current.scrollTo({
+//         top: 400,
+//         behavior: "smooth",
+//       });
+//       console.log("zillur 1");
+//     } else if (!messageText && !createChatIsLoading && hasMoreMessages) {
+//       // messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+//       // Add a 1-second delay before scrolling
+//       const scrollTimer = setTimeout(() => {
+//         messagesEndRef.current.scrollIntoView({
+//           behavior: "smooth",
+//         });
+//       }, 0); // 1-second delay
+
+//       // Clear timeout on cleanup
+//       return () => clearTimeout(scrollTimer);
+//       console.log("zillur 2");
+//     }
+
+//     hasScrolledRef.current = true; // Mark as scrolled
+
+//     // Reset on cleanup (optional, if needed)
+//     return () => {
+//       hasScrolledRef.current = false;
+//     };
+//   }, [isFetchingChatData]);

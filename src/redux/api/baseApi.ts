@@ -44,12 +44,6 @@ const baseQueryWithRefreshToken: BaseQueryFn<
   // if (result?.error?.status === 403) {
   //   toast.error('Password not match')
   // }
-  console.log(
-    "process.env.NEXT_PUBLIC_SERVER_URL",
-    process.env.NEXT_PUBLIC_SERVER_URL
-  );
-
-  console.log("result?.error?.status === 401", result?.error?.status === 401);
 
   if (result?.error?.status === 401) {
     //* Send Refresh
@@ -77,8 +71,6 @@ const baseQueryWithRefreshToken: BaseQueryFn<
       console.log({ data });
 
       const accessToken = data?.data?.accessToken;
-
-      console.log("baseApi res", accessToken);
 
       setUpdateAccessToken(accessToken);
 

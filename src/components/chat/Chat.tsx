@@ -9,9 +9,8 @@ import {
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
-  useDisclosure,
 } from "@heroui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSocketContext } from "@/context/socketContext";
 import { ISelectedUser } from "../common/UsersList";
@@ -24,9 +23,11 @@ import {
   incrementSkipCount,
   prependMessages,
   selectChatByKey,
+  selectDrawerStatus,
   selectHasMoreMessages,
   selectSkipCount,
   setChat,
+  setDrawerStatus,
   setHasMoreMessages,
 } from "@/redux/features/chat/chatSlice";
 import { RootState } from "@/redux/store";
@@ -40,23 +41,36 @@ const LIMIT = 10;
 
 const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   const { user } = useUser();
+
   const dispatch = useAppDispatch();
   const { socket } = useSocketContext();
   const [messageText, setMessageText] = useState("");
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [isTypingState, setIsTypingState] = useState(false); // Renamed to avoid confusion
-  // const [skip, setSkip] = useState(0);
+  // const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isTypingState, setIsTypingState] = useState(false);
+  const typingAudioRef = useRef<HTMLAudioElement | null>(null);
+  const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
   const key = `${user?._id}_${selectedUser?._id}`;
   const chat = useAppSelector((state: RootState) =>
     key ? selectChatByKey(key)(state) : null
   );
   const hasMoreMessages = useAppSelector(selectHasMoreMessages(key));
   const skip = useAppSelector(selectSkipCount(key));
+  const isDrawerOpen = useAppSelector(
+    selectDrawerStatus(selectedUser?._id as string)
+  );
+
+  const drawerStatus = useAppSelector(
+    (state: RootState) => state.chat.drawerStatus
+  );
 
   const [createChat, { isLoading: createChatIsLoading }] =
     useCreateChatMutation();
 
-  const { data: chatData, refetch: refetchChatData } = useGetChatbyUserIdQuery(
+  const {
+    data: chatData,
+    refetch: refetchChatData,
+    isFetching: isFetchingChatData,
+  } = useGetChatbyUserIdQuery(
     {
       senderId: user?._id as string,
       receiverId: selectedUser?._id,
@@ -67,7 +81,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   );
 
   const handleNewMessageScroll = async (e: React.UIEvent<HTMLDivElement>) => {
-    console.log("selectedUser?._id", selectedUser?._id);
     const element = e.currentTarget;
 
     // if (element.scrollTop === 0 && setHasMoreMessage) {
@@ -96,42 +109,57 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     }
   };
 
+  const handleDrawerChange = (isOpen: boolean) => {
+    dispatch(
+      setDrawerStatus({ key: selectedUser?._id as string, status: isOpen })
+    );
+  };
+
+  const handleOpen = () => {
+    if (!isDrawerOpen) {
+      dispatch(
+        setDrawerStatus({ key: selectedUser?._id as string, status: true })
+      );
+    }
+  };
+
+  useEffect(() => {
+    typingAudioRef.current = new Audio("/typing.mp3");
+    typingAudioRef.current.loop = true;
+    notificationAudioRef.current = new Audio("/notification.mp3");
+  }, []);
   // useEffect(() => {
-  //   if (selectedUser?.key) {
-  //     if (!isOpen) {
-  //       onOpen();
-  //       setSkip(0);
-  //     }
-  //     // setChat(null);
-  //     refetchChatData();
-  //   }
-  // }, [selectedUser?.key, onOpen, refetchChatData]);
+  //   notificationAudioRef.current = new Audio("/notification.mp3");
+  // }, []);
+
   useEffect(() => {
     const fetchChatData = async () => {
       if (selectedUser?.key && user?._id && selectedUser?._id) {
-        if (!isOpen) {
-          onOpen();
+        // if (!isOpen) {
+        //   onOpen();
+        // }
+        if (!isDrawerOpen) {
+          handleOpen();
         }
 
-        // try {
-        //   const { data } = await refetchChatData().unwrap();
-        //   const messages = data?.[0]?.messages || [];
-        //   console.log({ data });
+        try {
+          const { data } = await refetchChatData().unwrap();
+          const messages = data?.[0]?.messages || [];
 
-        //   if (messages.length > 0) {
-        //     dispatch(
-        //       setChat({
-        //         key,
-        //         chat: {
-        //           ...data[0],
-        //           messages, // Ensure we're using the latest messages
-        //         },
-        //       })
-        //     );
-        //   }
-        // } catch (error) {
-        //   console.error("Error fetching chat data:", error);
-        // }
+          if (messages.length > 0) {
+            dispatch(
+              setChat({
+                key,
+                chat: {
+                  ...data[0],
+                  messages, // Ensure we're using the latest messages
+                },
+              })
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching chat data:", error);
+        }
       }
     };
 
@@ -158,31 +186,57 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
 
     //   setMessageText("");
     // };
-    const handleReceiverNewMessage = (newMessage: IMessage) => {
-      const messageAudio = new Audio("/notification.mp3");
-      messageAudio.play();
 
-      dispatch(appendMessage({ key, message: newMessage }));
+    const handleReceiverNewMessage = (newMessage: IMessage) => {
+      if (notificationAudioRef.current) {
+        const audio = notificationAudioRef.current;
+        audio.pause(); // Reset any ongoing audio
+        audio.currentTime = 0;
+        audio.play().catch((err) => console.warn("Audio play failed:", err));
+      }
+      dispatch(
+        appendMessage({
+          key: `${user?._id}_${newMessage?.senderId?._id}`,
+          message: newMessage,
+        })
+      );
 
       setMessageText("");
     };
 
     // Create audio instance once (outside of handlers)
-    const typingAudio = new Audio("/typing.mp3");
-    typingAudio.loop = true; // optional: loop while user is typing
 
     const handleUserTyping = ({ senderId }: { senderId: string }) => {
-      if (senderId === selectedUser?._id) {
-        typingAudio.play();
+      if (
+        // senderId === selectedUser?._id &&
+        drawerStatus?.[senderId] &&
+        typingAudioRef.current
+      ) {
+        // typingAudio.play();
+        typingAudioRef.current
+          .play()
+          .catch((err) => console.warn("Play failed", err));
         setIsTypingState(true);
       }
     };
 
     const handleUserStoppedTyping = ({ senderId }: { senderId: string }) => {
-      if (senderId === selectedUser?._id) {
-        typingAudio.pause();
-        typingAudio.currentTime = 0;
+      if (
+        // senderId === selectedUser?._id &&
+        drawerStatus?.[senderId] &&
+        typingAudioRef.current
+      ) {
+        // typingAudio.pause();
+        // typingAudio.currentTime = 0;
+        typingAudioRef.current.pause();
+        typingAudioRef.current.currentTime = 0;
         setIsTypingState(false);
+      } else {
+        if (typingAudioRef.current) {
+          typingAudioRef.current.pause();
+          typingAudioRef.current.currentTime = 0;
+          setIsTypingState(false);
+        }
       }
     };
 
@@ -202,7 +256,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       socket?.off("userStoppedTyping", handleUserStoppedTyping);
       // socket?.off("myRecentChats");
     };
-  }, [socket, selectedUser, isOpen, onOpen, user?._id]);
+  }, [socket, selectedUser, isDrawerOpen, user?._id]);
 
   // const onSubmit = (data) => console.log(data);
   // const handleCreateChat = async (
@@ -229,8 +283,8 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       socket?.emit("fetchMyChats", { senderId: user?._id });
       reset();
       const { data } = await createChat(newChat).unwrap();
-      console.log(data);
       dispatch(appendMessage({ key, message: data }));
+      setMessageText("");
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create chat");
     }
@@ -240,8 +294,10 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     <Drawer
       placement="bottom"
       shouldBlockScroll={false}
-      isOpen={isOpen}
-      onOpenChange={onOpenChange}
+      // isOpen={isOpen}
+      // onOpenChange={onOpenChange}
+      isOpen={isDrawerOpen}
+      onOpenChange={handleDrawerChange}
       size="md"
       backdrop="transparent"
       className="w-[80%] md:w-[40%] lg:w-[23%] bottom-0 left-[10%] md:left-[50%] lg:left-[70%]"
@@ -258,21 +314,17 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
               <ChatMessage
                 chat={chat as IChat}
                 currentUserId={user?._id as string}
+                skip={skip}
+                isFetchingChatData={isFetchingChatData}
                 createChatIsLoading={createChatIsLoading}
                 handleNewMessageScroll={handleNewMessageScroll}
                 hasMoreMessages={hasMoreMessages}
                 messageText={messageText}
+                isTypingState={isTypingState}
               />
             </DrawerBody>
 
-            <DrawerFooter className=" !pt-1 !pb-2 !px-0 relative w-full mx-auto  ">
-              <div>
-                {isTypingState && (
-                  <div className="absolute -mt-5  text-gray-500 text-sm italic z-50 ">
-                    {selectedUser?.label} typing...
-                  </div>
-                )}
-              </div>
+            <DrawerFooter className=" !pt-0 !pb-2 !px-0 relative w-full mx-auto  ">
               <div className="w-full ">
                 <ChatMessageForm
                   onSubmit={handleSubmit}

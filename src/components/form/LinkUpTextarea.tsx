@@ -74,7 +74,7 @@ export default function LinkUpTextarea({
       shadow={minRows === 4 ? "none" : "md"}
       className={`${
         endContent ? "relative" : ""
-      } w-full rounded-lg ${className} border-2 border-red-400  `}
+      } w-full rounded-lg ${className}  `}
       // } w-full rounded-lg  border-2 border-red-400  `}
     >
       <Textarea

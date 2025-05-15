@@ -1,3 +1,4 @@
+import { useUser } from "@/context/UserProvider";
 import { IChat } from "@/type";
 import { formatChatTooltipDate } from "@/uitls/formatDate";
 import { Avatar, Card, Spinner, Tooltip } from "@heroui/react";
@@ -6,18 +7,34 @@ import { useEffect, useRef } from "react";
 const ChatMessage = ({
   chat,
   currentUserId,
+  skip,
+  isFetchingChatData,
   createChatIsLoading,
   handleNewMessageScroll,
   hasMoreMessages,
   messageText,
+  isTypingState,
 }: {
   chat: IChat;
   currentUserId: string;
+  skip: any;
+  isFetchingChatData: any;
   createChatIsLoading: boolean;
   handleNewMessageScroll: any;
   hasMoreMessages: any;
   messageText: string;
+  isTypingState: any;
 }) => {
+  const { user } = useUser();
+  const typingUserName =
+    chat?.receiverId?._id === user?._id
+      ? chat?.senderId?.name
+      : chat?.receiverId?.name;
+  const typingUserProfile =
+    chat?.receiverId?._id === user?._id
+      ? chat?.senderId?.profileImage
+      : chat?.receiverId?.profileImage;
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +47,8 @@ const ChatMessage = ({
     }
   }, [messageText, createChatIsLoading]);
 
-  // When fetching old messages, adjust scroll
+  const hasFetchedRef = useRef(false);
+
   useEffect(() => {
     if (!scrollContainerRef.current || !messagesEndRef.current) return;
 
@@ -38,20 +56,49 @@ const ChatMessage = ({
       !messageText &&
       !createChatIsLoading &&
       hasMoreMessages &&
-      chat?.messages?.length > 10
+      !isFetchingChatData &&
+      !hasFetchedRef.current
     ) {
-      scrollContainerRef.current.scrollTo({
-        top: 400,
-        behavior: "smooth",
-      });
-    } else if (!messageText && !createChatIsLoading && hasMoreMessages) {
-      // messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 0);
+      hasFetchedRef.current = true;
+
+      // if (chat?.messages?.length > 10) {
+      if (skip > 0) {
+        setTimeout(() => {
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({
+              top: 400,
+              behavior: "smooth",
+            });
+          }
+        }, 0);
+        // scrollContainerRef.current.scrollTo({
+        //   top: 400,
+        //   behavior: "smooth",
+        // });
+      } else {
+        // messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 0);
+      }
     }
-    // }, [hasMoreMessages, chatDataIsFetching, chat?.messages.length]);
-  }, [chat?.messages.length]);
+
+    if (isFetchingChatData) {
+      hasFetchedRef.current = false;
+    }
+  }, [isFetchingChatData]);
+
+  // useEffect(() => {
+  //   if (!scrollContainerRef.current || !messagesEndRef.current) return;
+  //   if (!messageText && !createChatIsLoading && hasMoreMessages && skip > 0) {
+  //     scrollContainerRef.current.scrollTo({
+  //       top: 400,
+  //       behavior: "smooth",
+  //     });
+  //   } else if (!messageText && !createChatIsLoading && hasMoreMessages) {
+  //     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [chat?.messages?.length]);
 
   // useEffect(() => {
   //   if (!messagesEndRef.current) return;
@@ -72,7 +119,9 @@ const ChatMessage = ({
       }}
     >
       <div className="space-y-1">
-        {hasMoreMessages && <Spinner className=" w-full text-center" />}
+        {hasMoreMessages && isFetchingChatData && (
+          <Spinner className=" w-full text-center" />
+        )}
         {chat?.messages?.map((msg, index) => (
           <div
             // key={msg._id}
@@ -108,6 +157,27 @@ const ChatMessage = ({
             </Tooltip>
           </div>
         ))}
+
+        {isTypingState && (
+          <div className="flex items-start justify-start">
+            <Tooltip content={typingUserName} closeDelay={0}>
+              <Avatar className="w-10 h-10 mr-1" src={typingUserProfile} />
+            </Tooltip>
+            <Card className="p-3 bg-default-200 text-black">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
+                <div
+                  className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
+                  style={{ animationDelay: "0.4s" }}
+                ></div>
+              </div>
+            </Card>
+          </div>
+        )}
 
         {/* Message being sent indicator */}
         {createChatIsLoading && messageText && (

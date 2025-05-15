@@ -16,11 +16,14 @@ interface ChatState {
   chats: Record<string, IChat>;
   hasMoreMessages: Record<string, boolean>;
   skipCounts: Record<string, number>;
+  drawerStatus: Record<string, boolean>;
 }
+
 const initialState: ChatState = {
   chats: {},
   hasMoreMessages: {},
   skipCounts: {},
+  drawerStatus: {},
 };
 
 const chatSlice = createSlice({
@@ -91,6 +94,35 @@ const chatSlice = createSlice({
       const { key, amount } = action.payload;
       state.skipCounts[key] = (state.skipCounts[key] || 0) + amount;
     },
+    setDrawerStatus: (
+      state,
+      action: PayloadAction<{ key: string; status: boolean }>
+    ) => {
+      // state.drawerStatus[action.payload.key] = action.payload.status;
+      const { key, status } = action.payload;
+
+      if (status) {
+        // Only store if status is true
+        state.drawerStatus[key] = true;
+      } else {
+        // Remove the key if status is false
+        delete state.drawerStatus[key];
+      }
+      // if (status) {
+      //   // When setting a new true status:
+      //   // 1. First clear all existing statuses
+      //   // 2. Then set the new status
+      //   state.drawerStatus = { [key]: true };
+      // } else {
+      //   // When setting false status:
+      //   // 1. Remove the specific key
+      //   // 2. If no statuses remain, set default
+      //   delete state.drawerStatus[key];
+      //   if (Object.keys(state.drawerStatus).length === 0) {
+      //     state.drawerStatus = { [DEFAULT_DRAWER_KEY]: true };
+      //   }
+      // }
+    },
   },
 });
 
@@ -107,6 +139,9 @@ export const selectHasMoreMessages = (key: string) => (state: RootState) =>
 export const selectSkipCount = (key: string) => (state: RootState) =>
   state.chat.skipCounts[key] || 0;
 
+export const selectDrawerStatus = (key: string) => (state: RootState) =>
+  state.chat.drawerStatus[key] || false;
+
 export const {
   setChat,
   prependMessages,
@@ -114,6 +149,7 @@ export const {
   setHasMoreMessages,
   setSkipCount,
   incrementSkipCount,
+  setDrawerStatus,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
