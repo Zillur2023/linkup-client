@@ -29,6 +29,7 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
     useUpdateUserMutation();
 
   const handleEditImage = async (data: any, reset?: () => void) => {
+    console.log({ data });
     const formData = new FormData();
     formData.append("data", JSON.stringify({ _id: user?._id }));
     if (data?.coverImage) {

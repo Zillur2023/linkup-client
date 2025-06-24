@@ -9,8 +9,10 @@ export interface IChatItem {
 
 export interface IMessage {
   _id: string;
+  like: boolean;
   text: string;
   imageUrl: string;
+  audioUrl: string;
   videoUrl: string;
   isSeen: boolean;
   senderId: IUser;

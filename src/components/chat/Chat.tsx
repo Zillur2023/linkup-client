@@ -33,8 +33,10 @@ import {
 import { RootState } from "@/redux/store";
 
 type TMessageContent = {
+  like?: boolean;
   text?: string;
   imageUrl?: string;
+  audioUrl?: string;
   videoUrl?: string;
 };
 const LIMIT = 10;
@@ -263,9 +265,35 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   const handleSubmit = async (
     content: TMessageContent & { reset: () => void }
   ) => {
+    console.log({ content });
     try {
-      const { text = "", imageUrl = "", videoUrl = "", reset } = content;
+      const formData = new FormData();
+      const {
+        like = false,
+        text = "",
+        imageUrl = "",
+        audioUrl,
+        videoUrl = "",
+        reset,
+      } = content;
       setMessageText(text);
+      console.log({ audioUrl });
+
+      if (text) {
+        formData.append("text", text);
+      }
+
+      // if (audioUrl) {
+      //   formData.append("audioUrl", audioUrl, "recording.webm");
+      // }
+
+      if (audioUrl && typeof audioUrl === "string") {
+        const blob = await fetch(audioUrl).then((res) => res.blob());
+        console.log({ blob });
+        formData.append("audioUrl", blob, "recording.webm");
+      }
+
+      console.log({ audioUrl });
 
       const newChat = {
         senderId: user?._id,
@@ -274,19 +302,27 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
           : chat.senderId?._id === user?._id
           ? chat.receiverId?._id
           : chat.senderId?._id,
+        like,
         text,
-        imageUrl,
-        videoUrl,
+        // imageUrl,
+        // audioUrl,
+        // videoUrl,
         isSeen: false,
       };
+      formData.append("data", JSON.stringify(newChat));
+
+      console.log({ newChat });
 
       socket?.emit("fetchMyChats", { senderId: user?._id });
       reset();
-      const { data } = await createChat(newChat).unwrap();
+      // const { data } = await createChat(newChat).unwrap();
+      const { data } = await createChat(formData).unwrap();
+      console.log({ data });
       dispatch(appendMessage({ key, message: data }));
       setMessageText("");
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create chat");
+      console.log({ error });
     }
   };
 
@@ -300,7 +336,8 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       onOpenChange={handleDrawerChange}
       size="md"
       backdrop="transparent"
-      className="w-[80%] md:w-[40%] lg:w-[23%] bottom-0 left-[10%] md:left-[50%] lg:left-[70%]"
+      // className="w-[80%] md:w-[40%] lg:w-[23%] bottom-0 left-[10%] md:left-[50%] lg:left-[70%]"
+      className="w-[90%] md:w-[40%] lg:w-[28%] bottom-0 left-[5%] md:left-[50%] lg:left-[70%]"
     >
       <DrawerContent>
         {() => (

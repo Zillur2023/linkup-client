@@ -1,8 +1,12 @@
-import { useUser } from "@/context/UserProvider";
-import { IChat } from "@/type";
-import { formatChatTooltipDate } from "@/uitls/formatDate";
+import { IChat, IMessage } from "@/type";
+import {
+  formatChatTooltipDate,
+  formatLastSentMessage,
+} from "@/uitls/formatDate";
 import { Avatar, Card, Spinner, Tooltip } from "@heroui/react";
 import { useEffect, useRef } from "react";
+import image from "../../../public/likeButton.png";
+import Image from "next/image";
 
 const ChatMessage = ({
   chat,
@@ -25,13 +29,15 @@ const ChatMessage = ({
   messageText: string;
   isTypingState: any;
 }) => {
-  const { user } = useUser();
+  const lastMessage = chat?.messages.at(-1);
+  const isLastMessageSentByCurrentUser =
+    lastMessage?.senderId?._id === currentUserId;
   const typingUserName =
-    chat?.receiverId?._id === user?._id
+    chat?.receiverId?._id === currentUserId
       ? chat?.senderId?.name
       : chat?.receiverId?.name;
   const typingUserProfile =
-    chat?.receiverId?._id === user?._id
+    chat?.receiverId?._id === currentUserId
       ? chat?.senderId?.profileImage
       : chat?.receiverId?.profileImage;
 
@@ -122,7 +128,7 @@ const ChatMessage = ({
         {hasMoreMessages && isFetchingChatData && (
           <Spinner className=" w-full text-center" />
         )}
-        {chat?.messages?.map((msg, index) => (
+        {chat?.messages?.map((msg: IMessage, index) => (
           <div
             // key={msg._id}
             key={index}
@@ -145,15 +151,57 @@ const ChatMessage = ({
               content={formatChatTooltipDate(msg.createdAt)}
               closeDelay={0}
             >
-              <Card
-                className={`p-3 break-words ${
-                  msg.senderId._id === currentUserId
-                    ? "bg-blue-600 text-white"
-                    : "bg-default-200 text-black"
-                }`}
-              >
-                <p className="text-sm">{msg.text}</p>
-              </Card>
+              <div className="space-y-1">
+                {msg?.text && (
+                  <Card
+                    className={`p-3 break-words ${
+                      msg.senderId._id === currentUserId
+                        ? "bg-blue-600 text-white"
+                        : "bg-default-200 text-black"
+                    }`}
+                  >
+                    {/* <p className="text-sm">{msg.text}</p> */}
+                    <p className="text-sm">{msg.text}</p>
+                  </Card>
+                )}
+                {msg.audioUrl && (
+                  <audio
+                    key={msg.audioUrl} // ensures re-render if the URL changes
+                    controls
+                    preload="metadata"
+                    onLoadedMetadata={(e) => {
+                      // This ensures that metadata (duration) is available before playback
+                      const audio = e.currentTarget;
+                      if (
+                        audio.duration === Infinity ||
+                        isNaN(audio.duration)
+                      ) {
+                        // Optional fallback handling
+                        audio.currentTime = 1e101;
+                        audio.ontimeupdate = () => {
+                          audio.ontimeupdate = null;
+                          audio.currentTime = 0;
+                        };
+                      }
+                    }}
+                  >
+                    <source
+                      src={msg.audioUrl}
+                      type="audio/mpeg"
+                      className=" "
+                    />
+                  </audio>
+                )}
+                {msg?.like && (
+                  <Image
+                    src={image}
+                    width={50}
+                    height={50}
+                    alt="Picture of the author"
+                    className="  "
+                  />
+                )}
+              </div>
             </Tooltip>
           </div>
         ))}
@@ -180,16 +228,40 @@ const ChatMessage = ({
         )}
 
         {/* Message being sent indicator */}
-        {createChatIsLoading && messageText && (
+        {createChatIsLoading || messageText ? (
           <div className="flex items-start justify-end">
             <div>
-              <Card className="p-3 bg-blue-600 text-white break-words">
-                <p className="text-sm">{messageText}</p>
-              </Card>
+              {messageText ? (
+                <Card className="p-3 bg-blue-600 text-white break-words">
+                  <p className="text-sm">{messageText}</p>
+                </Card>
+              ) : (
+                <Image
+                  src={image}
+                  width={50}
+                  height={50}
+                  alt="Picture of the author"
+                  className="  "
+                />
+              )}
+
               <p className="text-xs">Sending...</p>
             </div>
           </div>
+        ) : (
+          isLastMessageSentByCurrentUser &&
+          lastMessage?.createdAt && (
+            <p className="text-xs text-right mr-1">
+              sent {formatLastSentMessage(lastMessage.createdAt)}
+            </p>
+          )
         )}
+        {/* <Image
+          src={image}
+          width={500}
+          height={500}
+          alt="Picture of the author"
+        /> */}
 
         <div ref={messagesEndRef} />
       </div>
