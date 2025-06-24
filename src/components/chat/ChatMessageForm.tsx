@@ -19,6 +19,7 @@ import { IoMdImages } from "react-icons/io";
 import { PiGifFill } from "react-icons/pi";
 import { LuSticker } from "react-icons/lu";
 import VoiceRecorder from "./VoiceRecorder";
+import EmojiPickerButton from "./EmojiPickerButton";
 import { AudioPlayerControls } from "./AudioPlayerControls";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
@@ -230,8 +231,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
                 )
               }
               endContent={
-                isRecording ||
-                (isStopRecording && mediaBlobUrl && (
+                isRecording || (isStopRecording && mediaBlobUrl) ? (
                   <button className="bg-white rounded-full text-blue-500 text-sm px-2 z-40">
                     {isPlaying || isPause
                       ? formatRecordTime(Math.floor(currentPlayTime))
@@ -239,7 +239,14 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
                           isRecording ? recordTime : maxDuration
                         )}
                   </button>
-                ))
+                ) : (
+                  <EmojiPickerButton
+                    onEmojiSelect={(emoji) => {
+                      const currentText = methods.getValues("text") || "";
+                      methods.setValue("text", `${currentText}${emoji}`);
+                    }}
+                  />
+                )
               }
             />
           </div>
