@@ -1,16 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 
-export const useAudioPlayer = (
-  mediaBlobUrl: string | null,
-  maxDuration: number
-) => {
+export const useAudioPlayer = (blobUrl: string | null, maxDuration: number) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPause, setIsPause] = useState(false);
   const [playbackProgress, setPlaybackProgress] = useState(0);
   const [currentPlayTime, setCurrentPlayTime] = useState(maxDuration);
   const playbackInterval = useRef<NodeJS.Timeout | null>(null);
-  console.log({ currentPlayTime, mediaBlobUrl });
+  // console.log({ currentPlayTime, mediaBlobUrl });
 
   const clearPlaybackInterval = () => {
     if (playbackInterval.current) {
@@ -72,7 +69,7 @@ export const useAudioPlayer = (
   }, []);
 
   useEffect(() => {
-    if (!mediaBlobUrl) {
+    if (!blobUrl) {
       setIsPlaying(false);
       setIsPause(false);
       setPlaybackProgress(0);
@@ -80,7 +77,7 @@ export const useAudioPlayer = (
       // setCurrentPlayTime(0);
       clearPlaybackInterval();
     }
-  }, [mediaBlobUrl, maxDuration]);
+  }, [blobUrl, maxDuration]);
 
   return {
     audioRef,

@@ -2,7 +2,7 @@ import {
   useCreateChatMutation,
   useGetChatbyUserIdQuery,
 } from "@/redux/features/chat/chatApi";
-import { IChat, IMessage } from "@/type";
+import { IChat, IMessage, TSubmitMessage } from "@/type";
 import {
   Drawer,
   DrawerContent,
@@ -32,13 +32,6 @@ import {
 } from "@/redux/features/chat/chatSlice";
 import { RootState } from "@/redux/store";
 
-type TMessageContent = {
-  like?: boolean;
-  text?: string;
-  imageUrl?: string;
-  audioUrl?: string;
-  videoUrl?: string;
-};
 const LIMIT = 10;
 
 const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
@@ -46,7 +39,9 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
 
   const dispatch = useAppDispatch();
   const { socket } = useSocketContext();
-  const [messageText, setMessageText] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState<TSubmitMessage | null>(
+    null
+  );
   // const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isTypingState, setIsTypingState] = useState(false);
   const typingAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -55,11 +50,14 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   const chat = useAppSelector((state: RootState) =>
     key ? selectChatByKey(key)(state) : null
   );
+  // console.log("chat?.messages", chat?.messages);
   const hasMoreMessages = useAppSelector(selectHasMoreMessages(key));
   const skip = useAppSelector(selectSkipCount(key));
-  const isDrawerOpen = useAppSelector(
+  const isChatDrawerOpen = useAppSelector(
     selectDrawerStatus(selectedUser?._id as string)
   );
+
+  console.log({ isChatDrawerOpen });
 
   const drawerStatus = useAppSelector(
     (state: RootState) => state.chat.drawerStatus
@@ -118,7 +116,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   };
 
   const handleOpen = () => {
-    if (!isDrawerOpen) {
+    if (!isChatDrawerOpen) {
       dispatch(
         setDrawerStatus({ key: selectedUser?._id as string, status: true })
       );
@@ -140,7 +138,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
         // if (!isOpen) {
         //   onOpen();
         // }
-        if (!isDrawerOpen) {
+        if (!isChatDrawerOpen) {
           handleOpen();
         }
 
@@ -203,7 +201,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
         })
       );
 
-      setMessageText("");
+      setLoadingMessage(null);
     };
 
     // Create audio instance once (outside of handlers)
@@ -258,26 +256,21 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       socket?.off("userStoppedTyping", handleUserStoppedTyping);
       // socket?.off("myRecentChats");
     };
-  }, [socket, selectedUser, isDrawerOpen, user?._id]);
+  }, [socket, selectedUser, isChatDrawerOpen, user?._id]);
 
   // const onSubmit = (data) => console.log(data);
   // const handleCreateChat = async (
   const handleSubmit = async (
-    content: TMessageContent & { reset: () => void }
+    messageWithReset: TSubmitMessage & { reset: () => void }
   ) => {
-    console.log({ content });
     try {
       const formData = new FormData();
-      const {
-        like = false,
-        text = "",
-        imageUrl = "",
-        audioUrl,
-        videoUrl = "",
-        reset,
-      } = content;
-      setMessageText(text);
-      console.log({ audioUrl });
+      const { reset, ...message } = messageWithReset;
+
+      const { like, text, images, voice } = message;
+      console.log({ message });
+      setLoadingMessage(message);
+      // console.log({ voice });
 
       if (text) {
         formData.append("text", text);
@@ -287,13 +280,19 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       //   formData.append("audioUrl", audioUrl, "recording.webm");
       // }
 
-      if (audioUrl && typeof audioUrl === "string") {
-        const blob = await fetch(audioUrl).then((res) => res.blob());
-        console.log({ blob });
-        formData.append("audioUrl", blob, "recording.webm");
+      if (voice && typeof voice === "string") {
+        const blob = await fetch(voice).then((res) => res.blob());
+        // console.log({ blob });
+        formData.append("voice", blob, "recording.webm");
       }
 
-      console.log({ audioUrl });
+      if (images && Array.isArray(images)) {
+        images.forEach((file: File) => {
+          formData.append("images", file); // All files will be appended with the same key
+        });
+      }
+
+      // console.log({ voice });
 
       const newChat = {
         senderId: user?._id,
@@ -304,22 +303,30 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
           : chat.senderId?._id,
         like,
         text,
-        // imageUrl,
-        // audioUrl,
-        // videoUrl,
+
         isSeen: false,
       };
       formData.append("data", JSON.stringify(newChat));
 
-      console.log({ newChat });
+      // console.log({ newChat });
 
       socket?.emit("fetchMyChats", { senderId: user?._id });
       reset();
       // const { data } = await createChat(newChat).unwrap();
-      const { data } = await createChat(formData).unwrap();
-      console.log({ data });
-      dispatch(appendMessage({ key, message: data }));
-      setMessageText("");
+      // const { data } = await createChat(formData).unwrap();
+      // // console.log({ data });
+      // dispatch(appendMessage({ key, message: data }));
+      // setLoadingMessage(null);
+      try {
+        const { data } = await createChat(formData).unwrap();
+        dispatch(appendMessage({ key, message: data }));
+      } catch (error) {
+        console.error("Message failed:", error);
+      } finally {
+        setLoadingMessage(null); // Always clears after try/catch
+      }
+      // const { data } = await createChat(newChat).unwrap();
+      // const { data } = await createChat(formData).unwrap();
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create chat");
       console.log({ error });
@@ -332,7 +339,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       shouldBlockScroll={false}
       // isOpen={isOpen}
       // onOpenChange={onOpenChange}
-      isOpen={isDrawerOpen}
+      isOpen={isChatDrawerOpen}
       onOpenChange={handleDrawerChange}
       size="md"
       backdrop="transparent"
@@ -347,7 +354,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
               <div className="text-start">{selectedUser?.user}</div>
             </DrawerHeader>
 
-            <DrawerBody className="!px-2">
+            <DrawerBody className="!px-2 !pl-16">
               <ChatMessage
                 chat={chat as IChat}
                 currentUserId={user?._id as string}
@@ -356,7 +363,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
                 createChatIsLoading={createChatIsLoading}
                 handleNewMessageScroll={handleNewMessageScroll}
                 hasMoreMessages={hasMoreMessages}
-                messageText={messageText}
+                loadingMessage={loadingMessage}
                 isTypingState={isTypingState}
               />
             </DrawerBody>

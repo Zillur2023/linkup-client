@@ -11,14 +11,20 @@ export interface IMessage {
   _id: string;
   like: boolean;
   text: string;
-  imageUrl: string;
-  audioUrl: string;
-  videoUrl: string;
+  images: string[];
+  voice: string;
   isSeen: boolean;
   senderId: IUser;
   createdAt: string;
   updatedAt: string;
 }
+
+export type TSubmitMessage = {
+  like?: boolean;
+  text?: string;
+  images?: File[];
+  voice?: string;
+};
 
 export interface IChat {
   _id: string;

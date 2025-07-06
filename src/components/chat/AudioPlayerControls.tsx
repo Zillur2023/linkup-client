@@ -3,7 +3,7 @@ import { FaPauseCircle, FaPlayCircle, FaStopCircle } from "react-icons/fa";
 interface AudioPlayerControlsProps {
   isStopRecording: boolean;
   isPlaying: boolean;
-  mediaBlobUrl: string | null;
+  blobUrl: string | null;
   //   audioRef: React.RefObject<HTMLAudioElement>;
   audioRef: any;
   togglePlay: () => void;
@@ -15,7 +15,7 @@ interface AudioPlayerControlsProps {
 export const AudioPlayerControls = ({
   isStopRecording,
   isPlaying,
-  mediaBlobUrl,
+  blobUrl,
   audioRef,
   togglePlay,
   setIsStopRecording,
@@ -25,7 +25,7 @@ export const AudioPlayerControls = ({
     <>
       <audio
         ref={audioRef}
-        src={mediaBlobUrl as string}
+        src={blobUrl as string}
         onEnded={handlePlaybackEnd}
       />
       {isStopRecording ? (

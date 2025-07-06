@@ -22,12 +22,14 @@ import VoiceRecorder from "./VoiceRecorder";
 import EmojiPickerButton from "./EmojiPickerButton";
 import { AudioPlayerControls } from "./AudioPlayerControls";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import ImageUploader from "./ImageUploader ";
+import { useAppSelector } from "@/redux/hooks";
+import { selectDrawerStatus } from "@/redux/features/chat/chatSlice";
 
 type TFormValues = {
   text?: string;
-  imageUrl?: string;
-  audioUrl?: string;
-  videoUrl?: string;
+  images?: File[];
+  voice?: string;
 };
 
 interface ChatMessageFormProps {
@@ -46,10 +48,20 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
 
   // Audio recording state
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaBlobUrl, setMediaBlobUrl] = useState<string | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [isStopRecording, setIsStopRecording] = useState(false);
   const [recordTime, setRecordTime] = useState<number>(0);
   const [maxDuration, setMaxDuration] = useState(60);
+  const uploaderRef = useRef<HTMLInputElement>(null);
+
+  const isChatDrawerOpen = useAppSelector(
+    selectDrawerStatus(selectedUser?._id as string)
+  );
+
+  // console.log({ selectedUser, isRecording, blobUrl, isStopRecording });
+  const handleUploadClick = () => {
+    uploaderRef.current?.click();
+  };
 
   const {
     audioRef,
@@ -58,23 +70,20 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
     currentPlayTime,
     togglePlay,
     handlePlaybackEnd,
-  } = useAudioPlayer(mediaBlobUrl, maxDuration);
+  } = useAudioPlayer(blobUrl, maxDuration);
 
   const textValue = useWatch({
     control,
     name: "text",
-    defaultValue: "",
+    // defaultValue: "",
   });
-
-  const formValues = useWatch({
+  const watchImage = useWatch({
     control,
-    defaultValue: {
-      text: "",
-      imageUrl: "",
-      audioUrl: "",
-      videoUrl: "",
-    },
+    name: "images",
+    // defaultValue: "",
   });
+  // console.log({ textValue });
+  // console.log({ watchImage });
 
   // Set max duration when recording stops
   useEffect(() => {
@@ -93,10 +102,16 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
   }, [isRecording]);
 
   useEffect(() => {
-    if (mediaBlobUrl) {
-      setValue("audioUrl", mediaBlobUrl);
+    if (!isChatDrawerOpen) {
+      setBlobUrl(null);
     }
-  }, [mediaBlobUrl, setValue]);
+  }, [isChatDrawerOpen]);
+  console.log({ isChatDrawerOpen });
+  useEffect(() => {
+    if (blobUrl) {
+      setValue("voice", blobUrl);
+    }
+  }, [blobUrl]);
 
   // Format time display (MM:SS)
   const formatRecordTime = (seconds: number) => {
@@ -123,7 +138,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
-    setValue("text", text);
+    setValue("text", text.trim());
 
     if (selectedUser?._id && socket) {
       if (text.trim().length > 0 && !isSendingTyping) {
@@ -150,36 +165,43 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
     }
   };
 
-  const onSubmitForm = (data: TFormValues) => {
-    console.log("data 1", data);
-    const hasContent =
-      data.text?.trim() || data.imageUrl || data?.audioUrl || data.videoUrl;
+  useEffect(() => {
+    if (watchImage?.length) {
+      setValue("images", watchImage);
+    }
+  }, [watchImage?.length, setValue]);
 
-    console.log({ hasContent });
-
-    if (hasContent) {
-      // if (data?.audioUrl) {
-      onSubmit({ ...data, reset });
-      console.log("data 2", data);
+  const onSubmitForm = (data: any) => {
+    console.log({ data });
+    if (data.text.length && data.images.length) {
+      onSubmit({ text: data?.text?.trim(), images: data.images, reset });
+    } else if (data.text) {
+      onSubmit({ text: data?.text?.trim(), reset });
+    } else if (data.images.length) {
+      onSubmit({ images: data.images, reset });
+    } else if (data.voice) {
+      onSubmit({ voice: data.voice, reset });
     } else {
-      console.log("data 3", data);
       onSubmit({ like: true, reset });
     }
 
+    // reset();
+    reset({ text: "", images: [], voice: "" });
     setIsRecording(false);
-    setMediaBlobUrl(null);
+    setBlobUrl(null);
+    setIsStopRecording(false);
   };
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmitForm)}>
-        <Card shadow="none" className="relative w-full py-1">
-          <div className="flex justify-end mr-12 relative border-2">
+        <Card shadow="none" className="relative w-full py-1 ">
+          <div className="flex justify-end mr-12  relative border-2  ">
             {/* Progress bar - shows during recording OR playback */}
             {(isRecording || isPlaying) && (
               <div
                 className={`absolute bottom-0 h-10 bg-blue-500 overflow-hidden z-10 rounded-full transition-all duration-300 ${
-                  textValue?.trim() || isRecording
+                  textValue || isRecording
                     ? "w-[80%] md:w-[86%]"
                     : "w-[30%] md:w-[50%]"
                 }`}
@@ -196,7 +218,16 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
                 />
               </div>
             )}
-
+            <div
+              className={`  absolute ${
+                // textValue ? "w-[80%] md:w-[86%]" : "w-[30%] md:w-[50%]"
+                watchImage?.length
+                  ? "w-[80%] md:w-[86%]"
+                  : "w-[80%] md:w-[50%] hidden"
+              } `}
+            >
+              <ImageUploader name="images" ref={uploaderRef} />
+            </div>
             <Textarea
               {...register("text", { onChange: handleTextChange })}
               minRows={1}
@@ -204,17 +235,22 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
               size="md"
               fullWidth
               onKeyDown={handleKeyDown}
-              radius="full"
-              className={`${
-                textValue?.trim() || isRecording
-                  ? "w-[80%] md:w-[86%]"
-                  : "w-[30%] md:w-[50%]"
-              }`}
+              // radius="full"
+              className={` ${
+                watchImage?.length ? "pt-16 bg-default-100 rounded-md  " : " "
+              } 
+                ${
+                  textValue || isRecording || watchImage?.length
+                    ? "w-[80%] md:w-[86%]"
+                    : "w-[30%] md:w-[50%]"
+                }
+              `}
               value={textValue}
               classNames={{
-                inputWrapper: `${
-                  isRecording ? "!bg-blue-500" : "!bg-default-100"
-                } shadow-none`,
+                inputWrapper: ` rounded-full shadow-none  ${
+                  isRecording ? "!bg-blue-500" : "!bg-default-100  "
+                  // isRecording ? "!bg-blue-500" : "!bg-transparent  "
+                } `,
                 input: "",
               }}
               startContent={
@@ -222,7 +258,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
                   <AudioPlayerControls
                     isStopRecording={isStopRecording}
                     isPlaying={isPlaying}
-                    mediaBlobUrl={mediaBlobUrl}
+                    blobUrl={blobUrl}
                     audioRef={audioRef}
                     togglePlay={togglePlay}
                     setIsStopRecording={setIsStopRecording}
@@ -231,7 +267,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
                 )
               }
               endContent={
-                isRecording || (isStopRecording && mediaBlobUrl) ? (
+                isRecording || (isStopRecording && blobUrl) ? (
                   <button className="bg-white rounded-full text-blue-500 text-sm px-2 z-40">
                     {isPlaying || isPause
                       ? formatRecordTime(Math.floor(currentPlayTime))
@@ -252,7 +288,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
           </div>
 
           <div className="absolute bottom-1 left-0 flex gap-0">
-            {textValue?.trim() ? (
+            {textValue || watchImage?.length ? (
               <Dropdown placement="bottom-start">
                 <DropdownTrigger>
                   <Button isIconOnly variant="light" size="md" radius="full">
@@ -294,7 +330,8 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
                 <VoiceRecorder
                   isRecording={isRecording}
                   setIsRecording={setIsRecording}
-                  setMediaBlobUrl={setMediaBlobUrl}
+                  blobUrl={blobUrl}
+                  setBlobUrl={setBlobUrl}
                   isStopRecording={isStopRecording}
                   setIsStopRecording={setIsStopRecording}
                   setRecordTime={setRecordTime}
@@ -302,9 +339,16 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
 
                 {!isRecording && (
                   <>
-                    <Button isIconOnly variant="light" size="md" radius="full">
+                    <Button
+                      onClick={handleUploadClick}
+                      isIconOnly
+                      variant="light"
+                      size="md"
+                      radius="full"
+                    >
                       <IoMdImages size={24} />
                     </Button>
+
                     <Button isIconOnly variant="light" size="md" radius="full">
                       <LuSticker size={24} />
                     </Button>
@@ -325,7 +369,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
             radius="full"
             className="absolute bottom-1 right-0"
           >
-            {textValue?.trim() || mediaBlobUrl ? (
+            {textValue?.trim() || isRecording || watchImage?.length ? (
               <IoSend size={20} className="text-blue-500" />
             ) : (
               <Image src={image} width={24} height={24} alt="Like button" />
