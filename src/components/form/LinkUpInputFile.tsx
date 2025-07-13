@@ -9,7 +9,7 @@ interface LinkUpInputFileProps {
   label: string;
 }
 
-const LinkUpInputFile: React.FC<LinkUpInputFileProps> = ({ name, label }) => {
+const LinkUpInputFile = ({ name, label }: LinkUpInputFileProps) => {
   const {
     control,
     reset,

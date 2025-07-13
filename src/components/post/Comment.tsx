@@ -23,7 +23,7 @@ import Link from "next/link";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { useSocketContext } from "@/context/socketContext";
 
-interface PostCommentProps {
+interface CommentProps {
   user: IUser;
   post: IPost;
   startContent?: ReactNode;
@@ -34,7 +34,7 @@ interface PostCommentProps {
   clickRef?: any;
 }
 
-const PostComment: React.FC<PostCommentProps> = ({
+const Comment = ({
   user,
   post,
   startContent,
@@ -43,7 +43,7 @@ const PostComment: React.FC<PostCommentProps> = ({
   hideComments,
   focusRef,
   clickRef,
-}) => {
+}: CommentProps) => {
   const { socket } = useSocketContext();
   const [commentText, setCommentText] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
@@ -421,4 +421,4 @@ const PostComment: React.FC<PostCommentProps> = ({
   );
 };
 
-export default PostComment;
+export default Comment;

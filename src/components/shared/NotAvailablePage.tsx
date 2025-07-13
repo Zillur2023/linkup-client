@@ -1,6 +1,6 @@
 import React from "react";
 
-const NotAvailablePage: React.FC = () => {
+const NotAvailablePage = () => {
   const handleGoBack = () => {
     window.history.back();
   };

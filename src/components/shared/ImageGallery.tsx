@@ -19,12 +19,12 @@ type ImageGalleryProps = {
   field?: ControllerField;
 };
 
-export const ImageGallery: React.FC<ImageGalleryProps> = ({
+export const ImageGallery = ({
   images,
   addImage,
   reset,
   field,
-}) => {
+}: ImageGalleryProps) => {
   const clickRef = useRef<HTMLButtonElement | null>(null);
 
   let imageGallery;

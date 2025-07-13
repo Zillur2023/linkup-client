@@ -15,14 +15,14 @@ interface ReactionButtonProps {
   startContent?: ReactNode;
 }
 
-const ReactionButton: React.FC<ReactionButtonProps> = ({
+const ReactionButton = ({
   onClick,
   reactionType,
   children,
   post,
   className,
   startContent,
-}) => {
+}: ReactionButtonProps) => {
   const { user } = useUser();
   const reactions = useAppSelector((state: RootState) => state.reactions);
 

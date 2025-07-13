@@ -1,4 +1,4 @@
-import { IChat, IMessage, TMessage } from "@/type";
+import { IChat, IMessage, TLoadingMessage } from "@/type";
 import {
   formatChatTooltipDate,
   formatLastSentMessage,
@@ -7,10 +7,41 @@ import { Avatar, Card, Spinner, Tooltip } from "@heroui/react";
 import { useEffect, useRef } from "react";
 import image from "../../../public/likeButton.png";
 import Image from "next/image";
-import { ImageGallery } from "../shared/ImageGallery";
-import ChatMessageImages from "./ChatMessageImages ";
+import ChatMessageImages from "./MessageImages ";
+interface MessageProps {
+  chat: IChat;
+  currentUserId: string;
+  skip: any;
+  isFetchingChatData: any;
+  createChatIsLoading: boolean;
+  handleNewMessageScroll: any;
+  hasMoreMessages: any;
+  loadingMessage: TLoadingMessage | null;
+  isTypingState: any;
+}
 
-const ChatMessage = ({
+// const Message = ({
+//   chat,
+//   currentUserId,
+//   skip,
+//   isFetchingChatData,
+//   createChatIsLoading,
+//   handleNewMessageScroll,
+//   hasMoreMessages,
+//   loadingMessage,
+//   isTypingState,
+// }: {
+// chat: IChat;
+// currentUserId: string;
+// skip: any;
+// isFetchingChatData: any;
+// createChatIsLoading: boolean;
+// handleNewMessageScroll: any;
+// hasMoreMessages: any;
+// loadingMessage: TLoadingMessage | null;
+// isTypingState: any;
+// }) => {
+const Message = ({
   chat,
   currentUserId,
   skip,
@@ -20,19 +51,7 @@ const ChatMessage = ({
   hasMoreMessages,
   loadingMessage,
   isTypingState,
-}: {
-  chat: IChat;
-  currentUserId: string;
-  skip: any;
-  isFetchingChatData: any;
-  createChatIsLoading: boolean;
-  handleNewMessageScroll: any;
-  hasMoreMessages: any;
-  loadingMessage: TMessage | null;
-  isTypingState: any;
-}) => {
-  // console.log("chat?.messages", chat?.messages);
-  // console.log({ loadingMessage });
+}: MessageProps) => {
   const lastMessage = chat?.messages.at(-1);
   const isLastMessageSentByCurrentUser =
     lastMessage?.senderId?._id === currentUserId;
@@ -134,18 +153,20 @@ const ChatMessage = ({
               key={index}
               className={`flex items-start ${
                 msg.senderId._id === currentUserId
-                  ? "justify-end"
-                  : "justify-start"
+                  ? "justify-end ml-[20%] "
+                  : "justify-start mr-[20%] "
               }`}
             >
-              {msg.senderId._id !== currentUserId && (
-                <Tooltip content={msg.senderId.name} closeDelay={0}>
-                  <Avatar
-                    className="w-10 h-10 mr-1"
-                    src={msg.senderId.profileImage || "/default-avatar.png"}
-                  />
-                </Tooltip>
-              )}
+              <div>
+                {msg.senderId._id !== currentUserId && (
+                  <Tooltip content={msg.senderId.name} closeDelay={0}>
+                    <Avatar
+                      className=" mr-1"
+                      src={msg.senderId.profileImage || "/default-avatar.png"}
+                    />
+                  </Tooltip>
+                )}
+              </div>
 
               <Tooltip
                 content={formatChatTooltipDate(msg.createdAt)}
@@ -162,7 +183,7 @@ const ChatMessage = ({
                       <Card
                         className={`p-3 break-words ${
                           msg.senderId._id === currentUserId
-                            ? "bg-blue-600 text-white"
+                            ? "bg-blue-600 text-white "
                             : "bg-default-200 text-black"
                         }`}
                       >
@@ -194,21 +215,7 @@ const ChatMessage = ({
                       <source src={msg.voice} type="audio/mpeg" className=" " />
                     </audio>
                   )}
-                  {/* {msg?.images &&
-                    msg.images
-                      // .filter((image) => image && image.trim() !== "") // Add this filter
-                      .map((image, i) => (
-                        <Image
-                          key={i}
-                          src={image}
-                          width={50}
-                          height={50}
-                          alt="Picture of the author"
-                          className=""
-                        />
-                      ))} */}
 
-                  {/* {msg?.images && <ImageGallery images={msg?.images} />} */}
                   {msg?.images && (
                     <ChatMessageImages
                       images={msg.images}
@@ -253,7 +260,7 @@ const ChatMessage = ({
 
         {/* Message being sent indicator */}
         {createChatIsLoading || loadingMessage ? (
-          <div className="flex items-start justify-end">
+          <div className="flex items-start justify-end ml-[20%] ">
             <div>
               {loadingMessage?.text &&
                 (isPureEmojiString(loadingMessage?.text) ? (
@@ -284,25 +291,18 @@ const ChatMessage = ({
                     // isCurrentUser={msg.senderId._id === currentUserId}
                   />
                 </div>
-                // <Image
-                //   src={image}
-                //   width={500}
-                //   height={500}
-                //   alt="Picture of the author"
-                //   className="  "
-                // />
               )}
               {loadingMessage?.like && (
                 <Image
                   src={image}
-                  width={500}
-                  height={500}
+                  width={50}
+                  height={50}
                   alt="Picture of the author"
                   className="  "
                 />
               )}
 
-              <p className="text-xs">Sending...</p>
+              <p className="text-xs text-black">Sending...</p>
             </div>
           </div>
         ) : (
@@ -313,12 +313,6 @@ const ChatMessage = ({
             </p>
           )
         )}
-        {/* <Image
-          src={image}
-          width={500}
-          height={500}
-          alt="Picture of the author"
-        /> */}
 
         <div ref={messagesEndRef} />
       </div>
@@ -326,4 +320,4 @@ const ChatMessage = ({
   );
 };
 
-export default ChatMessage;
+export default Message;

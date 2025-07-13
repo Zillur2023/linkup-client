@@ -27,7 +27,7 @@ import LinkUpButton from "../shared/LinkUpButton";
 import { useRouter } from "next/navigation";
 import { ImageGallery } from "../shared/ImageGallery";
 import PostEditor from "./PostEditor";
-import PostComment from "./PostComment";
+import PostComment from "./Comment";
 import ActionButton from "../shared/ActionButton";
 import { formatPostDate, formatPostTooltipDate } from "@/uitls/formatDate";
 import { PiShareFat } from "react-icons/pi";
@@ -35,9 +35,11 @@ import { FiMessageCircle } from "react-icons/fi";
 import { PiCrown } from "react-icons/pi";
 import { useAppDispatch } from "@/redux/hooks";
 import { setReactions } from "@/redux/features/post/reactionSlice";
-import LikeButton from "../reactions/LikeButton";
-import DislikeButton from "../reactions/DislikeButton";
 import { useSocketContext } from "@/context/socketContext";
+import { store } from "@/redux/store";
+import Comment from "./Comment";
+import DislikeButton from "./DislikeButton";
+import LikeButton from "./LikeButton";
 
 interface PostsProps {
   postId?: string;
@@ -47,13 +49,13 @@ interface PostsProps {
   modalCommentRef?: any;
 }
 
-const Posts: React.FC<PostsProps> = ({
+const Posts = ({
   postId,
   userId,
   showAllComments = false,
   searchQuery,
   modalCommentRef,
-}) => {
+}: PostsProps) => {
   const dispatch = useAppDispatch();
   const { socket } = useSocketContext();
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
@@ -166,6 +168,15 @@ const Posts: React.FC<PostsProps> = ({
     }
   };
 
+  const handleInteraction = (postId: string) => {
+    const { likes, dislikes } = store.getState().reactions;
+    socket?.emit("update-like-dislike", {
+      postId,
+      likes: likes[postId],
+      dislikes: dislikes[postId],
+    });
+  };
+
   return (
     <div className=" space-y-5 ">
       {/* {userData &&
@@ -257,9 +268,18 @@ const Posts: React.FC<PostsProps> = ({
             <CardFooter className={` ${postId ? "!px-0" : ""}  flex flex-col `}>
               {/* <Divider /> */}
               <div className=" w-full flex justify-between lg:pl-[10%] lg:pr-[10%]   ">
-                <LikeButton post={post} />
+                {/* <LikeButton post={post} />
 
-                <DislikeButton post={post} />
+                <DislikeButton post={post} /> */}
+
+                <LikeButton
+                  post={post}
+                  onInteraction={() => handleInteraction(post._id)}
+                />
+                <DislikeButton
+                  post={post}
+                  onInteraction={() => handleInteraction(post._id)}
+                />
                 {/* <Button onClick={() => handleReaction(post._id, "like")}>
                   Like
                 </Button>
@@ -318,7 +338,7 @@ const Posts: React.FC<PostsProps> = ({
               {/* <Divider /> */}
               <div className=" w-full mt-2 ">
                 {userData?.data && (
-                  <PostComment
+                  <Comment
                     user={userData?.data}
                     post={post}
                     openButtonText={

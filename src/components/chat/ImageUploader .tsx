@@ -1,7 +1,7 @@
-import { IoMdImages, IoMdClose } from "react-icons/io";
+import { IoMdImages } from "react-icons/io";
 import React, { forwardRef, useState, useEffect } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { avatar, Avatar, Badge, Button } from "@heroui/react";
+import { Avatar, Badge, Button } from "@heroui/react";
 
 interface ImageUploaderProps {
   name: string;
@@ -11,7 +11,6 @@ const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
   ({ name }, ref) => {
     const {
       control,
-      watch,
       formState: { errors },
     } = useFormContext();
     const watchedImages = useWatch({ name, control });
@@ -159,5 +158,7 @@ const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
     );
   }
 );
+
+ImageUploader.displayName = "ImageUploader"; // ✅ Fix the ESLint error
 
 export default ImageUploader;

@@ -46,7 +46,7 @@ const menuItems: MenuItem[] = [
   // { href: "#menu", label: <Menu />, icon: "menu" },
 ];
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
   const [search, setSearch] = useState("");
 
   const [isFocused, setIsFocused] = useState(false);

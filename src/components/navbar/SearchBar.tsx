@@ -14,7 +14,7 @@ interface SearchBarProps {
   inputRef: React.RefObject<HTMLInputElement | null>;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({
+const SearchBar = ({
   search,
   isFocused,
   onSearchChange,
@@ -22,7 +22,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearchSubmit,
   searchResults,
   inputRef,
-}) => {
+}: SearchBarProps) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputRef.current) {
       inputRef.current.blur(); // Removes focus from input

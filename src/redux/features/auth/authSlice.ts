@@ -29,7 +29,6 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{ accessToken: string; refreshToken: string }>
     ) => {
-      console.log("action?.payload", action?.payload);
       const { accessToken, refreshToken } = action.payload;
 
       const decoded = jwtDecode<DecodedAccessToken>(accessToken);

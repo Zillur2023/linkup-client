@@ -3,9 +3,9 @@
 import { Suspense } from "react";
 import ProfileFriends from "@/components/profile/ProfileFriends";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
-import ProfileHome from "@/components/profile/ProfileHome";
 import { useGetUserByIdQuery } from "@/redux/features/user/userApi";
 import { usePathname, useSearchParams } from "next/navigation";
+import Profile from "@/components/profile/Profile";
 
 const ProfilePageContent = () => {
   const pathname = usePathname();
@@ -25,7 +25,7 @@ const ProfilePageContent = () => {
       if (sk === "friends") {
         return <ProfileFriends user={userData?.data} />;
       }
-      return <ProfileHome {...userData?.data} />;
+      return <Profile {...userData?.data} />;
     }
   };
 

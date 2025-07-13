@@ -5,7 +5,7 @@ import { IUser } from "@/type";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-const ProfileHome = (user: IUser) => {
+const Profile = (user: IUser) => {
   return (
     <div className=" flex justify-center w-full md:w-[70%] mx-auto gap-2 my-5">
       {user?.friends?.length > 0 && (
@@ -77,4 +77,4 @@ const FriendsGrid = (user: IUser) => {
   );
 };
 
-export default ProfileHome;
+export default Profile;

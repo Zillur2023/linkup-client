@@ -15,12 +15,12 @@ interface TabsMenuProps {
   isIconOnly?: boolean;
 }
 
-const TabsMenu: React.FC<TabsMenuProps> = ({
+const TabsMenu = ({
   selectedKey,
   items,
   tooltip = false,
   isIconOnly = false,
-}) => {
+}: TabsMenuProps) => {
   return (
     <Tabs
       aria-label="Tabs"

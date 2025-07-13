@@ -12,7 +12,7 @@ type VoiceRecorderProps = {
   setRecordTime: (time: number | ((prevTime: number) => number)) => void;
 };
 
-const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
+const VoiceRecorder = ({
   isRecording,
   setIsRecording,
   isStopRecording,
@@ -20,7 +20,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   blobUrl,
   setBlobUrl,
   setRecordTime,
-}) => {
+}: VoiceRecorderProps) => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);

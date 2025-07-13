@@ -2,7 +2,7 @@ import {
   useCreateChatMutation,
   useGetChatbyUserIdQuery,
 } from "@/redux/features/chat/chatApi";
-import { IChat, IMessage, TSubmitMessage } from "@/type";
+import { IChat, IMessage, TLoadingMessage, TSubmitMessage } from "@/type";
 import {
   Drawer,
   DrawerContent,
@@ -15,8 +15,6 @@ import { toast } from "sonner";
 import { useSocketContext } from "@/context/socketContext";
 import { ISelectedUser } from "../common/UsersList";
 import { useUser } from "@/context/UserProvider";
-import ChatMessage from "./ChatMessage";
-import ChatMessageForm from "./ChatMessageForm";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   appendMessage,
@@ -30,7 +28,9 @@ import {
   setDrawerStatus,
   setHasMoreMessages,
 } from "@/redux/features/chat/chatSlice";
-import { RootState } from "@/redux/store";
+import { RootState, store } from "@/redux/store";
+import MessageForm from "./MessageForm";
+import Message from "./Message";
 
 const LIMIT = 10;
 
@@ -39,7 +39,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
 
   const dispatch = useAppDispatch();
   const { socket } = useSocketContext();
-  const [loadingMessage, setLoadingMessage] = useState<TSubmitMessage | null>(
+  const [loadingMessage, setLoadingMessage] = useState<TLoadingMessage | null>(
     null
   );
   // const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -50,18 +50,16 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
   const chat = useAppSelector((state: RootState) =>
     key ? selectChatByKey(key)(state) : null
   );
-  // console.log("chat?.messages", chat?.messages);
+
   const hasMoreMessages = useAppSelector(selectHasMoreMessages(key));
   const skip = useAppSelector(selectSkipCount(key));
   const isChatDrawerOpen = useAppSelector(
     selectDrawerStatus(selectedUser?._id as string)
   );
 
-  console.log({ isChatDrawerOpen });
-
-  const drawerStatus = useAppSelector(
-    (state: RootState) => state.chat.drawerStatus
-  );
+  // const drawerStatus = useAppSelector(
+  //   (state: RootState) => state.chat.drawerStatus
+  // );
 
   const [createChat, { isLoading: createChatIsLoading }] =
     useCreateChatMutation();
@@ -188,7 +186,10 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     // };
 
     const handleReceiverNewMessage = (newMessage: IMessage) => {
-      if (notificationAudioRef.current) {
+      const { drawerStatus } = store.getState().chat;
+      const senderId = newMessage.senderId._id;
+      const isDrawerClosed = !drawerStatus?.[senderId as string];
+      if (notificationAudioRef.current && isDrawerClosed) {
         const audio = notificationAudioRef.current;
         audio.pause(); // Reset any ongoing audio
         audio.currentTime = 0;
@@ -200,13 +201,13 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
           message: newMessage,
         })
       );
-
       setLoadingMessage(null);
     };
 
     // Create audio instance once (outside of handlers)
 
     const handleUserTyping = ({ senderId }: { senderId: string }) => {
+      const { drawerStatus } = store.getState().chat;
       if (
         // senderId === selectedUser?._id &&
         drawerStatus?.[senderId] &&
@@ -221,6 +222,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     };
 
     const handleUserStoppedTyping = ({ senderId }: { senderId: string }) => {
+      const { drawerStatus } = store.getState().chat;
       if (
         // senderId === selectedUser?._id &&
         drawerStatus?.[senderId] &&
@@ -268,9 +270,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       const { reset, ...message } = messageWithReset;
 
       const { like, text, images, voice } = message;
-      console.log({ message });
       setLoadingMessage(message);
-      // console.log({ voice });
 
       if (text) {
         formData.append("text", text);
@@ -282,7 +282,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
 
       if (voice && typeof voice === "string") {
         const blob = await fetch(voice).then((res) => res.blob());
-        // console.log({ blob });
         formData.append("voice", blob, "recording.webm");
       }
 
@@ -291,8 +290,6 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
           formData.append("images", file); // All files will be appended with the same key
         });
       }
-
-      // console.log({ voice });
 
       const newChat = {
         senderId: user?._id,
@@ -308,13 +305,10 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       };
       formData.append("data", JSON.stringify(newChat));
 
-      // console.log({ newChat });
-
       socket?.emit("fetchMyChats", { senderId: user?._id });
       reset();
       // const { data } = await createChat(newChat).unwrap();
       // const { data } = await createChat(formData).unwrap();
-      // // console.log({ data });
       // dispatch(appendMessage({ key, message: data }));
       // setLoadingMessage(null);
       try {
@@ -354,8 +348,8 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
               <div className="text-start">{selectedUser?.user}</div>
             </DrawerHeader>
 
-            <DrawerBody className="!px-2 !pl-16">
-              <ChatMessage
+            <DrawerBody className="!px-2 ">
+              <Message
                 chat={chat as IChat}
                 currentUserId={user?._id as string}
                 skip={skip}
@@ -370,7 +364,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
 
             <DrawerFooter className=" !pt-0 !pb-2 !px-0 relative w-full mx-auto  ">
               <div className="w-full ">
-                <ChatMessageForm
+                <MessageForm
                   onSubmit={handleSubmit}
                   selectedUser={selectedUser}
                 />

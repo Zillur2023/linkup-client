@@ -7,7 +7,6 @@ export const useAudioPlayer = (blobUrl: string | null, maxDuration: number) => {
   const [playbackProgress, setPlaybackProgress] = useState(0);
   const [currentPlayTime, setCurrentPlayTime] = useState(maxDuration);
   const playbackInterval = useRef<NodeJS.Timeout | null>(null);
-  // console.log({ currentPlayTime, mediaBlobUrl });
 
   const clearPlaybackInterval = () => {
     if (playbackInterval.current) {

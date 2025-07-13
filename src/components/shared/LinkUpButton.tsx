@@ -13,14 +13,14 @@ interface LinkUpButtonProps {
   startContent?: ReactNode;
 }
 
-const LinkUpButton: React.FC<LinkUpButtonProps> = ({
+const LinkUpButton = ({
   onClick,
   buttonId,
   children,
   data,
   className,
   startContent,
-}) => {
+}: LinkUpButtonProps) => {
   const { user } = useUser();
   const [loadingStates, setLoadingStates] = useState<{
     [key: string]: boolean;

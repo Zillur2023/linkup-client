@@ -22,9 +22,9 @@ import VoiceRecorder from "./VoiceRecorder";
 import EmojiPickerButton from "./EmojiPickerButton";
 import { AudioPlayerControls } from "./AudioPlayerControls";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import ImageUploader from "./ImageUploader ";
 import { useAppSelector } from "@/redux/hooks";
 import { selectDrawerStatus } from "@/redux/features/chat/chatSlice";
+import ImageUploader from "./ImageUploader ";
 
 type TFormValues = {
   text?: string;
@@ -32,14 +32,14 @@ type TFormValues = {
   voice?: string;
 };
 
-interface ChatMessageFormProps {
+interface MessageFormProps {
   onSubmit: (
     content: TFormValues & { like?: boolean; reset: () => void }
   ) => void;
   selectedUser: ISelectedUser | null;
 }
 
-const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
+const MessageForm = ({ onSubmit, selectedUser }: MessageFormProps) => {
   const methods = useForm<TFormValues>();
   const { socket } = useSocketContext();
   const { register, handleSubmit, reset, setValue, control } = methods;
@@ -52,13 +52,13 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
   const [isStopRecording, setIsStopRecording] = useState(false);
   const [recordTime, setRecordTime] = useState<number>(0);
   const [maxDuration, setMaxDuration] = useState(60);
+  const [isMultiRow, setIsMultiRow] = useState(false);
   const uploaderRef = useRef<HTMLInputElement>(null);
 
   const isChatDrawerOpen = useAppSelector(
     selectDrawerStatus(selectedUser?._id as string)
   );
 
-  // console.log({ selectedUser, isRecording, blobUrl, isStopRecording });
   const handleUploadClick = () => {
     uploaderRef.current?.click();
   };
@@ -77,13 +77,12 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
     name: "text",
     // defaultValue: "",
   });
+
   const watchImage = useWatch({
     control,
     name: "images",
     // defaultValue: "",
   });
-  // console.log({ textValue });
-  // console.log({ watchImage });
 
   // Set max duration when recording stops
   useEffect(() => {
@@ -106,7 +105,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
       setBlobUrl(null);
     }
   }, [isChatDrawerOpen]);
-  console.log({ isChatDrawerOpen });
+
   useEffect(() => {
     if (blobUrl) {
       setValue("voice", blobUrl);
@@ -122,40 +121,40 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
       .padStart(2, "0")}`;
   };
 
-  const emitTypingStart = () => {
-    if (selectedUser?._id && socket && !isSendingTyping) {
-      setIsSendingTyping(true);
-      socket.emit("typing", { receiverId: selectedUser._id });
-    }
-  };
-
-  const emitTypingStop = () => {
-    if (selectedUser?._id && socket && isSendingTyping) {
-      setIsSendingTyping(false);
-      socket.emit("stopTyping", { receiverId: selectedUser._id });
-    }
-  };
-
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
-    setValue("text", text.trim());
 
     if (selectedUser?._id && socket) {
-      if (text.trim().length > 0 && !isSendingTyping) {
-        emitTypingStart();
-      } else if (text.trim().length === 0 && isSendingTyping) {
-        emitTypingStop();
-      }
-
+      // Always clear any existing timeout when the user types
       if (typingTimeout.current) {
         clearTimeout(typingTimeout.current);
       }
-      typingTimeout.current = setTimeout(() => {
-        if (isSendingTyping && text.trim().length > 0) {
-          emitTypingStop();
+
+      if (text.length > 0) {
+        // If text exists, start typing if not already
+        if (!isSendingTyping) {
+          setIsSendingTyping(true);
+          socket.emit("typing", { receiverId: selectedUser._id });
         }
-      }, 3000);
+        // Set a new timeout to stop typing after 3 seconds of inactivity
+        typingTimeout.current = setTimeout(() => {
+          // Only stop typing if there's no text (meaning the user cleared it)
+          // or if the text hasn't changed since the timeout was set (indicating inactivity)
+          // For simplicity, we just stop if the timeout fires, assuming inactivity.
+          // The next character typed will re-trigger the typing start.
+          setIsSendingTyping(false);
+          socket.emit("stopTyping", { receiverId: selectedUser._id });
+        }, 3000); // 3 seconds of inactivity
+      } else {
+        // If text is empty, immediately stop typing if we were sending it
+        if (isSendingTyping) {
+          setIsSendingTyping(false);
+          socket.emit("stopTyping", { receiverId: selectedUser._id });
+        }
+        // No need for a timeout if the text field is empty
+      }
     }
+    setValue("text", text); // Set the value without trimming here
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -172,11 +171,12 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
   }, [watchImage?.length, setValue]);
 
   const onSubmitForm = (data: any) => {
-    console.log({ data });
-    if (data.text.length && data.images.length) {
-      onSubmit({ text: data?.text?.trim(), images: data.images, reset });
-    } else if (data.text) {
-      onSubmit({ text: data?.text?.trim(), reset });
+    const trimmedText = data.text?.trim() || "";
+
+    if (trimmedText.length && data.images.length) {
+      onSubmit({ text: trimmedText, images: data.images, reset });
+    } else if (trimmedText.length) {
+      onSubmit({ text: trimmedText, reset });
     } else if (data.images.length) {
       onSubmit({ images: data.images, reset });
     } else if (data.voice) {
@@ -196,7 +196,7 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmitForm)}>
         <Card shadow="none" className="relative w-full py-1 ">
-          <div className="flex justify-end mr-12  relative border-2  ">
+          <div className="flex justify-end mr-12  relative  ">
             {/* Progress bar - shows during recording OR playback */}
             {(isRecording || isPlaying) && (
               <div
@@ -232,11 +232,14 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
               {...register("text", { onChange: handleTextChange })}
               minRows={1}
               placeholder={!isRecording ? "Aa" : ""}
-              size="md"
+              onHeightChange={(h, { rowHeight }) => {
+                setIsMultiRow(h / rowHeight >= 2);
+              }}
+              // size="md"
               fullWidth
               onKeyDown={handleKeyDown}
               // radius="full"
-              className={` ${
+              className={`  ${
                 watchImage?.length ? "pt-16 bg-default-100 rounded-md  " : " "
               } 
                 ${
@@ -247,7 +250,9 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
               `}
               value={textValue}
               classNames={{
-                inputWrapper: ` rounded-full shadow-none  ${
+                inputWrapper: `  ${
+                  isMultiRow ? "rounded-md" : "rounded-full"
+                }  shadow-none  ${
                   isRecording ? "!bg-blue-500" : "!bg-default-100  "
                   // isRecording ? "!bg-blue-500" : "!bg-transparent  "
                 } `,
@@ -381,4 +386,4 @@ const ChatMessageForm = ({ onSubmit, selectedUser }: ChatMessageFormProps) => {
   );
 };
 
-export default ChatMessageForm;
+export default MessageForm;

@@ -2,17 +2,13 @@ import { Image } from "@heroui/react";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-interface ChatMessageImagesProps {
+interface MessageImagesProps {
   images: string[] | File[];
   className?: string;
   isCurrentUser?: boolean;
 }
 
-const ChatMessageImages = ({
-  images,
-  className = "",
-  isCurrentUser = false,
-}: ChatMessageImagesProps) => {
+const MessageImages = ({ images, className = "" }: MessageImagesProps) => {
   const [carouselOpen, setCarouselOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [filePreviews, setFilePreviews] = useState<Record<number, string>>({});
@@ -114,7 +110,7 @@ const ChatMessageImages = ({
             style={{ maxHeight: "90vh" }}
           />
 
-          <div className="absolute bottom-4 left-0 right-0 text-center text-white text-sm">
+          <div className="absolute bottom-4 left-0 right-0 text-center text-white z-40 text-sm">
             {currentImageIndex + 1} / {filteredImages.length}
           </div>
         </div>
@@ -158,11 +154,13 @@ const ChatMessageImages = ({
         >
           <Image
             src={url}
-            width={400}
-            height={400}
+            width={300}
+            height={300}
+            // height={400}
             radius="none"
             alt={`Chat image ${index + 1}`}
-            className="object-cover w-full h-full"
+            // className="object-cover w-full h-full"
+            className="object-cover "
             loading="lazy"
           />
         </div>
@@ -275,4 +273,4 @@ const ChatMessageImages = ({
   );
 };
 
-export default ChatMessageImages;
+export default MessageImages;

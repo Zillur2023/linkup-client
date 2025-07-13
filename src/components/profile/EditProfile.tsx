@@ -10,7 +10,7 @@ import LinkUpTextarea from "../form/LinkUpTextarea";
 import { useUpdateUserMutation } from "@/redux/features/user/userApi";
 import { toast } from "sonner";
 
-const ProfileEdit = (user: IUser) => {
+const EditProfile = (user: IUser) => {
   const clickSubmitRef = useRef<HTMLButtonElement | null>(null);
   const [updateUser, { isLoading: updateUserIsLoading }] =
     useUpdateUserMutation();
@@ -111,4 +111,4 @@ const ProfileEdit = (user: IUser) => {
   );
 };
 
-export default ProfileEdit;
+export default EditProfile;

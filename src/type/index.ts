@@ -19,12 +19,11 @@ export interface IMessage {
   updatedAt: string;
 }
 
-export type TSubmitMessage = {
-  like?: boolean;
-  text?: string;
+type TMessageBase = Partial<Pick<IMessage, "like" | "text" | "voice">> & {
   images?: File[];
-  voice?: string;
 };
+export type TSubmitMessage = TMessageBase;
+export type TLoadingMessage = TMessageBase;
 
 export interface IChat {
   _id: string;

@@ -18,12 +18,12 @@ interface ActionButtonProps {
   post?: IPost;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({
+const ActionButton = ({
   onEdit,
   onDelete,
   confirmDelete,
   post,
-}) => {
+}: ActionButtonProps) => {
   const editRef = useRef<HTMLButtonElement | null>(null);
   const deleteRef = useRef<HTMLButtonElement | null>(null);
 

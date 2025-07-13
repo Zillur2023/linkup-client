@@ -7,7 +7,7 @@ import LinkUpReset from "../form/LinkUpReset";
 import LinkUpModal from "../shared/LinkUpModal";
 import { toast } from "sonner";
 import { useUpdateUserMutation } from "@/redux/features/user/userApi";
-import EditProfile from "./ProfileEdit";
+import EditProfile from "./EditProfile";
 import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import TabsMenu from "../shared/TabsMenu";
@@ -29,7 +29,6 @@ export const ProfileHeader = ({ user, profileRoute }: ProfileHeaderProps) => {
     useUpdateUserMutation();
 
   const handleEditImage = async (data: any, reset?: () => void) => {
-    console.log({ data });
     const formData = new FormData();
     formData.append("data", JSON.stringify({ _id: user?._id }));
     if (data?.coverImage) {

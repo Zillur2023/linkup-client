@@ -7,7 +7,7 @@ interface LinkUpCheckboxProps {
   label: string;
 }
 
-const LinkUpCheckbox: React.FC<LinkUpCheckboxProps> = ({ name, label }) => {
+const LinkUpCheckbox = ({ name, label }: LinkUpCheckboxProps) => {
   const {
     register,
     // formState: { errors },

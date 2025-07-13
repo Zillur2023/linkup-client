@@ -29,14 +29,14 @@ interface PostEditorProps {
   clickRef?: any;
 }
 
-const PostEditor: React.FC<PostEditorProps> = ({
+const PostEditor = ({
   post,
   openButtonIcon,
   openButtonText,
   size,
   radius,
   clickRef,
-}) => {
+}: PostEditorProps) => {
   const clickSubmitRef = useRef<HTMLButtonElement | null>(null);
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery(user?._id as string, {

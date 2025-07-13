@@ -19,7 +19,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useUser } from "@/context/UserProvider";
 import { logout } from "@/redux/features/auth/authSlice";
 
-export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
+export const UserDropdown = ({ user }: { user: IUser | null }) => {
   const dispatch = useAppDispatch();
   const { user: loginUser } = useUser();
   if (!loginUser) {
@@ -79,7 +79,7 @@ export const UserDropdown: React.FC<{ user: IUser | null }> = ({ user }) => {
   );
 };
 
-export const ChatDropdown: React.FC<{ user: IUser }> = ({ user }) => {
+export const ChatDropdown = ({ user }: { user: IUser }) => {
   const { data: chatData, refetch: refetchChatData } = useGetChatbyUserIdQuery(
     { senderId: user?._id as string },
     { skip: !user?._id }

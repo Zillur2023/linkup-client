@@ -17,7 +17,7 @@ export type IRegisterUser = {
   password: string;
 };
 
-const RegisterPage: React.FC = () => {
+const RegisterPage = () => {
   const router = useRouter();
   const [createUser, { isLoading: createUserIsLoading }] =
     useCreateUserMutation();
