@@ -2,12 +2,14 @@ import { IUser } from "@/type";
 import { User } from "@heroui/react";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import Link from "next/link";
-import { ReactNode } from "react";
 import { useSocketContext } from "@/context/socketContext";
+import image from "../../../public/likeButton.png";
+import Image from "next/image";
+import { useUser } from "@/context/UserProvider";
 
 interface AuthorProps {
   author: IUser;
-  description?: ReactNode;
+  description?: any;
   className?: string; // Optional class for the author's name
 }
 
@@ -16,6 +18,7 @@ export default function Author({
   description,
   className,
 }: AuthorProps) {
+  const { user } = useUser();
   const { onlineUsers } = useSocketContext();
 
   const isOnline = onlineUsers?.includes(author?._id as string);
@@ -40,12 +43,46 @@ export default function Author({
   );
 
   const renderDescription = () => {
-    if (typeof description === "string") {
-      return <p>{truncate(description, 40)}</p>;
-    } else if (description) {
-      return description;
-    } else {
-      return isOnline ? "Active now" : "Offline";
+    if (description?.text) {
+      return (
+        <p>
+          {user?._id === description?.senderId?._id
+            ? `You: ${truncate(description?.text, 40)}`
+            : truncate(description?.text, 40)}
+        </p>
+      );
+    } else if (description?.voice) {
+      return (
+        <p>
+          {user?._id === description?.senderId?._id
+            ? "You"
+            : description?.senderId?.name}{" "}
+          send a voice
+        </p>
+      );
+    } else if (description?.images) {
+      return (
+        <p>
+          {user?._id === description?.senderId?._id
+            ? "You"
+            : description?.senderId?.name}{" "}
+          send {description?.images?.length > 1 ? "images" : "a image"}
+        </p>
+      );
+    } else if (description?.like) {
+      return (
+        <div className="flex items-center gap-1">
+          <span>{user?._id === description?.senderId?._id ? "You:" : ""}</span>
+
+          <Image
+            src={image}
+            width={16}
+            height={16}
+            alt="Like reaction"
+            className="inline-block"
+          />
+        </div>
+      );
     }
   };
 

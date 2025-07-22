@@ -8,6 +8,7 @@ import { IPost } from "@/type";
 import { useRouter } from "next/navigation";
 import { BiLike, BiSolidLike } from "react-icons/bi";
 import ReactionButton from "./ReactionButton";
+import { useSocketContext } from "@/context/socketContext";
 
 // LikeButton.tsx
 interface LikeButtonProps {
@@ -16,6 +17,7 @@ interface LikeButtonProps {
 }
 
 const LikeButton = ({ post, onInteraction }: LikeButtonProps) => {
+  const { socket } = useSocketContext();
   const router = useRouter();
   const { user } = useUser();
   const dispatch = useAppDispatch();
@@ -24,8 +26,10 @@ const LikeButton = ({ post, onInteraction }: LikeButtonProps) => {
   const handlePostLike = () => {
     if (!user?._id) return router.push("/login");
 
-    dispatch(handleLike({ postId: post._id, userId: user._id }));
-    onInteraction?.();
+    if (socket?.connected) {
+      dispatch(handleLike({ postId: post._id, userId: user._id }));
+      onInteraction?.();
+    }
   };
 
   return (

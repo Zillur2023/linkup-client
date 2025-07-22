@@ -5,7 +5,7 @@ import { Button, Spinner, Tooltip } from "@heroui/react";
 import { ReactNode, useState } from "react";
 
 interface LinkUpButtonProps {
-  onClick?: () => Promise<void>; // Async function for handling the button action
+  onClick?: () => void; // Async function for handling the button action
   buttonId: string; // Unique identifier for each button
   children: ReactNode;
   data?: IUser[];

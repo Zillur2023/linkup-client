@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { BiDislike, BiSolidDislike } from "react-icons/bi";
 import ReactionButton from "./ReactionButton";
 import { useUser } from "@/context/UserProvider";
+import { useSocketContext } from "@/context/socketContext";
 
 // DislikeButton.tsx
 interface DislikeButtonProps {
@@ -16,6 +17,7 @@ interface DislikeButtonProps {
 }
 
 const DislikeButton = ({ post, onInteraction }: DislikeButtonProps) => {
+  const { socket } = useSocketContext();
   const router = useRouter();
   const { user } = useUser();
   const dispatch = useAppDispatch();
@@ -26,9 +28,10 @@ const DislikeButton = ({ post, onInteraction }: DislikeButtonProps) => {
       router.push("/login");
       return;
     }
-
-    dispatch(handleDislike({ postId: post._id, userId: user._id }));
-    onInteraction?.();
+    if (socket?.connected) {
+      dispatch(handleDislike({ postId: post._id, userId: user._id }));
+      onInteraction?.();
+    }
   };
 
   return (

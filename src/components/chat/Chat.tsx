@@ -2,7 +2,14 @@ import {
   useCreateChatMutation,
   useGetChatbyUserIdQuery,
 } from "@/redux/features/chat/chatApi";
-import { IChat, IMessage, TLoadingMessage, TSubmitMessage } from "@/type";
+import {
+  getSenderId,
+  IChat,
+  IMessage,
+  TIncomingMessage,
+  TLoadingMessage,
+  TSubmitMessage,
+} from "@/type";
 import {
   Drawer,
   DrawerContent,
@@ -171,7 +178,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       if (chat) {
         dispatch(prependMessages({ key, messages: fetchedMessages }));
       } else {
-        dispatch(setChat({ key, chat: chatData.data[0] }));
+        // dispatch(setChat({ key, chat: chatData.data[0] }));
       }
     }
   }, [chatData]);
@@ -185,9 +192,12 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
     //   setMessageText("");
     // };
 
-    const handleReceiverNewMessage = (newMessage: IMessage) => {
+    const handleReceiverNewMessage = async (newMessage: TIncomingMessage) => {
+      console.log({ newMessage });
       const { drawerStatus } = store.getState().chat;
-      const senderId = newMessage.senderId._id;
+      // const senderId = newMessage?.senderId?._id;
+      const senderId = getSenderId(newMessage);
+      console.log({ senderId });
       const isDrawerClosed = !drawerStatus?.[senderId as string];
       if (notificationAudioRef.current && isDrawerClosed) {
         const audio = notificationAudioRef.current;
@@ -195,12 +205,31 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
         audio.currentTime = 0;
         audio.play().catch((err) => console.warn("Audio play failed:", err));
       }
-      dispatch(
-        appendMessage({
-          key: `${user?._id}_${newMessage?.senderId?._id}`,
-          message: newMessage,
-        })
-      );
+      try {
+        const key = `${user?._id}_${senderId}`;
+
+        // Rest of your logic...
+        if ("messages" in newMessage) {
+          // Handle first message format
+          dispatch(
+            setChat({
+              key,
+              chat: { ...newMessage },
+            })
+          );
+        } else {
+          // Handle single message format
+          dispatch(
+            appendMessage({
+              key,
+              message: newMessage,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Error handling message:", error);
+      }
+
       setLoadingMessage(null);
     };
 
@@ -273,7 +302,7 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       setLoadingMessage(message);
 
       if (text) {
-        formData.append("text", text);
+        formData.append("text", text.trim());
       }
 
       // if (audioUrl) {
@@ -291,18 +320,25 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
         });
       }
 
-      const newChat = {
+      const newChat: Record<string, any> = {
         senderId: user?._id,
         receiverId: !chat
           ? selectedUser?._id
           : chat.senderId?._id === user?._id
           ? chat.receiverId?._id
           : chat.senderId?._id,
-        like,
-        text,
 
         isSeen: false,
       };
+      // Only include like if it's true (or whatever your condition is)
+      if (like) {
+        newChat.like = like;
+      }
+
+      // Only include text if it exists
+      if (text?.trim()) {
+        newChat.text = text.trim();
+      }
       formData.append("data", JSON.stringify(newChat));
 
       socket?.emit("fetchMyChats", { senderId: user?._id });
@@ -313,11 +349,45 @@ const Chat = ({ selectedUser }: { selectedUser: ISelectedUser | null }) => {
       // setLoadingMessage(null);
       try {
         const { data } = await createChat(formData).unwrap();
-        dispatch(appendMessage({ key, message: data }));
+        if (data) {
+          setLoadingMessage(null);
+          console.log({ data });
+          console.log({ chat });
+
+          // const senderId = getSenderId(data);
+          const key = `${user?._id}_${
+            !chat
+              ? selectedUser?._id
+              : chat.senderId?._id === user?._id
+              ? chat.receiverId?._id
+              : chat.senderId?._id
+          }`;
+          console.log({ key });
+
+          // Rest of your logic...
+          if ("messages" in data) {
+            // Handle first message format
+            dispatch(
+              setChat({
+                key,
+                chat: { ...data },
+              })
+            );
+          } else {
+            // Handle single message format
+            dispatch(
+              appendMessage({
+                key,
+                message: data,
+              })
+            );
+          }
+        }
+        // dispatch(setChat({ key, chat: chatData.data[0] }));
       } catch (error) {
         console.error("Message failed:", error);
       } finally {
-        setLoadingMessage(null); // Always clears after try/catch
+        // Always clears after try/catch
       }
       // const { data } = await createChat(newChat).unwrap();
       // const { data } = await createChat(formData).unwrap();

@@ -19,9 +19,10 @@ import {
   useGetUserByIdQuery,
 } from "@/redux/features/user/userApi";
 import TabsMenu from "../shared/TabsMenu";
-import { ChatDropdown, UserDropdown } from "./Dropdowns";
 import SearchBar from "./SearchBar";
 import { CiShop } from "react-icons/ci";
+import { ChatDropdown } from "./ChatDropdown";
+import { UserDropdown } from "./UserDropdown";
 
 // Define types for better type safety
 interface MenuItem {

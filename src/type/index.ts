@@ -19,12 +19,6 @@ export interface IMessage {
   updatedAt: string;
 }
 
-type TMessageBase = Partial<Pick<IMessage, "like" | "text" | "voice">> & {
-  images?: File[];
-};
-export type TSubmitMessage = TMessageBase;
-export type TLoadingMessage = TMessageBase;
-
 export interface IChat {
   _id: string;
   senderId: IUser;
@@ -42,6 +36,24 @@ export interface IChatApiResponse {
   data: IChat[];
 }
 
+type TMessageBase = Partial<Pick<IMessage, "like" | "text" | "voice">> & {
+  images?: File[];
+};
+export type TSubmitMessage = TMessageBase;
+export type TLoadingMessage = TMessageBase;
+
+export type TIncomingMessage = IChat | IMessage;
+
+export function getSenderId(message: TIncomingMessage): string {
+  if ("messages" in message && Array.isArray(message.messages)) {
+    // First message format - get senderId from first message
+    return message?.messages?.[0]?.senderId?._id!;
+  } else if ("senderId" in message && message.senderId) {
+    // Subsequent message format
+    return message?.senderId?._id!;
+  }
+  throw new Error("Invalid message format: Could not extract senderId");
+}
 // export interface IChat {
 //   _id?: string;
 //   senderId: IUser;
@@ -120,7 +132,8 @@ export interface IPostApiResponse {
 
 export interface IComment {
   _id: string;
-  postId: IPost;
+  // postId: IPost;
+  postId: string;
   userId: IUser;
   content: string;
   // parentCommentId?: Types.ObjectId | null;

@@ -1,56 +1,40 @@
+// components/Posts.tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-  Avatar,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Tooltip,
-} from "@heroui/react";
+import { useEffect, useState } from "react";
+import { Avatar, Card } from "@heroui/react";
 import { useUser } from "@/context/UserProvider";
 import {
   useGetUserByIdQuery,
   useUpdateFollowUnfollowMutation,
 } from "@/redux/features/user/userApi";
-import { IPost } from "@/type";
+import { IComment, IPost, IUser } from "@/type"; // Ensure these types are correctly defined
 import {
   useDeletePostMutation,
   useGetAllPostQuery,
 } from "@/redux/features/post/postApi";
 import { toast } from "sonner";
 import { PostSkeleton } from "../shared/Skeleton";
-import Author from "../shared/Author";
-import LinkUpButton from "../shared/LinkUpButton";
-import { useRouter } from "next/navigation";
-import { ImageGallery } from "../shared/ImageGallery";
 import PostEditor from "./PostEditor";
-import PostComment from "./Comment";
-import ActionButton from "../shared/ActionButton";
-import { formatPostDate, formatPostTooltipDate } from "@/uitls/formatDate";
-import { PiShareFat } from "react-icons/pi";
-import { FiMessageCircle } from "react-icons/fi";
-import { PiCrown } from "react-icons/pi";
-import { useAppDispatch } from "@/redux/hooks";
-import { setReactions } from "@/redux/features/post/reactionSlice";
-import { useSocketContext } from "@/context/socketContext";
-import { store } from "@/redux/store";
-import Comment from "./Comment";
-import DislikeButton from "./DislikeButton";
-import LikeButton from "./LikeButton";
+import { useAppDispatch } from "@/redux/hooks"; // Ensure this hook is correctly typed and exported
+import { setReactions } from "@/redux/features/post/reactionSlice"; // Ensure this slice and reducer exist
+import { useSocketContext } from "@/context/socketContext"; // Ensure SocketContext is correctly implemented and provided
+import { useDebouncedReactions } from "@/hooks/useDebouncedReactions "; // Ensure this hook is correctly implemented
+import PostCard from "./PostCard"; // Ensure this component exists and accepts its props
+import { useRouter } from "next/navigation";
+import { useCommentSocketEvents } from "@/hooks/useCommentSocketEvents";
+import { useReactionSocketEvents } from "@/hooks/useReactionSocketEvents";
 
 interface PostsProps {
-  postId?: string;
+  commentPost?: IPost;
   userId?: string;
   showAllComments?: boolean;
   searchQuery?: string;
-  modalCommentRef?: any;
+  modalCommentRef?: React.ReactNode;
 }
 
 const Posts = ({
-  postId,
+  commentPost,
   userId,
   showAllComments = false,
   searchQuery,
@@ -58,97 +42,68 @@ const Posts = ({
 }: PostsProps) => {
   const dispatch = useAppDispatch();
   const { socket } = useSocketContext();
+  const { triggerDebouncedEmit } = useDebouncedReactions();
   const [updateFollowUnfollow] = useUpdateFollowUnfollowMutation();
   const [deletePost] = useDeletePostMutation();
-  const modalRef = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
-  const postRef = useRef<HTMLDivElement>(null);
-  const clickMessageRef = useRef<{ [key: string]: HTMLButtonElement | null }>(
-    {}
-  );
   const router = useRouter();
   const { user } = useUser();
   const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
-  // const debounceSearchQuery = useDebounce(searchQuery);
 
-  const queryPost = postId
-    ? { postId }
-    : {
-        userId,
-        // searchQuery: debounceSearchQuery,
-        searchQuery,
-        // sortBy,
-        isPremium: userData?.data?.isVerified ? true : undefined,
-      };
-  const { data: postData, refetch } = useGetAllPostQuery(queryPost);
+  const queryPost = {
+    userId,
+    searchQuery,
+    isPremium: userData?.data?.isVerified ? true : undefined,
+  };
+  // FIX: Corrected destructuring syntax here
+  const { data: postData } = useGetAllPostQuery(queryPost);
 
   const [posts, setPosts] = useState<IPost[]>([]);
-  // const { data: postData } = useGetAllPostQuery<IPostData>({ searchQuery });
 
+  useReactionSocketEvents({ socket, setPosts });
+  useCommentSocketEvents({ socket, setPosts });
+
+  // Effect to set initial posts data
   useEffect(() => {
     if (postData?.data) {
       setPosts(postData?.data);
     }
-  }, [postData]);
+  }, [postData?.data]); // Changed dependency to postData?.data itself for better reactivity
 
-  // Listen for events from the server and update posts accordingly
+  // Effect to handle single commentPost prop (e.g., when viewing a specific post for comments)
   useEffect(() => {
-    if (!socket || !user) return;
+    if (commentPost) {
+      setPosts([commentPost]);
+    }
+  }, [commentPost]);
 
-    const handleUpdatedLikeDislike = () => {
-      // setPosts((prevPosts) =>
-      //   prevPosts.map((post) =>
-      //     post._id === updatedPost._id
-      //       ? {
-      //           ...post,
-      //           likes: updatedPost.likes,
-      //           dislikes: updatedPost.dislikes,
-      //         }
-      //       : post
-      //   )
-      // );
-      refetch();
-    };
-
-    const handleAddedComment = () => {
-      refetch();
-    };
-
-    socket.on("updated-like-dislike", handleUpdatedLikeDislike);
-    socket.on("addedComment", handleAddedComment);
-
-    return () => {
-      socket.off("updated-like-dislike", handleUpdatedLikeDislike);
-      socket.off("addedComment", handleAddedComment);
-    };
-  }, [socket, user, refetch]);
-
+  // Effect to initialize reactions for existing posts when they are first loaded
   useEffect(() => {
     if (!postData?.data) return;
 
+    // Use a small timeout to ensure Redux store is ready or avoid blocking initial render
     const timeout = setTimeout(() => {
       postData.data.forEach((post) => {
         dispatch(
           setReactions({
             postId: post._id,
-            likes: post.likes
-              .map((user) => user._id)
-              .filter(Boolean) as string[],
+            likes: post.likes.map((u) => u._id).filter(Boolean) as string[],
             dislikes: post.dislikes
-              .map((user) => user._id)
+              .map((u) => u._id)
               .filter(Boolean) as string[],
           })
         );
       });
-    }, 3000); // wait 5 seconds after postData changes
+    }, 500);
 
-    return () => clearTimeout(timeout); // clear if postData changes again within 5 sec
-  }, [postData?.data, refetch, dispatch]);
+    return () => clearTimeout(timeout);
+  }, [postData?.data, dispatch]);
 
+  // Handler for following/unfollowing users (passed to PostCard)
   const handleUpdateFollowUnfollow = async (id: string) => {
     if (!userData?.data?._id) {
-      router.push("/login");
+      router.push("/login"); // Redirect if user is not logged in
       return;
     }
     try {
@@ -156,205 +111,62 @@ const Posts = ({
         targetId: id,
         loginUserId: userData?.data?._id,
       }).unwrap();
-    } finally {
+      toast.success("Follow status updated!"); // User feedback
+    } catch (error: any) {
+      console.error("Failed to update follow status:", error);
+      toast.error(error?.data?.message || "Failed to update follow status.");
     }
   };
 
+  // Handler for deleting a post (passed to PostCard)
   const handleDelete = async (postId: string) => {
     try {
       await deletePost(postId).unwrap();
+      setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Optimistically update UI
+      toast.success("Post deleted successfully!"); // User feedback
     } catch (error: any) {
-      toast.error(error?.data?.message);
+      console.error("Failed to delete post:", error);
+      toast.error(error?.data?.message || "Failed to delete post.");
     }
-  };
-
-  const handleInteraction = (postId: string) => {
-    const { likes, dislikes } = store.getState().reactions;
-    socket?.emit("update-like-dislike", {
-      postId,
-      likes: likes[postId],
-      dislikes: dislikes[postId],
-    });
   };
 
   return (
     <div className=" space-y-5 ">
-      {/* {userData &&
-        postData?.data &&
-        postData.data.length > 0 &&
-        !searchQuery &&
-        !postId && ( */}
-      <Card className=" flex flex-row items-center justify-center gap-2 p-3 ">
-        <Avatar
-          radius="full"
-          src={userData?.data?.profileImage}
-          // size="md"
-        />
+      {/* Post creation area */}
+      <Card className="flex flex-row items-center justify-center gap-2 p-3 ">
+        <Avatar radius="full" src={userData?.data?.profileImage} />
         <PostEditor
-          openButtonText={`What's on your mind, ${userData?.data?.name}`}
+          openButtonText={`What's on your mind, ${
+            userData?.data?.name || "Guest"
+          }`}
           size="md"
           radius="full"
         />
       </Card>
-      {/* )} */}
-      {!postData && <PostSkeleton length={postId ? 1 : 4} />}
 
-      {posts?.map((post: IPost) => {
-        return (
-          <Card
-            radius="none"
-            ref={postRef}
-            key={post._id}
-            shadow={postId ? "none" : "md"}
-            className={` ${
-              postId ? "!px-0" : ""
-            } sm:rounded-none md:rounded-md `}
-          >
-            {/* Author Info */}
-            <CardHeader
-              className={` ${
-                postId ? "!px-0" : ""
-              }flex flex-col justify-start items-start relative `}
-            >
-              {post?.isPremium && (
-                <div className="absolute top-14 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg">
-                  <PiCrown size={16} /> {/* Use a crown icon or similar */}
-                  <span className="text-sm font-medium">Premium</span>
-                </div>
-              )}
+      {/* Loading skeleton for posts while data is fetching */}
+      {/* Show skeleton only if postData is null/undefined (initial load) */}
+      {!postData && <PostSkeleton length={commentPost ? 1 : 4} />}
 
-              <div className=" w-full flex justify-between items-center ">
-                <Author
-                  author={post?.author}
-                  // description={formatPostDate(post?.createdAt)}
-                  description={
-                    <Tooltip content={formatPostTooltipDate(post?.createdAt)}>
-                      {formatPostDate(post?.createdAt)}
-                    </Tooltip>
-                  }
-                />
-                <div className="flex items-center gap-3">
-                  {post?.author?._id !== userData?.data?._id && (
-                    <LinkUpButton
-                      buttonId="followUnfollow"
-                      onClick={() =>
-                        handleUpdateFollowUnfollow(post?.author?._id as string)
-                      }
-                      // loading={postIsFetching || updateDislikeIsLoading}
-                    >
-                      {userData?.data?.following?.includes(
-                        post?.author?._id as string
-                      )
-                        ? "Unfollow"
-                        : "Follow"}
-                    </LinkUpButton>
-                  )}
-                  {post?.author?._id === userData?.data?._id && (
-                    <ActionButton
-                      post={post}
-                      confirmDelete={() => handleDelete(post?._id)}
-                    />
-                  )}
-                </div>
-              </div>
-              <div className=" w-full flex justify-end items-center "></div>
-            </CardHeader>
-            <CardBody className={"!px-0"}>
-              <p className="mb-3 px-4 text-medium ">{post?.content}</p>
+      {/* Render each post using the PostCard component */}
+      {/* Ensure `posts` array is not null/undefined before mapping */}
+      {posts?.map((post: IPost) => (
+        <PostCard
+          key={post._id}
+          post={post}
+          userData={userData?.data}
+          handleUpdateFollowUnfollow={handleUpdateFollowUnfollow}
+          handleDelete={handleDelete}
+          triggerDebouncedEmit={triggerDebouncedEmit}
+          showAllComments={showAllComments}
+          modalCommentRef={modalCommentRef}
+        />
+      ))}
 
-              {post?.images && <ImageGallery images={post?.images} />}
-            </CardBody>
-
-            <CardFooter className={` ${postId ? "!px-0" : ""}  flex flex-col `}>
-              {/* <Divider /> */}
-              <div className=" w-full flex justify-between lg:pl-[10%] lg:pr-[10%]   ">
-                {/* <LikeButton post={post} />
-
-                <DislikeButton post={post} /> */}
-
-                <LikeButton
-                  post={post}
-                  onInteraction={() => handleInteraction(post._id)}
-                />
-                <DislikeButton
-                  post={post}
-                  onInteraction={() => handleInteraction(post._id)}
-                />
-                {/* <Button onClick={() => handleReaction(post._id, "like")}>
-                  Like
-                </Button>
-
-                <Button onClick={() => handleReaction(post._id, "dislike")}>
-                  Dislike
-                </Button> */}
-
-                {!modalCommentRef ? (
-                  <Button
-                    fullWidth
-                    onClick={() => clickMessageRef.current[post?._id]?.click()}
-                    // onClick={() => clickMessageRef.current?.click()}
-                    size="sm"
-                    variant="light"
-                    startContent={<FiMessageCircle size={24} />}
-                  >
-                    {post?.comments?.length}
-                  </Button>
-                ) : (
-                  modalCommentRef
-                )}
-                <div className=" hidden ">
-                  {userData?.data && (
-                    <PostComment
-                      clickRef={(el: any) =>
-                        (clickMessageRef.current[post?._id] = el)
-                      }
-                      focusRef={(el) => (modalRef.current[post?._id] = el)}
-                      user={userData?.data}
-                      post={post}
-                      startContent={<FiMessageCircle size={24} />}
-                      openButtonText={`${post?.comments?.length}`}
-                      showAllComments={showAllComments ? true : false}
-                      hideComments={true}
-                    />
-                  )}
-                </div>
-
-                <Button
-                  isDisabled
-                  fullWidth
-                  size="sm"
-                  variant="light"
-                  startContent={<PiShareFat size={24} />}
-                ></Button>
-
-                {/* <Button
-                  fullWidth
-                  size="sm"
-                  variant="light"
-                  onClick={() => generatePDF(postRef)}
-                  startContent={<MdOutlineFileDownload  />}
-                /> */}
-              </div>
-              {/* <Divider /> */}
-              <div className=" w-full mt-2 ">
-                {userData?.data && (
-                  <Comment
-                    user={userData?.data}
-                    post={post}
-                    openButtonText={
-                      post?.comments?.length > 2 &&
-                      !showAllComments &&
-                      "See all comment"
-                    }
-                    showAllComments={showAllComments ? true : false}
-                    focusRef={(el) => (modalRef.current[post?._id] = el)}
-                  />
-                )}
-              </div>
-            </CardFooter>
-          </Card>
-        );
-      })}
+      {/* Optional: Message if no posts are found after loading */}
+      {postData?.data && posts.length === 0 && !commentPost && (
+        <p className="text-center text-gray-500">No posts found.</p>
+      )}
     </div>
   );
 };

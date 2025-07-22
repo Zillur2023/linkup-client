@@ -26,7 +26,6 @@ const LoginPage = () => {
     const toastId = toast.loading("Logging in...");
     try {
       const res = await login(formData).unwrap();
-      console.log({ res });
 
       if (res?.success) {
         // userLoading(true);

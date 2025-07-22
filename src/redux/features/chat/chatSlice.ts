@@ -63,6 +63,8 @@ const chatSlice = createSlice({
       //   }
       const { key, message } = action.payload;
       const chat = state.chats[key];
+      console.log({ chat });
+      console.log({ key, message });
 
       if (chat) {
         const messageExists = chat.messages.some((m) => m._id === message._id);
